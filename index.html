@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት ማህሌት | Mahlet Calendar</title>
+  <title>የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት ማኅሌት | Mahlet Calendar</title>
 
   <!-- Typography: Ethiopic friendly serif fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -468,7 +468,7 @@
       <circle cx="12" cy="12" r="1.5"/>
     </svg>
     <h1>የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</h1>
-    <p>የዕለት ማህሌትና የበዓላት መቁጠሪያ | EOTC Daily Mahlet Calendar</p>
+    <p>የዕለት ማኅሌትና የበዓላት መቁጠሪያ | EOTC Daily Mahlet Calendar</p>
 
     <div class="top-controls">
       <div class="today-banner" id="todayBanner">
@@ -501,7 +501,7 @@
   <div id="passwordModal" class="modal-overlay">
     <div class="modal-content">
       <button class="modal-close" onclick="closePasswordModal()">&times;</button>
-      <div class="modal-header" id="modalTitle">ማህሌቱን ለመክፈት የይለፍ ቃል ያስገቡ</div>
+      <div class="modal-header" id="modalTitle">ማኅሌቱን ለመክፈት የይለፍ ቃል ያስገቡ</div>
       <div class="modal-body">
         <p style="font-size:0.9rem; color:var(--text-muted);" id="modalSub">Enter password to decrypt this day's Mahlet document.</p>
         <input type="password" id="passwordInput" class="password-input" placeholder="Password..." onkeyup="handleKeySubmit(event)" />
@@ -517,7 +517,7 @@
   <div id="viewerModal" class="modal-overlay viewer-modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeViewerModal()">&times;</button>
-      <div class="modal-header" id="viewerTitle">የዕለቱ ማህሌት</div>
+      <div class="modal-header" id="viewerTitle">የዕለቱ ማኅሌት</div>
       <div class="pdf-container">
         <iframe id="pdfFrame" src=""></iframe>
       </div>
@@ -823,7 +823,7 @@
     // 04. AES-GCM DECRYPTION & MODAL HANDLERS
     function openPasswordModal(monthObj, day) {
       currentSelectedDay = day;
-      document.getElementById('modalTitle').innerText = `${monthObj.nameAm} ${day} - ማህሌት`;
+      document.getElementById('modalTitle').innerText = `${monthObj.nameAm} ${day} - ማኅሌት`;
       document.getElementById('passwordInput').value = '';
       document.getElementById('errorMsg').style.display = 'none';
       document.getElementById('passwordModal').classList.add('active');
@@ -933,7 +933,7 @@
 
         closePasswordModal();
         
-        document.getElementById('viewerTitle').innerText = `${currentSelectedMonth.nameAm} ${currentSelectedDay} - ማህሌት`;
+        document.getElementById('viewerTitle').innerText = `${currentSelectedMonth.nameAm} ${currentSelectedDay} - ማኅሌት`;
         document.getElementById('pdfFrame').src = blobUrl;
         document.getElementById('viewerModal').classList.add('active');
 
