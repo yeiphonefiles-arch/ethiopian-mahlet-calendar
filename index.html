@@ -25,7 +25,6 @@
       --border-color: #e2d7c5;
       --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
       
-      /* Feast level colors */
       --feast-movable-bg: #8b0000;
       --feast-movable-text: #ffffff;
       --feast-annual-bg: #d4af37;
@@ -34,11 +33,7 @@
       --feast-monthly-text: #1a4971;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background-color: var(--cream);
@@ -49,7 +44,6 @@
       flex-direction: column;
     }
 
-    /* Top-Right Language Toggle */
     .top-right-controls {
       position: absolute;
       top: 1rem;
@@ -78,7 +72,6 @@
       transform: scale(1.05);
     }
 
-    /* Header */
     header {
       background: linear-gradient(135deg, var(--maroon-dark), var(--maroon));
       color: var(--gold-light);
@@ -146,7 +139,6 @@
       cursor: pointer;
     }
 
-    /* Main Container */
     main {
       flex: 1;
       max-width: 1000px;
@@ -155,7 +147,6 @@
       padding: 0 1rem;
     }
 
-    /* Calendar Header & Pager */
     .calendar-navbar {
       display: flex;
       align-items: center;
@@ -193,7 +184,6 @@
       text-align: center;
     }
 
-    /* 7-Column Standard Calendar Grid */
     .calendar-container {
       background-color: var(--cream-card);
       border: 1px solid var(--gold);
@@ -229,7 +219,6 @@
       gap: 1px;
     }
 
-    /* Day Cells */
     .day-cell {
       background-color: var(--cream-card);
       min-height: 100px;
@@ -311,7 +300,6 @@
       font-weight: 700;
     }
 
-    /* Availability Indicators */
     .res-badge-bar {
       display: flex;
       justify-content: center;
@@ -330,7 +318,6 @@
       background-color: #2e7d32;
     }
 
-    /* Modal Styling */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -536,12 +523,10 @@
 </head>
 <body>
 
-  <!-- Language Toggle -->
   <div class="top-right-controls">
     <button id="langToggleBtn" class="lang-toggle-btn" onclick="toggleLanguage()">English</button>
   </div>
 
-  <!-- Header -->
   <header>
     <svg class="header-cross" viewBox="0 0 24 24">
       <path d="M11 2h2v4h4v2h-4v3h5v2h-5v3h4v2h-4v4h-2v-4H7v-2h4v-3H6v-2h5V8H7V6h4V2z"/>
@@ -559,7 +544,6 @@
     </div>
   </header>
 
-  <!-- MAIN CALENDAR VIEW -->
   <main>
     <div class="calendar-navbar">
       <button class="nav-btn" onclick="navigateMonth(-1)">‹ <span id="prevLabel">Prev</span></button>
@@ -568,23 +552,21 @@
     </div>
 
     <div class="calendar-container">
-      <!-- Weekday Headers: Monday to Sunday -->
+      <!-- Weekday Headers: Sunday to Saturday -->
       <div class="weekdays-header">
+        <div class="weekday-name" id="wd-sun">እሁድ<br>(Sun)</div>
         <div class="weekday-name" id="wd-mon">ሰኞ<br>(Mon)</div>
         <div class="weekday-name" id="wd-tue">ማክሰኞ<br>(Tue)</div>
         <div class="weekday-name" id="wd-wed">ረቡዕ<br>(Wed)</div>
         <div class="weekday-name" id="wd-thu">ሐሙስ<br>(Thu)</div>
         <div class="weekday-name" id="wd-fri">አርብ<br>(Fri)</div>
         <div class="weekday-name" id="wd-sat">ቅዳሜ<br>(Sat)</div>
-        <div class="weekday-name" id="wd-sun">እሁድ<br>(Sun)</div>
       </div>
 
-      <!-- 7-Column Days Grid -->
       <div id="calendarGrid" class="calendar-grid"></div>
     </div>
   </main>
 
-  <!-- RESOURCE PICKER & PASSWORD MODAL -->
   <div id="passwordModal" class="modal-overlay">
     <div class="modal-content">
       <button class="modal-close" onclick="closePasswordModal()">&times;</button>
@@ -622,7 +604,6 @@
     </div>
   </div>
 
-  <!-- PDF VIEWER MODAL -->
   <div id="viewerModal" class="modal-overlay viewer-modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeViewerModal()">&times;</button>
@@ -633,7 +614,6 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer>
     <p id="footerDisclaimer"><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.</p>
   </footer>
@@ -690,13 +670,7 @@
         securityNote: "የደኅንነት ማስታወሻ: All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.",
         prev: "ቀደመ",
         next: "ቀጣይ",
-        weekdays: ["ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "አርብ", "ቅዳሜ", "እሁድ"],
-        resources: {
-          mahlet: "ማኅሌት",
-          gitsawe: "ግጻዌ",
-          mezmur: "መዝሙር",
-          qedassie: "ቅዳሴ"
-        }
+        resources: { mahlet: "ማኅሌት", gitsawe: "ግጻዌ", mezmur: "መዝሙር", qedassie: "ቅዳሴ" }
       },
       en: {
         pageTitle: "EOTC Daily Service Resources Portal",
@@ -713,50 +687,70 @@
         securityNote: "Security Note: All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.",
         prev: "Prev",
         next: "Next",
-        weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        resources: {
-          mahlet: "Mahlet",
-          gitsawe: "Gitsawe",
-          mezmur: "Mezmur",
-          qedassie: "Qedassie"
-        }
+        resources: { mahlet: "Mahlet", gitsawe: "Gitsawe", mezmur: "Mezmur", qedassie: "Qedassie" }
       }
     };
 
-    // 02. CALENDAR & FEAST MATHEMATICS
-    function gregorianToJDN(year, month, day) {
-      const a = Math.floor((14 - month) / 12);
-      const y = year + 4800 - a;
-      const m = month + 12 * a - 3;
-      return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+    // 02. ACCURATE ETHIOPIAN CALENDAR MATHEMATICS (Exact GitHub Logic)
+    function gregorianToEthiopian(date) {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+
+      // Check if Gregorian year is a leap year
+      const isGregorianLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+
+      // Ethiopian new year starting date in Gregorian calendar (Sept 11 or Sept 12)
+      const newYearDay = isGregorianLeap ? 12 : 11;
+
+      let ethYear = year - 8;
+      let ethMonth, ethDay;
+
+      // Dates before Ethiopian New Year (Jan 1 to Sept 10/11)
+      if (month < 9 || (month === 9 && day < newYearDay)) {
+        ethYear = year - 8;
+        
+        // Calculate offset from Meskerem 1
+        const prevNewYearDay = ((year - 1) % 4 === 0 && ((year - 1) % 100 !== 0 || (year - 1) % 400 === 0)) ? 12 : 11;
+        
+        // Day count from previous Sept 11/12
+        const dateCurrent = new Date(year, month - 1, day);
+        const datePrevNewYear = new Date(year - 1, 8, prevNewYearDay);
+        const diffDays = Math.floor((dateCurrent - datePrevNewYear) / (1000 * 60 * 60 * 24));
+
+        ethMonth = Math.floor(diffDays / 30) + 1;
+        ethDay = (diffDays % 30) + 1;
+      } else {
+        // Dates on or after Ethiopian New Year (Sept 11/12 to Dec 31)
+        ethYear = year - 7;
+        const dateCurrent = new Date(year, month - 1, day);
+        const dateNewYear = new Date(year, 8, newYearDay);
+        const diffDays = Math.floor((dateCurrent - dateNewYear) / (1000 * 60 * 60 * 24));
+
+        ethMonth = Math.floor(diffDays / 30) + 1;
+        ethDay = (diffDays % 30) + 1;
+      }
+
+      return { year: ethYear, month: ethMonth, day: ethDay };
     }
 
-    function jdnToEthiopian(jdn) {
-      const jdOffset = 1723856;
-      const r = (jdn - jdOffset) % 1461;
-      const n = (r % 365) + 365 * Math.floor(r / 1460);
-      const year = 4 * Math.floor((jdn - jdOffset) / 1461) + Math.floor(r / 365) - Math.floor(r / 1460);
-      const month = Math.floor(n / 30) + 1;
-      const day = (n % 30) + 1;
-      return { year, month, day };
-    }
+    function ethiopianToGregorian(ethYear, ethMonth, ethDay) {
+      const gregYearCandidate = ethYear + 7;
+      const isGregLeap = (gregYearCandidate % 4 === 0 && gregYearCandidate % 100 !== 0) || (gregYearCandidate % 400 === 0);
+      const newYearDay = isGregLeap ? 12 : 11;
 
-    function ethiopianToJDN(year, month, day) {
-      return 1723856 + 365 * (year - 1) + Math.floor(year / 4) + 30 * (month - 1) + day - 1;
-    }
+      const baseDate = new Date(gregYearCandidate, 8, newYearDay); // Sept 11/12
+      const totalDaysAdd = (ethMonth - 1) * 30 + (ethDay - 1);
+      
+      const resultDate = new Date(baseDate);
+      resultDate.setDate(baseDate.getDate() + totalDaysAdd);
 
-    function jdnToGregorian(jdn) {
-      let l = jdn + 68569;
-      let n = Math.floor((4 * l) / 146097);
-      l = l - Math.floor((146097 * n + 3) / 4);
-      let i = Math.floor((4000 * (l + 1)) / 1464101);
-      l = l - Math.floor((1461 * i) / 4) + 31;
-      let j = Math.floor((80 * l) / 2447);
-      let day = l - Math.floor((2447 * j) / 80);
-      l = Math.floor(j / 11);
-      let month = j + 2 - 12 * l;
-      let year = 100 * (n - 49) + i + l;
-      return { year, month, day };
+      return {
+        year: resultDate.getFullYear(),
+        month: resultDate.getMonth() + 1,
+        day: resultDate.getDate(),
+        dateObj: resultDate
+      };
     }
 
     const FIXED_MONTHLY_FEASTS = {
@@ -853,19 +847,9 @@
     }
 
     let todayGreg = new Date();
-    let todayJDN, todayEth, movableFeastsForYear;
-
-    try {
-      todayJDN = gregorianToJDN(todayGreg.getFullYear(), todayGreg.getMonth() + 1, todayGreg.getDate());
-      todayEth = jdnToEthiopian(todayJDN);
-      currentActiveMonthId = todayEth.month;
-      movableFeastsForYear = calculateBahireHasabMovableFeasts(todayEth.year);
-    } catch (e) {
-      console.warn("Date fallback engaged:", e);
-      todayEth = { year: 2018, month: 1, day: 1 };
-      currentActiveMonthId = 1;
-      movableFeastsForYear = {};
-    }
+    let todayEth = gregorianToEthiopian(todayGreg);
+    currentActiveMonthId = todayEth.month;
+    let movableFeastsForYear = calculateBahireHasabMovableFeasts(todayEth.year);
 
     function getFeastInfo(month, day) {
       const key = `${month}-${day}`;
@@ -907,10 +891,10 @@
       document.getElementById('footerDisclaimer').innerHTML = t.securityNote;
 
       const wDays = [
-        ["wd-mon", "ሰኞ", "Mon"], ["wd-tue", "ማክሰኞ", "Tue"],
-        ["wd-wed", "ረቡዕ", "Wed"], ["wd-thu", "ሐሙስ", "Thu"],
-        ["wd-fri", "አርብ", "Fri"], ["wd-sat", "ቅዳሜ", "Sat"],
-        ["wd-sun", "እሁድ", "Sun"]
+        ["wd-sun", "እሁድ", "Sun"], ["wd-mon", "ሰኞ", "Mon"],
+        ["wd-tue", "ማክሰኞ", "Tue"], ["wd-wed", "ረቡዕ", "Wed"],
+        ["wd-thu", "ሐሙስ", "Thu"], ["wd-fri", "አርብ", "Fri"],
+        ["wd-sat", "ቅዳሜ", "Sat"]
       ];
       wDays.forEach(([id, am, en]) => {
         document.getElementById(id).innerHTML = (currentLang === 'en') ? en : `${am}<br><small style="font-size:0.7rem; font-weight:normal;">(${en})</small>`;
@@ -935,7 +919,7 @@
       renderCalendar();
     }
 
-    // 7-Column Grid Renderer (Monday to Sunday)
+    // 7-Column Grid Renderer (Sunday to Saturday)
     function renderCalendar() {
       const grid = document.getElementById('calendarGrid');
       const title = document.getElementById('monthDisplayTitle');
@@ -948,9 +932,9 @@
       const totalDays = (monthObj.id === 13) ? (isLeapYear ? 6 : 5) : 30;
 
       // Determine day of week for Day 1 of this Ethiopian month
-      const jdnDay1 = ethiopianToJDN(todayEth.year, monthObj.id, 1);
-      // JDN % 7: 0 = Mon, 1 = Tue, 2 = Wed, 3 = Thu, 4 = Fri, 5 = Sat, 6 = Sun
-      const day1Dow = (jdnDay1 % 7);
+      const gregFirstDay = ethiopianToGregorian(todayEth.year, monthObj.id, 1);
+      // JS Date.getDay(): 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
+      const day1Dow = gregFirstDay.dateObj.getDay();
 
       // Render Empty Padding Cells
       for (let i = 0; i < day1Dow; i++) {
@@ -966,9 +950,8 @@
 
         let gDateStr = "";
         try {
-          const jdn = ethiopianToJDN(todayEth.year, monthObj.id, day);
-          const gDate = jdnToGregorian(jdn);
-          gDateStr = `${gDate.month}/${gDate.day}`;
+          const gInfo = ethiopianToGregorian(todayEth.year, monthObj.id, day);
+          gDateStr = `${gInfo.month}/${gInfo.day}`;
         } catch(e) {
           gDateStr = "--";
         }
