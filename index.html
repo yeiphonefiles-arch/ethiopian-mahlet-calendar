@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት ማኅሌት | Mahlet Calendar</title>
+  <title id="pageTitle">የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት አገልግሎት መጽሐፍት | EOTC Daily Service Resources</title>
 
   <!-- Typography: Ethiopic friendly serif fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,12 +49,41 @@
       flex-direction: column;
     }
 
+    /* FEATURE 2: Top-Right Bilingual Toggle Controls */
+    .top-right-controls {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 10;
+    }
+
+    .lang-toggle-btn {
+      background: var(--gold);
+      color: var(--maroon-dark);
+      border: 1px solid var(--gold-light);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+
+    .lang-toggle-btn:hover {
+      background: var(--gold-light);
+      transform: scale(1.05);
+    }
+
     /* Header & Navigation Header */
     header {
       background: linear-gradient(135deg, var(--maroon-dark), var(--maroon));
       color: var(--gold-light);
       border-bottom: 4px solid var(--gold);
-      padding: 2rem 1rem;
+      padding: 2.2rem 1rem 1.8rem 1rem;
       text-align: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       position: relative;
@@ -70,14 +99,14 @@
 
     header h1 {
       font-family: 'Cinzel', 'Noto Serif Ethiopic', serif;
-      font-size: 1.8rem;
+      font-size: 1.7rem;
       color: var(--gold);
       margin-bottom: 0.25rem;
       letter-spacing: 0.5px;
     }
 
     header p {
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--gold-light);
       opacity: 0.9;
     }
@@ -123,40 +152,48 @@
       flex: 1;
       max-width: 1100px;
       width: 100%;
-      margin: 2rem auto;
+      margin: 1.5rem auto 2rem auto;
       padding: 0 1rem;
     }
 
-    /* View Controls / Breadcrumbs */
+    /* FEATURE 1: View Controls & Month Page Navigation */
     .view-nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1.5rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
-    .back-btn {
+    .nav-buttons-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn, .month-nav-btn {
       background-color: var(--maroon);
       color: var(--gold-light);
       border: 1px solid var(--gold);
-      padding: 0.5rem 1.25rem;
+      padding: 0.45rem 0.9rem;
       border-radius: 4px;
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.3rem;
       transition: background-color 0.2s, transform 0.1s;
     }
 
-    .back-btn:hover {
+    .back-btn:hover, .month-nav-btn:hover {
       background-color: var(--maroon-light);
       transform: translateY(-1px);
     }
 
     .view-title {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--maroon-dark);
       font-weight: 700;
       border-bottom: 2px solid var(--gold);
@@ -198,6 +235,22 @@
       transform: translateY(-3px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
       border-color: var(--gold);
+    }
+
+    /* FEATURE 1: Highlight Current Ethiopian Month */
+    .month-card.current-month-card {
+      border: 2px solid var(--gold);
+      background-color: #fffaf0;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+    }
+
+    .month-card.current-month-card::before {
+      content: '★';
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      color: var(--gold-dark);
+      font-size: 0.85rem;
     }
 
     .month-card h2 {
@@ -262,12 +315,30 @@
       color: var(--feast-monthly-text);
     }
 
-    /* Special highlight for Easter/Genna movable major feasts */
     .day-card.feast-major .feast-tag {
       background-color: var(--gold);
       color: var(--maroon-dark);
       font-weight: 700;
       border: 1px solid var(--maroon);
+    }
+
+    /* FEATURE 4: Resource Availability Badges on Day Cards */
+    .res-badge-bar {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      margin-top: 0.4rem;
+    }
+
+    .res-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #ccc;
+    }
+
+    .res-dot.active {
+      background-color: #2e7d32;
     }
 
     /* Unavailable Day Styling */
@@ -283,17 +354,6 @@
       transform: none;
       border-color: var(--border-color);
     }
-
-    .status-indicator {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-    .status-indicator.available { background-color: #2e7d32; }
-    .status-indicator.unavailable { background-color: #c62828; }
 
     /* Modal Styling */
     .modal-overlay {
@@ -344,15 +404,57 @@
     }
 
     .modal-header {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       color: var(--maroon-dark);
       margin-bottom: 0.5rem;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 0.5rem;
     }
 
-    .modal-body {
+    /* FEATURE 4: Resource Picker Modal Grid */
+    .resource-picker-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
       margin: 1rem 0;
+    }
+
+    .resource-option-btn {
+      background-color: var(--cream);
+      border: 1px solid var(--gold-dark);
+      color: var(--maroon-dark);
+      padding: 0.85rem 0.5rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.2s ease;
+    }
+
+    .resource-option-btn:hover:not(.disabled) {
+      background-color: var(--maroon);
+      color: var(--gold-light);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .resource-option-btn.selected {
+      background-color: var(--maroon-dark);
+      color: var(--gold);
+      border-color: var(--gold);
+      box-shadow: inset 0 0 5px rgba(212,175,55,0.5);
+    }
+
+    .resource-option-btn.disabled {
+      opacity: 0.4;
+      border-style: dashed;
+      cursor: not-allowed;
+      background-color: #e5dec9;
     }
 
     .password-input {
@@ -461,22 +563,25 @@
 </head>
 <body>
 
+  <!-- FEATURE 2: Fixed Language Toggle in Top Right -->
+  <div class="top-right-controls">
+    <button id="langToggleBtn" class="lang-toggle-btn" onclick="toggleLanguage()">English</button>
+  </div>
+
   <!-- HEADER -->
   <header>
     <svg class="header-cross" viewBox="0 0 24 24">
       <path d="M11 2h2v4h4v2h-4v3h5v2h-5v3h4v2h-4v4h-2v-4H7v-2h4v-3H6v-2h5V8H7V6h4V2z"/>
       <circle cx="12" cy="12" r="1.5"/>
     </svg>
-    <h1>የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</h1>
-    <p>የዕለት ማኅሌትና የበዓላት መቁጠሪያ | EOTC Daily Mahlet Calendar</p>
+    <h1 id="headerTitle">የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</h1>
+    <p id="headerSubtitle">የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ | EOTC Daily Service Resources</p>
 
     <div class="top-controls">
-      <div class="today-banner" id="todayBanner">
-        <!-- Javascript populates today's date -->
-      </div>
+      <div class="today-banner" id="todayBanner"></div>
       <label class="leap-toggle">
         <input type="checkbox" id="leapYearToggle" onchange="toggleLeapYear(this.checked)" />
-        <span>ጳጉሜ 6 ቀን (ዘመነ ዮሐንስ / Leap Year)</span>
+        <span id="leapToggleLabel">ጳጉሜ 6 ቀን (ዘመነ ዮሐንስ / Leap Year)</span>
       </label>
     </div>
   </header>
@@ -484,9 +589,18 @@
   <!-- MAIN CONTENT AREA -->
   <main>
     <div class="view-nav">
-      <button id="backBtn" class="back-btn hidden" onclick="showMonthView()">
-        &#8592; ወደ ወራት ተመለስ (Back to Months)
-      </button>
+      <div class="nav-buttons-group">
+        <button id="backBtn" class="back-btn hidden" onclick="showMonthView()">
+          &#8592; <span id="backBtnText">ወደ ወራት ተመለስ (Back to Months)</span>
+        </button>
+      </div>
+
+      <!-- FEATURE 1: Month Pager Controls -->
+      <div id="monthPagerNav" class="nav-buttons-group hidden">
+        <button class="month-nav-btn" onclick="navigateAdjacentMonth(-1)">‹ <span id="prevMonthLabel">Prev</span></button>
+        <button class="month-nav-btn" onclick="navigateAdjacentMonth(1)"><span id="nextMonthLabel">Next</span> ›</button>
+      </div>
+
       <div id="viewTitle" class="view-title">ወራት (Months)</div>
     </div>
 
@@ -497,18 +611,41 @@
     <div id="dayGrid" class="grid day-grid hidden"></div>
   </main>
 
-  <!-- PASSWORD MODAL -->
+  <!-- FEATURE 4: RESOURCE PICKER & PASSWORD MODAL -->
   <div id="passwordModal" class="modal-overlay">
     <div class="modal-content">
       <button class="modal-close" onclick="closePasswordModal()">&times;</button>
-      <div class="modal-header" id="modalTitle">ማኅሌቱን ለመክፈት የይለፍ ቃል ያስገቡ</div>
+      <div class="modal-header" id="modalTitle">የአገልግሎት መጽሐፍ ይምረጡ</div>
       <div class="modal-body">
-        <p style="font-size:0.9rem; color:var(--text-muted);" id="modalSub">Enter password to decrypt this day's Mahlet document.</p>
-        <input type="password" id="passwordInput" class="password-input" placeholder="Password..." onkeyup="handleKeySubmit(event)" />
-        <div id="errorMsg" class="error-msg">የተሳሳተ የይለፍ ቃል! እባክዎ እንደገና ይሞክሩ። (Incorrect password)</div>
-        <button id="submitBtn" class="btn-submit" onclick="submitPassword()">
-          <span id="btnText">ክፈት (Decrypt & Open)</span>
-        </button>
+        <p style="font-size:0.85rem; color:var(--text-muted);" id="modalSub">Select service document to view:</p>
+        
+        <!-- 4 Resource Buttons -->
+        <div class="resource-picker-grid">
+          <button id="resBtn-mahlet" class="resource-option-btn" onclick="selectResourceType('mahlet')">
+            <span>ማኅሌት</span>
+            <small style="font-size:0.75rem; opacity:0.8;">(Mahlet)</small>
+          </button>
+          <button id="resBtn-gitsawe" class="resource-option-btn" onclick="selectResourceType('gitsawe')">
+            <span>ግጻዌ</span>
+            <small style="font-size:0.75rem; opacity:0.8;">(Gitsawe)</small>
+          </button>
+          <button id="resBtn-mezmur" class="resource-option-btn" onclick="selectResourceType('mezmur')">
+            <span>መዝሙር</span>
+            <small style="font-size:0.75rem; opacity:0.8;">(Mezmur)</small>
+          </button>
+          <button id="resBtn-qedassie" class="resource-option-btn" onclick="selectResourceType('qedassie')">
+            <span>ቅዳሴ</span>
+            <small style="font-size:0.75rem; opacity:0.8;">(Qedassie)</small>
+          </button>
+        </div>
+
+        <div id="passwordSection" class="hidden">
+          <input type="password" id="passwordInput" class="password-input" placeholder="Password..." onkeyup="handleKeySubmit(event)" />
+          <div id="errorMsg" class="error-msg">የተሳሳተ የይለፍ ቃል! እባክዎ እንደገና ይሞክሩ። (Incorrect password)</div>
+          <button id="submitBtn" class="btn-submit" onclick="submitPassword()">
+            <span id="btnText">ክፈት (Decrypt & Open)</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -517,7 +654,7 @@
   <div id="viewerModal" class="modal-overlay viewer-modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeViewerModal()">&times;</button>
-      <div class="modal-header" id="viewerTitle">የዕለቱ ማኅሌት</div>
+      <div class="modal-header" id="viewerTitle">የዕለቱ አገልግሎት</div>
       <div class="pdf-container">
         <iframe id="pdfFrame" src=""></iframe>
       </div>
@@ -526,7 +663,7 @@
 
   <!-- HONEST SECURITY FOOTER -->
   <footer>
-    <p><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Mahlet PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside your browser memory only when the correct password is entered — files are not merely hidden. Security relies strictly on password strength and confidentiality.</p>
+    <p id="footerDisclaimer"><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside your browser memory only when the correct password is entered — files are not merely hidden. Security relies strictly on password strength and confidentiality.</p>
   </footer>
 
   <!-- JAVASCRIPT LOGIC -->
@@ -535,6 +672,10 @@
     let isLeapYear = false;
     let currentSelectedMonth = null;
     let currentSelectedDay = null;
+    let currentSelectedResource = null; // 'mahlet' | 'gitsawe' | 'mezmur' | 'qedassie'
+
+    // FEATURE 2: Bilingual UI language state (persisted via sessionStorage)
+    let currentLang = sessionStorage.getItem('eotc_lang') || 'am';
 
     const ETHIOPIAN_MONTHS = [
       { id: 1, nameAm: "መስከረም", nameEn: "Meskerem", folder: "meskerem" },
@@ -552,16 +693,79 @@
       { id: 13, nameAm: "ጳጉሜ", nameEn: "Pagume", folder: "pagume" }
     ];
 
-    const MAHLET_MANIFEST = {};
+    // FEATURE 4: Independent resource manifest tracking
+    // Format: RESOURCE_MANIFEST[monthId][day][resourceType] = boolean
+    const RESOURCE_MANIFEST = {};
 
-    function isPdfAvailable(monthId, day) {
-      if (MAHLET_MANIFEST[monthId] && MAHLET_MANIFEST[monthId][day] !== undefined) {
-        return MAHLET_MANIFEST[monthId][day];
+    function isResourceAvailable(monthId, day, resourceType) {
+      if (RESOURCE_MANIFEST[monthId] && 
+          RESOURCE_MANIFEST[monthId][day] && 
+          RESOURCE_MANIFEST[monthId][day][resourceType] !== undefined) {
+        return RESOURCE_MANIFEST[monthId][day][resourceType];
       }
-      return true; 
+      return true; // Default fallback: assume available
     }
 
-    // 02. FEAST DAY LOGIC
+    function isAnyResourceAvailable(monthId, day) {
+      const types = ['mahlet', 'gitsawe', 'mezmur', 'qedassie'];
+      return types.some(t => isResourceAvailable(monthId, day, t));
+    }
+
+    // FEATURE 2: Translation Dictionaries for Chrome UI
+    const TRANSLATIONS = {
+      am: {
+        pageTitle: "የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት አገልግሎት መጽሐፍት | EOTC Daily Service Resources",
+        headerTitle: "የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን",
+        headerSubtitle: "የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ",
+        todayLabel: "ዛሬ",
+        leapToggle: "ጳጉሜ 6 ቀን (ዘመነ ዮሐንስ / Leap Year)",
+        backBtn: "ወደ ወራት ተመለስ",
+        viewTitleMonths: "ወራት",
+        daysUnit: "ቀናት",
+        selectResHeader: "የአገልግሎት መጽሐፍ ይምረጡ",
+        selectResSub: "ለማየት የሚፈልጉትን የአገልግሎት ክፍል ይምረጡ፡",
+        decryptOpen: "ክፈት",
+        decrypting: "በመፍታት ላይ...",
+        incorrectPw: "የተሳሳተ የይለፍ ቃል ወይም ፋይሉ አልተገኘም!",
+        enterPwPrompt: "እባክዎ የይለፍ ቃል ያስገቡ",
+        securityNote: "የደኅንነት ማስታወሻ: All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.",
+        prev: "ቀደመ",
+        next: "ቀጣይ",
+        resources: {
+          mahlet: "ማኅሌት",
+          gitsawe: "ግጻዌ",
+          mezmur: "መዝሙር",
+          qedassie: "ቅዳሴ"
+        }
+      },
+      en: {
+        pageTitle: "EOTC Daily Service Resources Portal",
+        headerTitle: "Ethiopian Orthodox Tewahedo Church",
+        headerSubtitle: "Daily Service Resources & Liturgical Calendar",
+        todayLabel: "Today",
+        leapToggle: "Pagume 6 (Leap Year / Yohannes)",
+        backBtn: "Back to Months",
+        viewTitleMonths: "Months",
+        daysUnit: "Days",
+        selectResHeader: "Select Service Resource",
+        selectResSub: "Select a service document to view:",
+        decryptOpen: "Decrypt & Open",
+        decrypting: "Decrypting...",
+        incorrectPw: "Incorrect password or file unavailable!",
+        enterPwPrompt: "Please enter a password",
+        securityNote: "Security Note: All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.",
+        prev: "Prev",
+        next: "Next",
+        resources: {
+          mahlet: "Mahlet",
+          gitsawe: "Gitsawe",
+          mezmur: "Mezmur",
+          qedassie: "Qedassie"
+        }
+      }
+    };
+
+    // FEATURE 3: Verified Bahire Hasab / Feast Day Logic
     function gregorianToJDN(year, month, day) {
       const a = Math.floor((14 - month) / 12);
       const y = year + 4800 - a;
@@ -598,41 +802,41 @@
     }
 
     const FIXED_MONTHLY_FEASTS = {
-      5: "አቡነ ገብረ መንፈስ ቅዱስ",
-      7: "ሥላሴ (Holy Trinity)",
-      12: "ቅዱስ ሚካኤል (St. Michael)",
-      16: "ቅድስት ኪዳነ ምሕረት (Kidane Mihret)",
-      19: "ቅዱስ ገብርኤል (St. Gabriel)",
-      21: "ቅድስት ማርያም (St. Mary)",
-      23: "ቅዱስ ጊዮርጊስ (St. George)",
-      24: "አቡነ ተክለ ሃይማኖት",
-      27: "መድኃኔዓለም (Savior of the World)",
-      29: "በዓለ ወልድ (Feast of the Son)"
+      5: "አቡነ ገብረ መንፈስ ቅዱስ / Abune Gebre Menfes Kidus",
+      7: "ሥላሴ / Holy Trinity",
+      12: "ቅዱስ ሚካኤል / St. Michael",
+      16: "ቅድስት ኪዳነ ምሕረት / Kidane Mihret",
+      19: "ቅዱስ ገብርኤል / St. Gabriel",
+      21: "ቅድስት ማርያም / St. Mary",
+      23: "ቅዱስ ጊዮርጊስ / St. George",
+      24: "አቡነ ተክለ ሃይማኖት / Abune Tekle Haymanot",
+      27: "መድኃኔዓለም / Savior of the World",
+      29: "በዓለ ወልድ / Feast of the Son"
     };
 
     const FIXED_ANNUAL_FEASTS = {
       "1-1": "እንቁጣጣሽ / New Year",
       "1-17": "መስቀል / Meskel",
-      "1-21": "ብዙኃን ማርያም",
-      "2-27": "የመድኃኔዓለም ዓመታዊ በዓል",
-      "3-6": "ደብረ ቁስቋም",
-      "3-21": "ጽዮን ማርያም",
-      "4-19": "በዓለ ቅዱስ ገብርኤል",
+      "1-21": "ብዙኃን ማርያም / Bizuhan Maryam",
+      "2-27": "የመድኃኔዓለም ዓመታዊ በዓል / Annual MedhaneAlem",
+      "3-6": "ደብረ ቁስቋም / Debre Kuskwam",
+      "3-21": "ጽዮን ማርያም / Tsion Maryam",
+      "4-19": "በዓለ ቅዱስ ገብርኤል / St. Gabriel",
       "4-29": "ልደት / Christmas (Genna)",
       "5-11": "ጥምቀት / Timkat",
-      "5-12": "ቃና ዘገሊላ",
-      "5-21": "አስተርእዮ ማርያም",
-      "6-16": "በዓለ ቅድስት ኪዳነ ምሕረት",
-      "7-27": "በዓለ መድኃኔዓለም",
-      "8-23": "በዓለ ቅዱስ ጊዮርጊስ",
-      "9-1": "ልደታ ለማርያም",
-      "9-21": "ደብረ ምጥማቅ",
-      "10-12": "በዓለ ቅዱስ ሚካኤል",
-      "10-21": "ሕንጸተ ቤታ ለማርያም",
-      "11-5": "ጴጥሮስ ወጳውሎስ",
-      "11-19": "በዓለ ቅዱስ ገብርኤል",
+      "5-12": "ቃና ዘገሊላ / Kana ZeGalila",
+      "5-21": "አስተርእዮ ማርያም / Aster'eyo Maryam",
+      "6-16": "በዓለ ቅድስት ኪዳነ ምሕረት / Kidane Mihret",
+      "7-27": "በዓለ መድኃኔዓለም / MedhaneAlem",
+      "8-23": "በዓለ ቅዱስ ጊዮርጊስ / St. George",
+      "9-1": "ልደታ ለማርያም / Lideta Maryam",
+      "9-21": "ደብረ ምጥማቅ / Debre Mitmak",
+      "10-12": "በዓለ ቅዱስ ሚካኤል / St. Michael",
+      "10-21": "ሕንጸተ ቤታ ለማርያም / Hinsteta Maryam",
+      "11-5": "ጴጥሮስ ወጳውሎስ / St. Peter & St. Paul",
+      "11-19": "በዓለ ቅዱስ ገብርኤል / St. Gabriel",
       "12-13": "ደብረ ታቦር / Buhe",
-      "12-16": "ፍልሰታ ለማርያም"
+      "12-16": "ፍልሰታ ለማርያም / Filseta Maryam"
     };
 
     function calculateBahireHasabMovableFeasts(ethiopianYear) {
@@ -661,31 +865,31 @@
       const tewsak = tewsakMap[tewsakDay];
 
       const nineveh = monthday(metqMonth, metq, tewsak);
-      holidays[`${nineveh.month}-${nineveh.day}`] = { name: "ጾመ ነነዌ (Nineveh Fast)", type: "movable" };
+      holidays[`${nineveh.month}-${nineveh.day}`] = { name: "ጾመ ነነዌ / Nineveh Fast", type: "movable" };
 
       const lent = monthday(nineveh.month, nineveh.day, 14);
-      holidays[`${lent.month}-${lent.day}`] = { name: "ዐቢይ ጾም (Great Lent)", type: "movable" };
+      holidays[`${lent.month}-${lent.day}`] = { name: "ዐቢይ ጾም / Great Lent", type: "movable" };
 
       const debre = monthday(lent.month, lent.day, 27);
-      holidays[`${debre.month}-${debre.day}`] = { name: "ደብረ ዘይት (Mount of Olives)", type: "movable" };
+      holidays[`${debre.month}-${debre.day}`] = { name: "ደብረ ዘይት / Mount of Olives", type: "movable" };
 
       const goodFriday = monthday(debre.month, debre.day, 26);
-      holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት (Good Friday)", type: "movable" };
+      holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት / Good Friday", type: "movable" };
 
       const easter = monthday(debre.month, debre.day, 28);
-      holidays[`${easter.month}-${easter.day}`] = { name: "ትንሣኤ (Easter)", type: "movable-major" };
+      holidays[`${easter.month}-${easter.day}`] = { name: "ትንሣኤ / Easter", type: "movable-major" };
 
       const rk = monthday(easter.month, easter.day, 24);
-      holidays[`${rk.month}-${rk.day}`] = { name: "ርክበ ካህናት", type: "movable" };
+      holidays[`${rk.month}-${rk.day}`] = { name: "ርክበ ካህናት / Rikbe Kahnat", type: "movable" };
 
       const ascension = monthday(easter.month, easter.day, 39);
-      holidays[`${ascension.month}-${ascension.day}`] = { name: "ዕርገት (Ascension)", type: "movable" };
+      holidays[`${ascension.month}-${ascension.day}`] = { name: "ዕርገት / Ascension", type: "movable" };
 
       const pentecost = monthday(easter.month, easter.day, 49);
-      holidays[`${pentecost.month}-${pentecost.day}`] = { name: "ጰራቅሊጦስ (Pentecost)", type: "movable" };
+      holidays[`${pentecost.month}-${pentecost.day}`] = { name: "ጰራቅሊጦስ / Pentecost", type: "movable" };
 
       const apostlesFast = monthday(easter.month, easter.day, 50);
-      holidays[`${apostlesFast.month}-${apostlesFast.day}`] = { name: "ጾመ ሐዋርያት", type: "movable" };
+      holidays[`${apostlesFast.month}-${apostlesFast.day}`] = { name: "ጾመ ሐዋርያት / Apostles' Fast", type: "movable" };
 
       return holidays;
     }
@@ -698,53 +902,111 @@
       todayEth = jdnToEthiopian(todayJDN);
       movableFeastsForYear = calculateBahireHasabMovableFeasts(todayEth.year);
     } catch (e) {
-      console.warn("Date initialization fallback engaged:", e);
+      console.warn("Date calculation fallback engaged:", e);
       todayEth = { year: 2018, month: 1, day: 1 };
       movableFeastsForYear = {};
     }
 
+    // FEATURE 3: Strict Precedence (Movable > Annual > Monthly) + Bilingual Parsing
     function getFeastInfo(month, day) {
       const key = `${month}-${day}`;
+      let feastObj = null;
+
       if (movableFeastsForYear && movableFeastsForYear[key]) {
-        return movableFeastsForYear[key];
+        feastObj = movableFeastsForYear[key];
+      } else if (FIXED_ANNUAL_FEASTS[key]) {
+        feastObj = { name: FIXED_ANNUAL_FEASTS[key], type: "annual" };
+      } else if (FIXED_MONTHLY_FEASTS[day] && month !== 13) {
+        feastObj = { name: FIXED_MONTHLY_FEASTS[day], type: "monthly" };
       }
-      if (FIXED_ANNUAL_FEASTS[key]) {
-        return { name: FIXED_ANNUAL_FEASTS[key], type: "annual" };
-      }
-      if (FIXED_MONTHLY_FEASTS[day] && month !== 13) {
-        return { name: FIXED_MONTHLY_FEASTS[day], type: "monthly" };
-      }
-      return null;
+
+      if (!feastObj) return null;
+
+      // Format name string based on current language toggle
+      const parts = feastObj.name.split(" / ");
+      const formattedName = (currentLang === 'en' && parts.length > 1) ? parts[1] : parts[0];
+
+      return {
+        name: formattedName,
+        type: feastObj.type
+      };
     }
 
-    // 03. UI RENDER FUNCTIONS
+    // FEATURE 2: Toggle Language Function
+    function toggleLanguage() {
+      currentLang = (currentLang === 'am') ? 'en' : 'am';
+      sessionStorage.setItem('eotc_lang', currentLang);
+      applyLanguageUI();
+
+      // Re-render current view without losing position
+      if (currentSelectedMonth) {
+        renderDayView(currentSelectedMonth);
+      } else {
+        renderMonthView();
+      }
+    }
+
+    function applyLanguageUI() {
+      const t = TRANSLATIONS[currentLang];
+      document.getElementById('langToggleBtn').innerText = (currentLang === 'am') ? 'English' : 'አማርኛ';
+      document.getElementById('pageTitle').innerText = t.pageTitle;
+      document.getElementById('headerTitle').innerText = t.headerTitle;
+      document.getElementById('headerSubtitle').innerText = t.headerSubtitle;
+      document.getElementById('leapToggleLabel').innerText = t.leapToggle;
+      document.getElementById('backBtnText').innerText = t.backBtn;
+      document.getElementById('prevMonthLabel').innerText = t.prev;
+      document.getElementById('nextMonthLabel').innerText = t.next;
+      document.getElementById('footerDisclaimer').innerHTML = t.securityNote;
+
+      initHeaderBanner();
+    }
+
+    // 03. UI RENDER & FEATURE 1 NAVIGATION FUNCTIONS
     function initHeaderBanner() {
       const banner = document.getElementById('todayBanner');
       if (!banner) return;
+      const t = TRANSLATIONS[currentLang];
       const mInfo = ETHIOPIAN_MONTHS.find(m => m.id === todayEth.month);
-      banner.innerHTML = `<strong>ዛሬ (Today):</strong> ${mInfo ? mInfo.nameAm : ''} ${todayEth.day} ቀን ${todayEth.year} ዓ.ም. (${todayGreg.toDateString()})`;
+      const monthName = mInfo ? (currentLang === 'en' ? mInfo.nameEn : mInfo.nameAm) : '';
+      banner.innerHTML = `<strong>${t.todayLabel}:</strong> ${monthName} ${todayEth.day}, ${todayEth.year} (${todayGreg.toDateString()})`;
     }
 
     function renderMonthView() {
       const container = document.getElementById('monthGrid');
       if (!container) return;
       container.innerHTML = '';
+      const t = TRANSLATIONS[currentLang];
+
+      document.getElementById('viewTitle').innerText = t.viewTitleMonths;
+      document.getElementById('monthPagerNav').classList.add('hidden');
 
       ETHIOPIAN_MONTHS.forEach(m => {
         const totalDays = (m.id === 13) ? (isLeapYear ? 6 : 5) : 30;
+        const isCurrentMonth = (m.id === todayEth.month);
+
         const card = document.createElement('div');
-        card.className = 'card month-card';
+        // FEATURE 1: Highlight current month card
+        card.className = `card month-card ${isCurrentMonth ? 'current-month-card' : ''}`;
+        card.id = `month-card-${m.id}`;
         card.onclick = () => showDayView(m);
 
         card.innerHTML = `
           <div>
-            <h2>${m.nameAm}</h2>
-            <div class="translit">${m.nameEn}</div>
+            <h2>${currentLang === 'en' ? m.nameEn : m.nameAm}</h2>
+            <div class="translit">${currentLang === 'en' ? m.nameAm : m.nameEn}</div>
           </div>
-          <div class="meta">${totalDays} ቀናት (Days)</div>
+          <div class="meta">${totalDays} ${t.daysUnit}</div>
         `;
         container.appendChild(card);
       });
+
+      // FEATURE 1: Auto-scroll to current Ethiopian month on initial load
+      setTimeout(() => {
+        const currentCard = document.getElementById(`month-card-${todayEth.month}`);
+        if (currentCard) {
+          currentCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 200);
     }
 
     function showDayView(monthObj) {
@@ -752,7 +1014,7 @@
       document.getElementById('monthGrid').classList.add('hidden');
       document.getElementById('dayGrid').classList.remove('hidden');
       document.getElementById('backBtn').classList.remove('hidden');
-      document.getElementById('viewTitle').innerText = `${monthObj.nameAm} (${monthObj.nameEn})`;
+      document.getElementById('monthPagerNav').classList.remove('hidden');
 
       renderDayView(monthObj);
     }
@@ -762,17 +1024,34 @@
       document.getElementById('dayGrid').classList.add('hidden');
       document.getElementById('monthGrid').classList.remove('hidden');
       document.getElementById('backBtn').classList.add('hidden');
-      document.getElementById('viewTitle').innerText = 'ወራት (Months)';
+      document.getElementById('monthPagerNav').classList.add('hidden');
+      renderMonthView();
+    }
+
+    // FEATURE 1: Adjacent month navigation (wrapping Pagume <-> Meskerem)
+    function navigateAdjacentMonth(delta) {
+      if (!currentSelectedMonth) return;
+      let newId = currentSelectedMonth.id + delta;
+      if (newId > 13) newId = 1;
+      if (newId < 1) newId = 13;
+      const newMonthObj = ETHIOPIAN_MONTHS.find(m => m.id === newId);
+      if (newMonthObj) {
+        showDayView(newMonthObj);
+      }
     }
 
     function renderDayView(monthObj) {
       const container = document.getElementById('dayGrid');
       if (!container) return;
       container.innerHTML = '';
+      const t = TRANSLATIONS[currentLang];
       const totalDays = (monthObj.id === 13) ? (isLeapYear ? 6 : 5) : 30;
 
+      const titleMonth = (currentLang === 'en') ? `${monthObj.nameEn} (${monthObj.nameAm})` : `${monthObj.nameAm} (${monthObj.nameEn})`;
+      document.getElementById('viewTitle').innerText = titleMonth;
+
       for (let day = 1; day <= totalDays; day++) {
-        const available = isPdfAvailable(monthObj.id, day);
+        const anyAvailable = isAnyResourceAvailable(monthObj.id, day);
         const feast = getFeastInfo(monthObj.id, day);
         
         let gDateStr = "";
@@ -786,7 +1065,7 @@
 
         const card = document.createElement('div');
         let cardClass = 'card day-card';
-        if (!available) cardClass += ' disabled';
+        if (!anyAvailable) cardClass += ' disabled';
 
         if (feast) {
           if (feast.type === 'movable-major') cardClass += ' feast-major';
@@ -796,15 +1075,25 @@
         }
 
         card.className = cardClass;
-        if (available) {
-          card.onclick = () => openPasswordModal(monthObj, day);
+        if (anyAvailable) {
+          card.onclick = () => openResourcePickerModal(monthObj, day);
         }
 
+        // FEATURE 4: Resource Availability Indicators
+        const mAvail = isResourceAvailable(monthObj.id, day, 'mahlet');
+        const gAvail = isResourceAvailable(monthObj.id, day, 'gitsawe');
+        const zAvail = isResourceAvailable(monthObj.id, day, 'mezmur');
+        const qAvail = isResourceAvailable(monthObj.id, day, 'qedassie');
+
         card.innerHTML = `
-          <div class="status-indicator ${available ? 'available' : 'unavailable'}" 
-               title="${available ? 'Mahlet PDF Available' : 'No PDF Uploaded'}"></div>
           <div class="day-num">${day}</div>
           <div class="greg-date">G: ${gDateStr}</div>
+          <div class="res-badge-bar" title="Mahlet, Gitsawe, Mezmur, Qedassie availability">
+            <span class="res-dot ${mAvail ? 'active' : ''}"></span>
+            <span class="res-dot ${gAvail ? 'active' : ''}"></span>
+            <span class="res-dot ${zAvail ? 'active' : ''}"></span>
+            <span class="res-dot ${qAvail ? 'active' : ''}"></span>
+          </div>
           ${feast ? `<div class="feast-tag">${feast.name}</div>` : ''}
         `;
 
@@ -820,13 +1109,45 @@
       }
     }
 
-    // 04. AES-GCM DECRYPTION & MODAL HANDLERS
-    function openPasswordModal(monthObj, day) {
+    // FEATURE 4: RESOURCE PICKER & AES-GCM DECRYPTION HANDLERS
+    function openResourcePickerModal(monthObj, day) {
       currentSelectedDay = day;
-      document.getElementById('modalTitle').innerText = `${monthObj.nameAm} ${day} - ማኅሌት`;
+      currentSelectedResource = null;
+      const t = TRANSLATIONS[currentLang];
+
+      const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
+      document.getElementById('modalTitle').innerText = `${monthName} ${day} - ${t.selectResHeader}`;
+      document.getElementById('modalSub').innerText = t.selectResSub;
+      
+      // Configure 4 resource buttons based on availability
+      const types = ['mahlet', 'gitsawe', 'mezmur', 'qedassie'];
+      types.forEach(type => {
+        const btn = document.getElementById(`resBtn-${type}`);
+        const avail = isResourceAvailable(monthObj.id, day, type);
+        btn.className = `resource-option-btn ${avail ? '' : 'disabled'}`;
+        btn.querySelector('span').innerText = t.resources[type];
+      });
+
+      document.getElementById('passwordSection').classList.add('hidden');
       document.getElementById('passwordInput').value = '';
       document.getElementById('errorMsg').style.display = 'none';
       document.getElementById('passwordModal').classList.add('active');
+    }
+
+    function selectResourceType(type) {
+      if (!isResourceAvailable(currentSelectedMonth.id, currentSelectedDay, type)) {
+        return; // Non-clickable if disabled
+      }
+
+      currentSelectedResource = type;
+      const types = ['mahlet', 'gitsawe', 'mezmur', 'qedassie'];
+      types.forEach(t => {
+        const btn = document.getElementById(`resBtn-${t}`);
+        if (t === type) btn.classList.add('selected');
+        else btn.classList.remove('selected');
+      });
+
+      document.getElementById('passwordSection').classList.remove('hidden');
       setTimeout(() => document.getElementById('passwordInput').focus(), 100);
     }
 
@@ -906,18 +1227,20 @@
       const password = document.getElementById('passwordInput').value;
       const errorMsg = document.getElementById('errorMsg');
       const btnText = document.getElementById('btnText');
+      const t = TRANSLATIONS[currentLang];
 
-      if (!password) {
-        errorMsg.innerText = "እባክዎ የይለፍ ቃል ያስገቡ (Please enter a password)";
+      if (!password || !currentSelectedResource) {
+        errorMsg.innerText = t.enterPwPrompt;
         errorMsg.style.display = 'block';
         return;
       }
 
       errorMsg.style.display = 'none';
-      btnText.innerHTML = `<span class="spinner"></span>በመፍታት ላይ... (Decrypting...)`;
+      btnText.innerHTML = `<span class="spinner"></span>${t.decrypting}`;
 
+      // FEATURE 4: Updated filename convention
       const dayPadded = String(currentSelectedDay).padStart(2, '0');
-      const filePath = `pdfs/${currentSelectedMonth.folder}/${dayPadded}.pdf.enc`;
+      const filePath = `pdfs/${currentSelectedMonth.folder}/${dayPadded}-${currentSelectedResource}.pdf.enc`;
 
       try {
         const response = await fetch(filePath);
@@ -933,23 +1256,25 @@
 
         closePasswordModal();
         
-        document.getElementById('viewerTitle').innerText = `${currentSelectedMonth.nameAm} ${currentSelectedDay} - ማኅሌት`;
+        const monthName = (currentLang === 'en') ? currentSelectedMonth.nameEn : currentSelectedMonth.nameAm;
+        const resName = t.resources[currentSelectedResource];
+        document.getElementById('viewerTitle').innerText = `${monthName} ${currentSelectedDay} - ${resName}`;
         document.getElementById('pdfFrame').src = blobUrl;
         document.getElementById('viewerModal').classList.add('active');
 
       } catch (err) {
         console.error("Decryption error:", err);
-        errorMsg.innerText = "የተሳሳተ የይለፍ ቃል ወይም ፋይሉ አልተገኘም! (Incorrect password or file unreadable)";
+        errorMsg.innerText = t.incorrectPw;
         errorMsg.style.display = 'block';
       } finally {
-        btnText.innerText = "ክፈት (Decrypt & Open)";
+        btnText.innerText = t.decryptOpen;
       }
     }
 
     // INITIALIZATION GUARANTEE
     window.addEventListener('DOMContentLoaded', () => {
       try {
-        initHeaderBanner();
+        applyLanguageUI();
         renderMonthView();
       } catch (err) {
         console.error("Initialization error encountered, running resilient fallback:", err);
