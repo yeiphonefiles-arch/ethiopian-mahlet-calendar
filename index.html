@@ -309,7 +309,7 @@
     <div class="calendar-container">
       <!-- Weekday Headers: Sunday to Saturday -->
       <div class="weekdays-header">
-        <div class="weekday-name" id="wd-sun">እሁድ<br>(Sun)</div>
+        <div class="weekday-name" id="wd-sun">እሑድ<br>(Sun)</div>
         <div class="weekday-name" id="wd-mon">ሰኞ<br>(Mon)</div>
         <div class="weekday-name" id="wd-tue">ማክሰኞ<br>(Tue)</div>
         <div class="weekday-name" id="wd-wed">ረቡዕ<br>(Wed)</div>
@@ -345,7 +345,12 @@
 
     let currentLang = sessionStorage.getItem('eotc_lang') || 'am';
 
-    // Calculate Ethiopian Year and Leap Status
+    // Normalize any Date object to UTC midnight to prevent time-of-day math truncation errors
+    function toUTCMidnight(d) {
+      return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    // Dynamic Ethiopian Year & Leap Year Status
     function getEthiopianYearInfo(nowDate) {
       const gYear = nowDate.getFullYear();
       const prevGregLeap = ((gYear - 1) % 4 === 0 && (gYear - 1) % 100 !== 0) || ((gYear - 1) % 400 === 0);
@@ -354,30 +359,34 @@
       const newYearDate = new Date(gYear, 8, newYearDay); // Sept 11 or 12
       let ethYear = (nowDate >= newYearDate) ? (gYear - 7) : (gYear - 8);
 
-      // In Ethiopian Calendar, year % 4 === 3 is Leap Year (ዘመነ ዮሐንስ)
       const isLeapYear = (ethYear % 4 === 3);
 
       return { ethYear, isLeapYear, newYearDate };
     }
 
-    // Deduce today's Ethiopian Year, Month, and Day dynamically from current Gregorian date
+    // Accurately calculate today's Ethiopian date using UTC timestamps
     function getCurrentEthiopianDate(nowDate) {
       const gYear = nowDate.getFullYear();
+      
       const prevGregLeap = ((gYear - 1) % 4 === 0 && (gYear - 1) % 100 !== 0) || ((gYear - 1) % 400 === 0);
       const currentYearNewYearDay = prevGregLeap ? 12 : 11;
       const currentYearNewYear = new Date(gYear, 8, currentYearNewYearDay);
 
-      let ethYear, diffDays;
+      let ethYear, anchorDate;
+
       if (nowDate >= currentYearNewYear) {
         ethYear = gYear - 7;
-        diffDays = Math.floor((nowDate - currentYearNewYear) / (1000 * 60 * 60 * 24));
+        anchorDate = currentYearNewYear;
       } else {
         ethYear = gYear - 8;
         const prevYearLeap = ((gYear - 2) % 4 === 0 && (gYear - 2) % 100 !== 0) || ((gYear - 2) % 400 === 0);
         const prevYearNewYearDay = prevYearLeap ? 12 : 11;
-        const prevYearNewYear = new Date(gYear - 1, 8, prevYearNewYearDay);
-        diffDays = Math.floor((nowDate - prevYearNewYear) / (1000 * 60 * 60 * 24));
+        anchorDate = new Date(gYear - 1, 8, prevYearNewYearDay);
       }
+
+      const utcNow = toUTCMidnight(nowDate);
+      const utcAnchor = toUTCMidnight(anchorDate);
+      const diffDays = Math.round((utcNow - utcAnchor) / (1000 * 60 * 60 * 24));
 
       const ethMonth = Math.floor(diffDays / 30) + 1;
       const ethDay = (diffDays % 30) + 1;
@@ -389,10 +398,8 @@
     const todayEth = getCurrentEthiopianDate(todayGreg);
     const yearInfo = getEthiopianYearInfo(todayGreg);
 
-    // Dynamically set current month view to today's Ethiopian month
     let currentActiveMonthId = todayEth.month;
 
-    // Grid starting day calculation (0 = Sunday, 6 = Saturday)
     function getMonthStartDayOfWeek(monthId) {
       const meskerem1 = yearInfo.newYearDate;
       const meskerem1Dow = meskerem1.getDay();
@@ -444,24 +451,20 @@
       const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentActiveMonthId);
       title.innerText = (currentLang === 'en') ? `${monthObj.nameEn} (${monthObj.nameAm})` : `${monthObj.nameAm} (${monthObj.nameEn})`;
 
-      // Pagume has 6 days on Leap Year, otherwise 5
       const totalDays = (monthObj.id === 13) ? (yearInfo.isLeapYear ? 6 : 5) : 30;
       const startDow = getMonthStartDayOfWeek(monthObj.id);
 
-      // Render empty grid padding cells before Day 1
       for (let i = 0; i < startDow; i++) {
         const empty = document.createElement('div');
         empty.className = 'day-cell empty-cell';
         grid.appendChild(empty);
       }
 
-      // Render calendar days
       for (let day = 1; day <= totalDays; day++) {
         const gregStr = getGregorianEquivalent(monthObj.id, day);
         const cell = document.createElement('div');
         cell.className = 'day-cell';
 
-        // Highlight today's date if viewing current active month and year
         if (currentActiveMonthId === todayEth.month && day === todayEth.day) {
           cell.classList.add('today-cell');
         }
