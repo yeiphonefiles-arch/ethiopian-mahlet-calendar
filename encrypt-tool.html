@@ -72,8 +72,27 @@
     </div>
 
     <div class="form-group">
-      <label>3. Target Output Filename (e.g., 01.pdf.enc):</label>
-      <input type="text" id="filenameInput" value="01.pdf.enc" />
+      <label>3. Ethiopian Day of Month (1-30, or 1-6 for Pagume):</label>
+      <input type="text" id="dayInput" value="01" placeholder="e.g. 01" />
+    </div>
+
+    <div class="form-group">
+      <label>4. Resource Type:</label>
+      <select id="resourceTypeInput">
+        <option value="mahlet">Mahlet (ማኅሌት)</option>
+        <option value="gitsawe">Gitsawe (ግጻዌ)</option>
+        <option value="mezmur">Mezmur (መዝሙር)</option>
+        <option value="qedassie">Qedassie (ቅዳሴ)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>5. Output Filename (auto-generated, editable):</label>
+      <input type="text" id="filenameInput" value="01-mahlet.pdf.enc" />
+      <p style="font-size: 0.75rem; color: #888; margin-top: 0.3rem;">
+        Save this file into: <code>pdfs/&lt;month-folder&gt;/</code> on the site
+        (e.g. <code>pdfs/meskerem/01-mahlet.pdf.enc</code>).
+      </p>
     </div>
 
     <button onclick="encryptAndDownload()">Encrypt & Download .enc File</button>
@@ -82,6 +101,20 @@
   </div>
 
   <script>
+    // Keep the suggested output filename in sync with the day + resource type,
+    // e.g. day "01" + resource "mahlet" -> "01-mahlet.pdf.enc". The field
+    // stays editable in case you need a different naming scheme.
+    function updateSuggestedFilename() {
+      const day = (document.getElementById('dayInput').value || '01').padStart(2, '0');
+      const resourceType = document.getElementById('resourceTypeInput').value;
+      document.getElementById('filenameInput').value = `${day}-${resourceType}.pdf.enc`;
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('dayInput').addEventListener('input', updateSuggestedFilename);
+      document.getElementById('resourceTypeInput').addEventListener('change', updateSuggestedFilename);
+      updateSuggestedFilename();
+    });
+
     async function encryptAndDownload() {
       const fileInput = document.getElementById('pdfInput');
       const password = document.getElementById('passwordInput').value;
