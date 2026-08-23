@@ -464,7 +464,6 @@
   <!-- HEADER -->
   <header>
     <svg class="header-cross" viewBox="0 0 24 24">
-      <!-- Standard Ethiopian Style Cross Motif -->
       <path d="M11 2h2v4h4v2h-4v3h5v2h-5v3h4v2h-4v4h-2v-4H7v-2h4v-3H6v-2h5V8H7V6h4V2z"/>
       <circle cx="12" cy="12" r="1.5"/>
     </svg>
@@ -473,7 +472,7 @@
 
     <div class="top-controls">
       <div class="today-banner" id="todayBanner">
-        <!-- Javascript populates today's Ethiopian & Gregorian date -->
+        <!-- Javascript populates today's date -->
       </div>
       <label class="leap-toggle">
         <input type="checkbox" id="leapYearToggle" onchange="toggleLeapYear(this.checked)" />
@@ -532,15 +531,11 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    /01. CONFIGURATION & STATE
-    // Toggle for leap year (Pagume 6 days vs 5 days)
+    // 01. CONFIGURATION & STATE
     let isLeapYear = false;
-
-    // Current selection tracking
     let currentSelectedMonth = null;
     let currentSelectedDay = null;
 
-    // Available Ethiopian Months
     const ETHIOPIAN_MONTHS = [
       { id: 1, nameAm: "መስከረም", nameEn: "Meskerem", folder: "meskerem" },
       { id: 2, nameAm: "ጥቅምት", nameEn: "Tikimt", folder: "tikimt" },
@@ -557,29 +552,16 @@
       { id: 13, nameAm: "ጳጉሜ", nameEn: "Pagume", folder: "pagume" }
     ];
 
-    /**
-     * PDF AVAILABILITY MANIFEST
-     * Define which days have available Mahlet .enc files.
-     * Setting a key to true expects a file at: pdfs/[month_folder]/[day_padded].pdf.enc
-     * Example: month 1, day 1 -> pdfs/meskerem/01.pdf.enc
-     */
-    const MAHLET_MANIFEST = {
-      // Example default configuration: all days marked available.
-      // Set individual month/day values to false if no PDF is uploaded for that day.
-    };
+    const MAHLET_MANIFEST = {};
 
     function isPdfAvailable(monthId, day) {
-      // Default fallback: if not specified in manifest, assume true for testing/demo
       if (MAHLET_MANIFEST[monthId] && MAHLET_MANIFEST[monthId][day] !== undefined) {
         return MAHLET_MANIFEST[monthId][day];
       }
-      return true; // Default available unless explicitly turned off
+      return true; 
     }
 
-
-    /02. FEAST DAY LOGIC (ISOLATED MODULE)
-
-    // A. Gregorian <-> Ethiopian Date Conversion (Beyene-Kudlek JDN Method)
+    // 02. FEAST DAY LOGIC
     function gregorianToJDN(year, month, day) {
       const a = Math.floor((14 - month) / 12);
       const y = year + 4800 - a;
@@ -615,7 +597,6 @@
       return { year, month, day };
     }
 
-    // B. Fixed Monthly Commemorations
     const FIXED_MONTHLY_FEASTS = {
       5: "አቡነ ገብረ መንፈስ ቅዱስ",
       7: "ሥላሴ (Holy Trinity)",
@@ -629,7 +610,6 @@
       29: "በዓለ ወልድ (Feast of the Son)"
     };
 
-    // C. Fixed Annual Feasts
     const FIXED_ANNUAL_FEASTS = {
       "1-1": "እንቁጣጣሽ / New Year",
       "1-17": "መስቀል / Meskel",
@@ -655,7 +635,6 @@
       "12-16": "ፍልሰታ ለማርያም"
     };
 
-    // D. Movable Feasts via Bahire Hasab Algorithm
     function calculateBahireHasabMovableFeasts(ethiopianYear) {
       const holidays = {};
       const ameteAlem = ethiopianYear + 5500;
@@ -711,40 +690,44 @@
       return holidays;
     }
 
-    // Determine current active Ethiopian Year
-    const todayGreg = new Date();
-    const todayJDN = gregorianToJDN(todayGreg.getFullYear(), todayGreg.getMonth() + 1, todayGreg.getDate());
-    const todayEth = jdnToEthiopian(todayJDN);
-    const movableFeastsForYear = calculateBahireHasabMovableFeasts(todayEth.year);
+    let todayGreg = new Date();
+    let todayJDN, todayEth, movableFeastsForYear;
+
+    try {
+      todayJDN = gregorianToJDN(todayGreg.getFullYear(), todayGreg.getMonth() + 1, todayGreg.getDate());
+      todayEth = jdnToEthiopian(todayJDN);
+      movableFeastsForYear = calculateBahireHasabMovableFeasts(todayEth.year);
+    } catch (e) {
+      console.warn("Date initialization fallback engaged:", e);
+      todayEth = { year: 2018, month: 1, day: 1 };
+      movableFeastsForYear = {};
+    }
 
     function getFeastInfo(month, day) {
       const key = `${month}-${day}`;
-      // Priority 1: Movable Feasts (Bahire Hasab)
-      if (movableFeastsForYear[key]) {
+      if (movableFeastsForYear && movableFeastsForYear[key]) {
         return movableFeastsForYear[key];
       }
-      // Priority 2: Fixed Annual Feasts
       if (FIXED_ANNUAL_FEASTS[key]) {
         return { name: FIXED_ANNUAL_FEASTS[key], type: "annual" };
       }
-      // Priority 3: Fixed Monthly Commemorations
       if (FIXED_MONTHLY_FEASTS[day] && month !== 13) {
         return { name: FIXED_MONTHLY_FEASTS[day], type: "monthly" };
       }
       return null;
     }
 
-
-    /03. UI RENDER FUNCTIONS
-
+    // 03. UI RENDER FUNCTIONS
     function initHeaderBanner() {
+      const banner = document.getElementById('todayBanner');
+      if (!banner) return;
       const mInfo = ETHIOPIAN_MONTHS.find(m => m.id === todayEth.month);
-      document.getElementById('todayBanner').innerHTML = 
-        `<strong>ዛሬ (Today):</strong> ${mInfo ? mInfo.nameAm : ''} ${todayEth.day} ቀን ${todayEth.year} ዓ.ም. (${todayGreg.toDateString()})`;
+      banner.innerHTML = `<strong>ዛሬ (Today):</strong> ${mInfo ? mInfo.nameAm : ''} ${todayEth.day} ቀን ${todayEth.year} ዓ.ም. (${todayGreg.toDateString()})`;
     }
 
     function renderMonthView() {
       const container = document.getElementById('monthGrid');
+      if (!container) return;
       container.innerHTML = '';
 
       ETHIOPIAN_MONTHS.forEach(m => {
@@ -784,6 +767,7 @@
 
     function renderDayView(monthObj) {
       const container = document.getElementById('dayGrid');
+      if (!container) return;
       container.innerHTML = '';
       const totalDays = (monthObj.id === 13) ? (isLeapYear ? 6 : 5) : 30;
 
@@ -791,10 +775,14 @@
         const available = isPdfAvailable(monthObj.id, day);
         const feast = getFeastInfo(monthObj.id, day);
         
-        // Calculate corresponding Gregorian Date
-        const jdn = ethiopianToJDN(todayEth.year, monthObj.id, day);
-        const gDate = jdnToGregorian(jdn);
-        const gDateStr = `${gDate.month}/${gDate.day}`;
+        let gDateStr = "";
+        try {
+          const jdn = ethiopianToJDN(todayEth.year, monthObj.id, day);
+          const gDate = jdnToGregorian(jdn);
+          gDateStr = `${gDate.month}/${gDate.day}`;
+        } catch(e) {
+          gDateStr = "--";
+        }
 
         const card = document.createElement('div');
         let cardClass = 'card day-card';
@@ -832,9 +820,7 @@
       }
     }
 
-
-    /04. AES-GCM DECRYPTION & MODAL HANDLERS
-
+    // 04. AES-GCM DECRYPTION & MODAL HANDLERS
     function openPasswordModal(monthObj, day) {
       currentSelectedDay = day;
       document.getElementById('modalTitle').innerText = `${monthObj.nameAm} ${day} - ማህሌት`;
@@ -852,7 +838,7 @@
       document.getElementById('viewerModal').classList.remove('active');
       const iframe = document.getElementById('pdfFrame');
       if (iframe.src) {
-        URL.revokeObjectURL(iframe.src); // Free memory
+        URL.revokeObjectURL(iframe.src);
         iframe.src = '';
       }
     }
@@ -861,7 +847,6 @@
       if (event.key === 'Enter') submitPassword();
     }
 
-    // Modal dismiss rules
     window.onclick = function(e) {
       const pModal = document.getElementById('passwordModal');
       const vModal = document.getElementById('viewerModal');
@@ -876,13 +861,8 @@
       }
     };
 
-    /**
-     * Web Crypto API AES-GCM Decryption Logic
-     */
     async function decryptPdfBuffer(encryptedArrayBuffer, password) {
       const bytes = new Uint8Array(encryptedArrayBuffer);
-      
-      // Structure: Salt (16 bytes) | IV (12 bytes) | AES-GCM Ciphertext + Tag
       if (bytes.length < 28) {
         throw new Error("Invalid file structure or corrupted data.");
       }
@@ -894,7 +874,6 @@
       const enc = new TextEncoder();
       const pwBytes = enc.encode(password);
 
-      // Import plain password key
       const baseKey = await crypto.subtle.importKey(
         "raw",
         pwBytes,
@@ -903,7 +882,6 @@
         ["deriveKey"]
       );
 
-      // Derive AES-GCM Key using PBKDF2
       const derivedKey = await crypto.subtle.deriveKey(
         {
           name: "PBKDF2",
@@ -917,7 +895,6 @@
         ["decrypt"]
       );
 
-      // Decrypt using Web Crypto API
       return await crypto.subtle.decrypt(
         { name: "AES-GCM", iv: iv },
         derivedKey,
@@ -939,7 +916,6 @@
       errorMsg.style.display = 'none';
       btnText.innerHTML = `<span class="spinner"></span>በመፍታት ላይ... (Decrypting...)`;
 
-      // File path structure: pdfs/[folder]/[day_padded].pdf.enc
       const dayPadded = String(currentSelectedDay).padStart(2, '0');
       const filePath = `pdfs/${currentSelectedMonth.folder}/${dayPadded}.pdf.enc`;
 
@@ -952,7 +928,6 @@
         const encryptedData = await response.arrayBuffer();
         const decryptedBuffer = await decryptPdfBuffer(encryptedData, password);
 
-        // Success: create BLOB URL & open in PDF viewer modal
         const blob = new Blob([decryptedBuffer], { type: 'application/pdf' });
         const blobUrl = URL.createObjectURL(blob);
 
@@ -971,11 +946,16 @@
       }
     }
 
-    // INITIALIZATION
-    window.onload = function() {
-      initHeaderBanner();
-      renderMonthView();
-    };
+    // INITIALIZATION GUARANTEE
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        initHeaderBanner();
+        renderMonthView();
+      } catch (err) {
+        console.error("Initialization error encountered, running resilient fallback:", err);
+        renderMonthView();
+      }
+    });
   </script>
 </body>
 </html>
