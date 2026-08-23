@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title id="pageTitle">የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት አገልግሎት መጽሐፍት | EOTC Daily Service Resources</title>
 
-  <!-- Typography: Ethiopic friendly serif fonts -->
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Cinzel:wght@500;700&family=Noto+Serif+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
@@ -49,7 +49,7 @@
       flex-direction: column;
     }
 
-    /* FEATURE 2: Top-Right Bilingual Toggle Controls */
+    /* Top-Right Language Toggle */
     .top-right-controls {
       position: absolute;
       top: 1rem;
@@ -78,35 +78,34 @@
       transform: scale(1.05);
     }
 
-    /* Header & Navigation Header */
+    /* Header */
     header {
       background: linear-gradient(135deg, var(--maroon-dark), var(--maroon));
       color: var(--gold-light);
       border-bottom: 4px solid var(--gold);
-      padding: 2.2rem 1rem 1.8rem 1rem;
+      padding: 2rem 1rem 1.5rem 1rem;
       text-align: center;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       position: relative;
     }
 
     .header-cross {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 0.75rem auto;
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 0.5rem auto;
       display: block;
       fill: var(--gold);
     }
 
     header h1 {
       font-family: 'Cinzel', 'Noto Serif Ethiopic', serif;
-      font-size: 1.7rem;
+      font-size: 1.6rem;
       color: var(--gold);
       margin-bottom: 0.25rem;
-      letter-spacing: 0.5px;
     }
 
     header p {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--gold-light);
       opacity: 0.9;
     }
@@ -115,8 +114,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 1100px;
-      margin: 1.5rem auto 0 auto;
+      max-width: 1000px;
+      margin: 1.2rem auto 0 auto;
       padding: 0 1rem;
       gap: 1rem;
       flex-wrap: wrap;
@@ -126,8 +125,8 @@
       background-color: rgba(212, 175, 55, 0.15);
       border: 1px solid var(--gold);
       border-radius: 6px;
-      padding: 0.5rem 1rem;
-      font-size: 0.95rem;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.88rem;
       color: var(--gold-light);
     }
 
@@ -135,7 +134,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--gold-light);
       cursor: pointer;
     }
@@ -150,209 +149,185 @@
     /* Main Container */
     main {
       flex: 1;
-      max-width: 1100px;
+      max-width: 1000px;
       width: 100%;
       margin: 1.5rem auto 2rem auto;
       padding: 0 1rem;
     }
 
-    /* FEATURE 1: View Controls & Month Page Navigation */
-    .view-nav {
+    /* Calendar Header & Pager */
+    .calendar-navbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+      background-color: var(--maroon-dark);
+      color: var(--gold);
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px 8px 0 0;
+      border: 1px solid var(--gold);
+      border-bottom: none;
     }
 
-    .nav-buttons-group {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .back-btn, .month-nav-btn {
+    .nav-btn {
       background-color: var(--maroon);
       color: var(--gold-light);
       border: 1px solid var(--gold);
-      padding: 0.45rem 0.9rem;
+      padding: 0.4rem 0.85rem;
       border-radius: 4px;
       font-family: inherit;
       font-size: 0.9rem;
+      font-weight: bold;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      transition: background-color 0.2s, transform 0.1s;
+      transition: all 0.2s;
     }
 
-    .back-btn:hover, .month-nav-btn:hover {
+    .nav-btn:hover {
       background-color: var(--maroon-light);
       transform: translateY(-1px);
     }
 
-    .view-title {
-      font-size: 1.4rem;
-      color: var(--maroon-dark);
+    .month-display-title {
+      font-size: 1.35rem;
       font-weight: 700;
-      border-bottom: 2px solid var(--gold);
-      padding-bottom: 0.25rem;
-    }
-
-    /* Grid Layouts */
-    .grid {
-      display: grid;
-      gap: 1.25rem;
-    }
-
-    .month-grid {
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    }
-
-    .day-grid {
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    }
-
-    /* Cards */
-    .card {
-      background-color: var(--cream-card);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.25rem;
+      color: var(--gold);
       text-align: center;
+    }
+
+    /* 7-Column Standard Calendar Grid */
+    .calendar-container {
+      background-color: var(--cream-card);
+      border: 1px solid var(--gold);
+      border-radius: 0 0 8px 8px;
       box-shadow: var(--shadow);
-      transition: all 0.25s ease;
-      cursor: pointer;
-      position: relative;
       overflow: hidden;
+    }
+
+    .weekdays-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background-color: var(--maroon);
+      color: var(--gold-light);
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .weekday-name {
+      padding: 0.6rem 0.2rem;
+      border-right: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .weekday-name:last-child {
+      border-right: none;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background-color: var(--border-color);
+      gap: 1px;
+    }
+
+    /* Day Cells */
+    .day-cell {
+      background-color: var(--cream-card);
+      min-height: 100px;
+      padding: 0.5rem 0.35rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
     }
 
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      border-color: var(--gold);
-    }
-
-    /* FEATURE 1: Highlight Current Ethiopian Month */
-    .month-card.current-month-card {
-      border: 2px solid var(--gold);
+    .day-cell:hover:not(.empty-cell) {
       background-color: #fffaf0;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+      box-shadow: inset 0 0 0 2px var(--gold);
+      z-index: 2;
     }
 
-    .month-card.current-month-card::before {
-      content: '★';
+    .empty-cell {
+      background-color: #f1ede4;
+      cursor: default;
+    }
+
+    .day-cell.today-cell {
+      background-color: #fff9e6;
+      box-shadow: inset 0 0 0 2px var(--gold);
+    }
+
+    .day-cell.today-cell::after {
+      content: '•';
       position: absolute;
-      top: 6px;
-      right: 8px;
+      top: 4px;
+      right: 6px;
       color: var(--gold-dark);
-      font-size: 0.85rem;
+      font-size: 1.2rem;
     }
 
-    .month-card h2 {
-      font-size: 1.4rem;
-      color: var(--maroon);
-      margin-bottom: 0.25rem;
-    }
-
-    .month-card .translit {
-      font-family: 'Cinzel', serif;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
-    }
-
-    .month-card .meta {
-      font-size: 0.85rem;
-      color: var(--maroon-light);
-      font-weight: 600;
-    }
-
-    /* Day Card Styling */
-    .day-card {
-      min-height: 110px;
-      padding: 0.75rem;
-    }
-
-    .day-card .day-num {
-      font-size: 1.4rem;
+    .day-header-num {
+      font-size: 1.25rem;
       font-weight: 700;
       color: var(--maroon-dark);
+      line-height: 1;
     }
 
-    .day-card .greg-date {
-      font-size: 0.75rem;
+    .greg-date-sub {
+      font-size: 0.7rem;
       color: var(--text-muted);
       margin-top: 0.2rem;
     }
 
-    .day-card .feast-tag {
-      font-size: 0.7rem;
-      padding: 0.25rem 0.35rem;
-      border-radius: 4px;
-      margin-top: 0.5rem;
-      line-height: 1.2;
+    .feast-tag {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.25rem;
+      border-radius: 3px;
+      margin-top: 0.35rem;
+      line-height: 1.15;
       font-weight: 600;
       word-break: break-word;
     }
 
-    .day-card.feast-movable .feast-tag {
+    .day-cell.feast-movable .feast-tag {
       background-color: var(--feast-movable-bg);
       color: var(--feast-movable-text);
     }
-    
-    .day-card.feast-annual .feast-tag {
+
+    .day-cell.feast-annual .feast-tag {
       background-color: var(--feast-annual-bg);
       color: var(--feast-annual-text);
     }
 
-    .day-card.feast-monthly .feast-tag {
+    .day-cell.feast-monthly .feast-tag {
       background-color: var(--feast-monthly-bg);
       color: var(--feast-monthly-text);
     }
 
-    .day-card.feast-major .feast-tag {
+    .day-cell.feast-major .feast-tag {
       background-color: var(--gold);
       color: var(--maroon-dark);
       font-weight: 700;
-      border: 1px solid var(--maroon);
     }
 
-    /* FEATURE 4: Resource Availability Badges on Day Cards */
+    /* Availability Indicators */
     .res-badge-bar {
       display: flex;
       justify-content: center;
       gap: 3px;
-      margin-top: 0.4rem;
+      margin-top: 0.3rem;
     }
 
     .res-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background-color: #ccc;
     }
 
     .res-dot.active {
       background-color: #2e7d32;
-    }
-
-    /* Unavailable Day Styling */
-    .day-card.disabled {
-      opacity: 0.45;
-      background-color: #eae5dc;
-      border-style: dashed;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .day-card.disabled:hover {
-      transform: none;
-      border-color: var(--border-color);
     }
 
     /* Modal Styling */
@@ -380,16 +355,10 @@
       border: 2px solid var(--gold);
       border-radius: 8px;
       width: 90%;
-      max-width: 500px;
-      padding: 1.75rem;
+      max-width: 480px;
+      padding: 1.5rem;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       position: relative;
-      transform: translateY(-20px);
-      transition: transform 0.25s ease;
-    }
-
-    .modal-overlay.active .modal-content {
-      transform: translateY(0);
     }
 
     .modal-close {
@@ -404,14 +373,13 @@
     }
 
     .modal-header {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--maroon-dark);
       margin-bottom: 0.5rem;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 0.5rem;
     }
 
-    /* FEATURE 4: Resource Picker Modal Grid */
     .resource-picker-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -423,16 +391,16 @@
       background-color: var(--cream);
       border: 1px solid var(--gold-dark);
       color: var(--maroon-dark);
-      padding: 0.85rem 0.5rem;
+      padding: 0.75rem 0.5rem;
       border-radius: 6px;
       font-family: inherit;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.2rem;
       transition: all 0.2s ease;
     }
 
@@ -440,14 +408,12 @@
       background-color: var(--maroon);
       color: var(--gold-light);
       border-color: var(--gold);
-      transform: translateY(-2px);
     }
 
     .resource-option-btn.selected {
       background-color: var(--maroon-dark);
       color: var(--gold);
       border-color: var(--gold);
-      box-shadow: inset 0 0 5px rgba(212,175,55,0.5);
     }
 
     .resource-option-btn.disabled {
@@ -469,7 +435,6 @@
 
     .password-input:focus {
       outline: 2px solid var(--gold);
-      border-color: transparent;
     }
 
     .btn-submit {
@@ -496,7 +461,6 @@
       display: none;
     }
 
-    /* Viewer Modal for PDF */
     .viewer-modal .modal-content {
       max-width: 900px;
       width: 95%;
@@ -518,16 +482,15 @@
       border: none;
     }
 
-    /* Loading Spinner */
     .spinner {
       display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(212,175,55,.3);
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(212,175,55,.3);
       border-radius: 50%;
       border-top-color: var(--gold);
       animation: spin 1s ease-in-out infinite;
-      margin-right: 8px;
+      margin-right: 6px;
       vertical-align: middle;
     }
 
@@ -535,21 +498,14 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Footer */
     footer {
       background-color: var(--maroon-dark);
       color: #d1c4b2;
       border-top: 3px solid var(--gold);
-      padding: 1.5rem 1rem;
+      padding: 1.25rem 1rem;
       text-align: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       margin-top: auto;
-    }
-
-    footer p {
-      max-width: 800px;
-      margin: 0.4rem auto;
-      line-height: 1.4;
     }
 
     footer strong {
@@ -559,16 +515,33 @@
     .hidden {
       display: none !important;
     }
+
+    @media (max-width: 600px) {
+      .day-cell {
+        min-height: 75px;
+        padding: 0.3rem 0.15rem;
+      }
+      .day-header-num {
+        font-size: 1rem;
+      }
+      .greg-date-sub {
+        font-size: 0.6rem;
+      }
+      .weekday-name {
+        font-size: 0.72rem;
+        padding: 0.4rem 0.1rem;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- FEATURE 2: Fixed Language Toggle in Top Right -->
+  <!-- Language Toggle -->
   <div class="top-right-controls">
     <button id="langToggleBtn" class="lang-toggle-btn" onclick="toggleLanguage()">English</button>
   </div>
 
-  <!-- HEADER -->
+  <!-- Header -->
   <header>
     <svg class="header-cross" viewBox="0 0 24 24">
       <path d="M11 2h2v4h4v2h-4v3h5v2h-5v3h4v2h-4v4h-2v-4H7v-2h4v-3H6v-2h5V8H7V6h4V2z"/>
@@ -586,32 +559,32 @@
     </div>
   </header>
 
-  <!-- MAIN CONTENT AREA -->
+  <!-- MAIN CALENDAR VIEW -->
   <main>
-    <div class="view-nav">
-      <div class="nav-buttons-group">
-        <button id="backBtn" class="back-btn hidden" onclick="showMonthView()">
-          &#8592; <span id="backBtnText">ወደ ወራት ተመለስ (Back to Months)</span>
-        </button>
-      </div>
-
-      <!-- FEATURE 1: Month Pager Controls -->
-      <div id="monthPagerNav" class="nav-buttons-group hidden">
-        <button class="month-nav-btn" onclick="navigateAdjacentMonth(-1)">‹ <span id="prevMonthLabel">Prev</span></button>
-        <button class="month-nav-btn" onclick="navigateAdjacentMonth(1)"><span id="nextMonthLabel">Next</span> ›</button>
-      </div>
-
-      <div id="viewTitle" class="view-title">ወራት (Months)</div>
+    <div class="calendar-navbar">
+      <button class="nav-btn" onclick="navigateMonth(-1)">‹ <span id="prevLabel">Prev</span></button>
+      <div id="monthDisplayTitle" class="month-display-title">---</div>
+      <button class="nav-btn" onclick="navigateMonth(1)"><span id="nextLabel">Next</span> ›</button>
     </div>
 
-    <!-- LEVEL 1: Month View Container -->
-    <div id="monthGrid" class="grid month-grid"></div>
+    <div class="calendar-container">
+      <!-- Weekday Headers: Monday to Sunday -->
+      <div class="weekdays-header">
+        <div class="weekday-name" id="wd-mon">ሰኞ<br>(Mon)</div>
+        <div class="weekday-name" id="wd-tue">ማክሰኞ<br>(Tue)</div>
+        <div class="weekday-name" id="wd-wed">ረቡዕ<br>(Wed)</div>
+        <div class="weekday-name" id="wd-thu">ሐሙስ<br>(Thu)</div>
+        <div class="weekday-name" id="wd-fri">አርብ<br>(Fri)</div>
+        <div class="weekday-name" id="wd-sat">ቅዳሜ<br>(Sat)</div>
+        <div class="weekday-name" id="wd-sun">እሁድ<br>(Sun)</div>
+      </div>
 
-    <!-- LEVEL 2: Day View Container -->
-    <div id="dayGrid" class="grid day-grid hidden"></div>
+      <!-- 7-Column Days Grid -->
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
   </main>
 
-  <!-- FEATURE 4: RESOURCE PICKER & PASSWORD MODAL -->
+  <!-- RESOURCE PICKER & PASSWORD MODAL -->
   <div id="passwordModal" class="modal-overlay">
     <div class="modal-content">
       <button class="modal-close" onclick="closePasswordModal()">&times;</button>
@@ -619,7 +592,6 @@
       <div class="modal-body">
         <p style="font-size:0.85rem; color:var(--text-muted);" id="modalSub">Select service document to view:</p>
         
-        <!-- 4 Resource Buttons -->
         <div class="resource-picker-grid">
           <button id="resBtn-mahlet" class="resource-option-btn" onclick="selectResourceType('mahlet')">
             <span>ማኅሌት</span>
@@ -641,7 +613,7 @@
 
         <div id="passwordSection" class="hidden">
           <input type="password" id="passwordInput" class="password-input" placeholder="Password..." onkeyup="handleKeySubmit(event)" />
-          <div id="errorMsg" class="error-msg">የተሳሳተ የይለፍ ቃል! እባክዎ እንደገና ይሞክሩ። (Incorrect password)</div>
+          <div id="errorMsg" class="error-msg">የተሳሳተ የይለፍ ቃል! እባክዎ እንደገና ይሞክሩ።</div>
           <button id="submitBtn" class="btn-submit" onclick="submitPassword()">
             <span id="btnText">ክፈት (Decrypt & Open)</span>
           </button>
@@ -661,20 +633,18 @@
     </div>
   </div>
 
-  <!-- HONEST SECURITY FOOTER -->
+  <!-- FOOTER -->
   <footer>
-    <p id="footerDisclaimer"><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside your browser memory only when the correct password is entered — files are not merely hidden. Security relies strictly on password strength and confidentiality.</p>
+    <p id="footerDisclaimer"><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.</p>
   </footer>
 
-  <!-- JAVASCRIPT LOGIC -->
   <script>
     // 01. CONFIGURATION & STATE
     let isLeapYear = false;
-    let currentSelectedMonth = null;
+    let currentActiveMonthId = 1;
     let currentSelectedDay = null;
-    let currentSelectedResource = null; // 'mahlet' | 'gitsawe' | 'mezmur' | 'qedassie'
+    let currentSelectedResource = null;
 
-    // FEATURE 2: Bilingual UI language state (persisted via sessionStorage)
     let currentLang = sessionStorage.getItem('eotc_lang') || 'am';
 
     const ETHIOPIAN_MONTHS = [
@@ -693,8 +663,6 @@
       { id: 13, nameAm: "ጳጉሜ", nameEn: "Pagume", folder: "pagume" }
     ];
 
-    // FEATURE 4: Independent resource manifest tracking
-    // Format: RESOURCE_MANIFEST[monthId][day][resourceType] = boolean
     const RESOURCE_MANIFEST = {};
 
     function isResourceAvailable(monthId, day, resourceType) {
@@ -703,15 +671,9 @@
           RESOURCE_MANIFEST[monthId][day][resourceType] !== undefined) {
         return RESOURCE_MANIFEST[monthId][day][resourceType];
       }
-      return true; // Default fallback: assume available
+      return true;
     }
 
-    function isAnyResourceAvailable(monthId, day) {
-      const types = ['mahlet', 'gitsawe', 'mezmur', 'qedassie'];
-      return types.some(t => isResourceAvailable(monthId, day, t));
-    }
-
-    // FEATURE 2: Translation Dictionaries for Chrome UI
     const TRANSLATIONS = {
       am: {
         pageTitle: "የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት አገልግሎት መጽሐፍት | EOTC Daily Service Resources",
@@ -719,9 +681,6 @@
         headerSubtitle: "የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ",
         todayLabel: "ዛሬ",
         leapToggle: "ጳጉሜ 6 ቀን (ዘመነ ዮሐንስ / Leap Year)",
-        backBtn: "ወደ ወራት ተመለስ",
-        viewTitleMonths: "ወራት",
-        daysUnit: "ቀናት",
         selectResHeader: "የአገልግሎት መጽሐፍ ይምረጡ",
         selectResSub: "ለማየት የሚፈልጉትን የአገልግሎት ክፍል ይምረጡ፡",
         decryptOpen: "ክፈት",
@@ -731,6 +690,7 @@
         securityNote: "የደኅንነት ማስታወሻ: All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.",
         prev: "ቀደመ",
         next: "ቀጣይ",
+        weekdays: ["ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "አርብ", "ቅዳሜ", "እሁድ"],
         resources: {
           mahlet: "ማኅሌት",
           gitsawe: "ግጻዌ",
@@ -744,9 +704,6 @@
         headerSubtitle: "Daily Service Resources & Liturgical Calendar",
         todayLabel: "Today",
         leapToggle: "Pagume 6 (Leap Year / Yohannes)",
-        backBtn: "Back to Months",
-        viewTitleMonths: "Months",
-        daysUnit: "Days",
         selectResHeader: "Select Service Resource",
         selectResSub: "Select a service document to view:",
         decryptOpen: "Decrypt & Open",
@@ -756,6 +713,7 @@
         securityNote: "Security Note: All Service PDF documents on this site are client-side encrypted using 256-bit AES-GCM (PBKDF2 key derivation, 100,000+ iterations). Decryption happens locally inside browser memory.",
         prev: "Prev",
         next: "Next",
+        weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         resources: {
           mahlet: "Mahlet",
           gitsawe: "Gitsawe",
@@ -765,7 +723,7 @@
       }
     };
 
-    // FEATURE 3: Verified Bahire Hasab / Feast Day Logic
+    // 02. CALENDAR & FEAST MATHEMATICS
     function gregorianToJDN(year, month, day) {
       const a = Math.floor((14 - month) / 12);
       const y = year + 4800 - a;
@@ -900,14 +858,15 @@
     try {
       todayJDN = gregorianToJDN(todayGreg.getFullYear(), todayGreg.getMonth() + 1, todayGreg.getDate());
       todayEth = jdnToEthiopian(todayJDN);
+      currentActiveMonthId = todayEth.month;
       movableFeastsForYear = calculateBahireHasabMovableFeasts(todayEth.year);
     } catch (e) {
-      console.warn("Date calculation fallback engaged:", e);
+      console.warn("Date fallback engaged:", e);
       todayEth = { year: 2018, month: 1, day: 1 };
+      currentActiveMonthId = 1;
       movableFeastsForYear = {};
     }
 
-    // FEATURE 3: Strict Precedence (Movable > Annual > Monthly) + Bilingual Parsing
     function getFeastInfo(month, day) {
       const key = `${month}-${day}`;
       let feastObj = null;
@@ -922,28 +881,18 @@
 
       if (!feastObj) return null;
 
-      // Format name string based on current language toggle
       const parts = feastObj.name.split(" / ");
       const formattedName = (currentLang === 'en' && parts.length > 1) ? parts[1] : parts[0];
 
-      return {
-        name: formattedName,
-        type: feastObj.type
-      };
+      return { name: formattedName, type: feastObj.type };
     }
 
-    // FEATURE 2: Toggle Language Function
+    // 03. UI & RENDER LOGIC
     function toggleLanguage() {
       currentLang = (currentLang === 'am') ? 'en' : 'am';
       sessionStorage.setItem('eotc_lang', currentLang);
       applyLanguageUI();
-
-      // Re-render current view without losing position
-      if (currentSelectedMonth) {
-        renderDayView(currentSelectedMonth);
-      } else {
-        renderMonthView();
-      }
+      renderCalendar();
     }
 
     function applyLanguageUI() {
@@ -953,15 +902,23 @@
       document.getElementById('headerTitle').innerText = t.headerTitle;
       document.getElementById('headerSubtitle').innerText = t.headerSubtitle;
       document.getElementById('leapToggleLabel').innerText = t.leapToggle;
-      document.getElementById('backBtnText').innerText = t.backBtn;
-      document.getElementById('prevMonthLabel').innerText = t.prev;
-      document.getElementById('nextMonthLabel').innerText = t.next;
+      document.getElementById('prevLabel').innerText = t.prev;
+      document.getElementById('nextLabel').innerText = t.next;
       document.getElementById('footerDisclaimer').innerHTML = t.securityNote;
+
+      const wDays = [
+        ["wd-mon", "ሰኞ", "Mon"], ["wd-tue", "ማክሰኞ", "Tue"],
+        ["wd-wed", "ረቡዕ", "Wed"], ["wd-thu", "ሐሙስ", "Thu"],
+        ["wd-fri", "አርብ", "Fri"], ["wd-sat", "ቅዳሜ", "Sat"],
+        ["wd-sun", "እሁድ", "Sun"]
+      ];
+      wDays.forEach(([id, am, en]) => {
+        document.getElementById(id).innerHTML = (currentLang === 'en') ? en : `${am}<br><small style="font-size:0.7rem; font-weight:normal;">(${en})</small>`;
+      });
 
       initHeaderBanner();
     }
 
-    // 03. UI RENDER & FEATURE 1 NAVIGATION FUNCTIONS
     function initHeaderBanner() {
       const banner = document.getElementById('todayBanner');
       if (!banner) return;
@@ -971,89 +928,42 @@
       banner.innerHTML = `<strong>${t.todayLabel}:</strong> ${monthName} ${todayEth.day}, ${todayEth.year} (${todayGreg.toDateString()})`;
     }
 
-    function renderMonthView() {
-      const container = document.getElementById('monthGrid');
-      if (!container) return;
-      container.innerHTML = '';
-      const t = TRANSLATIONS[currentLang];
-
-      document.getElementById('viewTitle').innerText = t.viewTitleMonths;
-      document.getElementById('monthPagerNav').classList.add('hidden');
-
-      ETHIOPIAN_MONTHS.forEach(m => {
-        const totalDays = (m.id === 13) ? (isLeapYear ? 6 : 5) : 30;
-        const isCurrentMonth = (m.id === todayEth.month);
-
-        const card = document.createElement('div');
-        // FEATURE 1: Highlight current month card
-        card.className = `card month-card ${isCurrentMonth ? 'current-month-card' : ''}`;
-        card.id = `month-card-${m.id}`;
-        card.onclick = () => showDayView(m);
-
-        card.innerHTML = `
-          <div>
-            <h2>${currentLang === 'en' ? m.nameEn : m.nameAm}</h2>
-            <div class="translit">${currentLang === 'en' ? m.nameAm : m.nameEn}</div>
-          </div>
-          <div class="meta">${totalDays} ${t.daysUnit}</div>
-        `;
-        container.appendChild(card);
-      });
-
-      // FEATURE 1: Auto-scroll to current Ethiopian month on initial load
-      setTimeout(() => {
-        const currentCard = document.getElementById(`month-card-${todayEth.month}`);
-        if (currentCard) {
-          currentCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      }, 200);
+    function navigateMonth(delta) {
+      currentActiveMonthId += delta;
+      if (currentActiveMonthId > 13) currentActiveMonthId = 1;
+      if (currentActiveMonthId < 1) currentActiveMonthId = 13;
+      renderCalendar();
     }
 
-    function showDayView(monthObj) {
-      currentSelectedMonth = monthObj;
-      document.getElementById('monthGrid').classList.add('hidden');
-      document.getElementById('dayGrid').classList.remove('hidden');
-      document.getElementById('backBtn').classList.remove('hidden');
-      document.getElementById('monthPagerNav').classList.remove('hidden');
+    // 7-Column Grid Renderer (Monday to Sunday)
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const title = document.getElementById('monthDisplayTitle');
+      if (!grid || !title) return;
 
-      renderDayView(monthObj);
-    }
+      grid.innerHTML = '';
+      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentActiveMonthId);
+      title.innerText = (currentLang === 'en') ? `${monthObj.nameEn} (${monthObj.nameAm})` : `${monthObj.nameAm} (${monthObj.nameEn})`;
 
-    function showMonthView() {
-      currentSelectedMonth = null;
-      document.getElementById('dayGrid').classList.add('hidden');
-      document.getElementById('monthGrid').classList.remove('hidden');
-      document.getElementById('backBtn').classList.add('hidden');
-      document.getElementById('monthPagerNav').classList.add('hidden');
-      renderMonthView();
-    }
-
-    // FEATURE 1: Adjacent month navigation (wrapping Pagume <-> Meskerem)
-    function navigateAdjacentMonth(delta) {
-      if (!currentSelectedMonth) return;
-      let newId = currentSelectedMonth.id + delta;
-      if (newId > 13) newId = 1;
-      if (newId < 1) newId = 13;
-      const newMonthObj = ETHIOPIAN_MONTHS.find(m => m.id === newId);
-      if (newMonthObj) {
-        showDayView(newMonthObj);
-      }
-    }
-
-    function renderDayView(monthObj) {
-      const container = document.getElementById('dayGrid');
-      if (!container) return;
-      container.innerHTML = '';
-      const t = TRANSLATIONS[currentLang];
       const totalDays = (monthObj.id === 13) ? (isLeapYear ? 6 : 5) : 30;
 
-      const titleMonth = (currentLang === 'en') ? `${monthObj.nameEn} (${monthObj.nameAm})` : `${monthObj.nameAm} (${monthObj.nameEn})`;
-      document.getElementById('viewTitle').innerText = titleMonth;
+      // Determine day of week for Day 1 of this Ethiopian month
+      const jdnDay1 = ethiopianToJDN(todayEth.year, monthObj.id, 1);
+      // JDN % 7: 0 = Mon, 1 = Tue, 2 = Wed, 3 = Thu, 4 = Fri, 5 = Sat, 6 = Sun
+      const day1Dow = (jdnDay1 % 7);
 
+      // Render Empty Padding Cells
+      for (let i = 0; i < day1Dow; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'day-cell empty-cell';
+        grid.appendChild(empty);
+      }
+
+      // Render Active Days 1 to totalDays
       for (let day = 1; day <= totalDays; day++) {
-        const anyAvailable = isAnyResourceAvailable(monthObj.id, day);
         const feast = getFeastInfo(monthObj.id, day);
-        
+        const isToday = (monthObj.id === todayEth.month && day === todayEth.day);
+
         let gDateStr = "";
         try {
           const jdn = ethiopianToJDN(todayEth.year, monthObj.id, day);
@@ -1063,53 +973,49 @@
           gDateStr = "--";
         }
 
-        const card = document.createElement('div');
-        let cardClass = 'card day-card';
-        if (!anyAvailable) cardClass += ' disabled';
+        const cell = document.createElement('div');
+        let cellClass = 'day-cell';
+        if (isToday) cellClass += ' today-cell';
 
         if (feast) {
-          if (feast.type === 'movable-major') cardClass += ' feast-major';
-          else if (feast.type === 'movable') cardClass += ' feast-movable';
-          else if (feast.type === 'annual') cardClass += ' feast-annual';
-          else if (feast.type === 'monthly') cardClass += ' feast-monthly';
+          if (feast.type === 'movable-major') cellClass += ' feast-major';
+          else if (feast.type === 'movable') cellClass += ' feast-movable';
+          else if (feast.type === 'annual') cellClass += ' feast-annual';
+          else if (feast.type === 'monthly') cellClass += ' feast-monthly';
         }
 
-        card.className = cardClass;
-        if (anyAvailable) {
-          card.onclick = () => openResourcePickerModal(monthObj, day);
-        }
+        cell.className = cellClass;
+        cell.onclick = () => openResourcePickerModal(monthObj, day);
 
-        // FEATURE 4: Resource Availability Indicators
         const mAvail = isResourceAvailable(monthObj.id, day, 'mahlet');
         const gAvail = isResourceAvailable(monthObj.id, day, 'gitsawe');
         const zAvail = isResourceAvailable(monthObj.id, day, 'mezmur');
         const qAvail = isResourceAvailable(monthObj.id, day, 'qedassie');
 
-        card.innerHTML = `
-          <div class="day-num">${day}</div>
-          <div class="greg-date">G: ${gDateStr}</div>
+        cell.innerHTML = `
+          <div>
+            <div class="day-header-num">${day}</div>
+            <div class="greg-date-sub">G: ${gDateStr}</div>
+          </div>
+          ${feast ? `<div class="feast-tag">${feast.name}</div>` : ''}
           <div class="res-badge-bar" title="Mahlet, Gitsawe, Mezmur, Qedassie availability">
             <span class="res-dot ${mAvail ? 'active' : ''}"></span>
             <span class="res-dot ${gAvail ? 'active' : ''}"></span>
             <span class="res-dot ${zAvail ? 'active' : ''}"></span>
             <span class="res-dot ${qAvail ? 'active' : ''}"></span>
           </div>
-          ${feast ? `<div class="feast-tag">${feast.name}</div>` : ''}
         `;
 
-        container.appendChild(card);
+        grid.appendChild(cell);
       }
     }
 
     function toggleLeapYear(checked) {
       isLeapYear = checked;
-      renderMonthView();
-      if (currentSelectedMonth && currentSelectedMonth.id === 13) {
-        renderDayView(currentSelectedMonth);
-      }
+      renderCalendar();
     }
 
-    // FEATURE 4: RESOURCE PICKER & AES-GCM DECRYPTION HANDLERS
+    // Modal & Cryptographic Handlers
     function openResourcePickerModal(monthObj, day) {
       currentSelectedDay = day;
       currentSelectedResource = null;
@@ -1119,7 +1025,6 @@
       document.getElementById('modalTitle').innerText = `${monthName} ${day} - ${t.selectResHeader}`;
       document.getElementById('modalSub').innerText = t.selectResSub;
       
-      // Configure 4 resource buttons based on availability
       const types = ['mahlet', 'gitsawe', 'mezmur', 'qedassie'];
       types.forEach(type => {
         const btn = document.getElementById(`resBtn-${type}`);
@@ -1135,9 +1040,7 @@
     }
 
     function selectResourceType(type) {
-      if (!isResourceAvailable(currentSelectedMonth.id, currentSelectedDay, type)) {
-        return; // Non-clickable if disabled
-      }
+      if (!isResourceAvailable(currentActiveMonthId, currentSelectedDay, type)) return;
 
       currentSelectedResource = type;
       const types = ['mahlet', 'gitsawe', 'mezmur', 'qedassie'];
@@ -1169,10 +1072,8 @@
     }
 
     window.onclick = function(e) {
-      const pModal = document.getElementById('passwordModal');
-      const vModal = document.getElementById('viewerModal');
-      if (e.target === pModal) closePasswordModal();
-      if (e.target === vModal) closeViewerModal();
+      if (e.target === document.getElementById('passwordModal')) closePasswordModal();
+      if (e.target === document.getElementById('viewerModal')) closeViewerModal();
     };
 
     window.onkeydown = function(e) {
@@ -1184,9 +1085,7 @@
 
     async function decryptPdfBuffer(encryptedArrayBuffer, password) {
       const bytes = new Uint8Array(encryptedArrayBuffer);
-      if (bytes.length < 28) {
-        throw new Error("Invalid file structure or corrupted data.");
-      }
+      if (bytes.length < 28) throw new Error("Corrupted payload.");
 
       const salt = bytes.slice(0, 16);
       const iv = bytes.slice(16, 28);
@@ -1195,32 +1094,16 @@
       const enc = new TextEncoder();
       const pwBytes = enc.encode(password);
 
-      const baseKey = await crypto.subtle.importKey(
-        "raw",
-        pwBytes,
-        "PBKDF2",
-        false,
-        ["deriveKey"]
-      );
-
+      const baseKey = await crypto.subtle.importKey("raw", pwBytes, "PBKDF2", false, ["deriveKey"]);
       const derivedKey = await crypto.subtle.deriveKey(
-        {
-          name: "PBKDF2",
-          salt: salt,
-          iterations: 100000,
-          hash: "SHA-256"
-        },
+        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
         baseKey,
         { name: "AES-GCM", length: 256 },
         false,
         ["decrypt"]
       );
 
-      return await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: iv },
-        derivedKey,
-        ciphertext
-      );
+      return await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, derivedKey, ciphertext);
     }
 
     async function submitPassword() {
@@ -1238,15 +1121,13 @@
       errorMsg.style.display = 'none';
       btnText.innerHTML = `<span class="spinner"></span>${t.decrypting}`;
 
-      // FEATURE 4: Updated filename convention
+      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentActiveMonthId);
       const dayPadded = String(currentSelectedDay).padStart(2, '0');
-      const filePath = `pdfs/${currentSelectedMonth.folder}/${dayPadded}-${currentSelectedResource}.pdf.enc`;
+      const filePath = `pdfs/${monthObj.folder}/${dayPadded}-${currentSelectedResource}.pdf.enc`;
 
       try {
         const response = await fetch(filePath);
-        if (!response.ok) {
-          throw new Error(`File non-existent or network error (Status: ${response.status})`);
-        }
+        if (!response.ok) throw new Error("Network response error.");
 
         const encryptedData = await response.arrayBuffer();
         const decryptedBuffer = await decryptPdfBuffer(encryptedData, password);
@@ -1256,7 +1137,7 @@
 
         closePasswordModal();
         
-        const monthName = (currentLang === 'en') ? currentSelectedMonth.nameEn : currentSelectedMonth.nameAm;
+        const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
         const resName = t.resources[currentSelectedResource];
         document.getElementById('viewerTitle').innerText = `${monthName} ${currentSelectedDay} - ${resName}`;
         document.getElementById('pdfFrame').src = blobUrl;
@@ -1271,15 +1152,9 @@
       }
     }
 
-    // INITIALIZATION GUARANTEE
     window.addEventListener('DOMContentLoaded', () => {
-      try {
-        applyLanguageUI();
-        renderMonthView();
-      } catch (err) {
-        console.error("Initialization error encountered, running resilient fallback:", err);
-        renderMonthView();
-      }
+      applyLanguageUI();
+      renderCalendar();
     });
   </script>
 </body>
