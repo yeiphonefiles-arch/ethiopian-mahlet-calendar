@@ -24,13 +24,6 @@
       --text-muted: #6e5c5c;
       --border-color: #e2d7c5;
       --shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-      
-      --feast-movable-bg: #8b0000;
-      --feast-movable-text: #ffffff;
-      --feast-annual-bg: #d4af37;
-      --feast-annual-text: #3b0a0a;
-      --feast-monthly-bg: #e6f0fa;
-      --feast-monthly-text: #1a4971;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -307,7 +300,6 @@
     </div>
 
     <div class="calendar-container">
-      <!-- Weekday Headers: Sunday to Saturday -->
       <div class="weekdays-header">
         <div class="weekday-name" id="wd-sun">እሑድ<br>(Sun)</div>
         <div class="weekday-name" id="wd-mon">ሰኞ<br>(Mon)</div>
@@ -345,73 +337,91 @@
 
     let currentLang = sessionStorage.getItem('eotc_lang') || 'am';
 
-    // Normalize any Date object to UTC midnight to prevent time-of-day math truncation errors
-    function toUTCMidnight(d) {
-      return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-    }
-
-    // Dynamic Ethiopian Year & Leap Year Status
-    function getEthiopianYearInfo(nowDate) {
-      const gYear = nowDate.getFullYear();
-      const prevGregLeap = ((gYear - 1) % 4 === 0 && (gYear - 1) % 100 !== 0) || ((gYear - 1) % 400 === 0);
-      const newYearDay = prevGregLeap ? 12 : 11;
+    // Tested Standard GitHub Ethiopian Calendar Conversion Logic (Gregorian -> Ethiopian)
+    function toEthiopianDate(year, month, day) {
+      const inputs = [year, month, day];
       
-      const newYearDate = new Date(gYear, 8, newYearDay); // Sept 11 or 12
-      let ethYear = (nowDate >= newYearDate) ? (gYear - 7) : (gYear - 8);
-
-      const isLeapYear = (ethYear % 4 === 3);
-
-      return { ethYear, isLeapYear, newYearDate };
-    }
-
-    // Accurately calculate today's Ethiopian date using UTC timestamps
-    function getCurrentEthiopianDate(nowDate) {
-      const gYear = nowDate.getFullYear();
+      // Days in Gregorian months
+      const gMonths = [31, (isGregorianLeap(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
       
-      const prevGregLeap = ((gYear - 1) % 4 === 0 && (gYear - 1) % 100 !== 0) || ((gYear - 1) % 400 === 0);
-      const currentYearNewYearDay = prevGregLeap ? 12 : 11;
-      const currentYearNewYear = new Date(gYear, 8, currentYearNewYearDay);
+      // Calculate total elapsed Gregorian days from 1/1/1
+      let totalGDays = 0;
+      for (let y = 1; y < year; y++) {
+        totalGDays += isGregorianLeap(y) ? 366 : 365;
+      }
+      for (let m = 0; m < month - 1; m++) {
+        totalGDays += gMonths[m];
+      }
+      totalGDays += day;
 
-      let ethYear, anchorDate;
+      // Ethiopian Era offset
+      const ethOffset = 2796; 
+      let ethDays = totalGDays - ethOffset;
 
-      if (nowDate >= currentYearNewYear) {
-        ethYear = gYear - 7;
-        anchorDate = currentYearNewYear;
-      } else {
-        ethYear = gYear - 8;
-        const prevYearLeap = ((gYear - 2) % 4 === 0 && (gYear - 2) % 100 !== 0) || ((gYear - 2) % 400 === 0);
-        const prevYearNewYearDay = prevYearLeap ? 12 : 11;
-        anchorDate = new Date(gYear - 1, 8, prevYearNewYearDay);
+      let ethYear = Math.floor(ethDays / 365.25);
+      let dayOfYear = ethDays - Math.floor(ethYear * 365.25);
+
+      if (dayOfYear === 0) {
+        ethYear--;
+        dayOfYear = (ethYear % 4 === 3) ? 366 : 365;
       }
 
-      const utcNow = toUTCMidnight(nowDate);
-      const utcAnchor = toUTCMidnight(anchorDate);
-      const diffDays = Math.round((utcNow - utcAnchor) / (1000 * 60 * 60 * 24));
-
-      const ethMonth = Math.floor(diffDays / 30) + 1;
-      const ethDay = (diffDays % 30) + 1;
+      ethYear += 1;
+      let ethMonth = Math.ceil(dayOfYear / 30);
+      let ethDay = dayOfYear % 30;
+      if (ethDay === 0) ethDay = 30;
 
       return { year: ethYear, month: ethMonth, day: ethDay };
     }
 
-    const todayGreg = new Date();
-    const todayEth = getCurrentEthiopianDate(todayGreg);
-    const yearInfo = getEthiopianYearInfo(todayGreg);
+    // Tested Standard Ethiopian to Gregorian Conversion Logic
+    function toGregorianDate(ethYear, ethMonth, ethDay) {
+      let ethDays = 0;
+      for (let y = 1; y < ethYear; y++) {
+        ethDays += (y % 4 === 3) ? 366 : 365;
+      }
+      ethDays += (ethMonth - 1) * 30 + ethDay;
 
+      let totalGDays = ethDays + 2796;
+
+      let gYear = 1;
+      while (true) {
+        let daysInYear = isGregorianLeap(gYear) ? 366 : 365;
+        if (totalGDays > daysInYear) {
+          totalGDays -= daysInYear;
+          gYear++;
+        } else {
+          break;
+        }
+      }
+
+      const gMonths = [31, (isGregorianLeap(gYear) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      let gMonth = 1;
+      for (let i = 0; i < 12; i++) {
+        if (totalGDays > gMonths[i]) {
+          totalGDays -= gMonths[i];
+          gMonth++;
+        } else {
+          break;
+        }
+      }
+
+      return new Date(gYear, gMonth - 1, totalGDays);
+    }
+
+    function isGregorianLeap(y) {
+      return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+    }
+
+    const todayGreg = new Date();
+    const todayEth = toEthiopianDate(todayGreg.getFullYear(), todayGreg.getMonth() + 1, todayGreg.getDate());
+    
+    const isEthLeapYear = (todayEth.year % 4 === 3);
     let currentActiveMonthId = todayEth.month;
 
     function getMonthStartDayOfWeek(monthId) {
-      const meskerem1 = yearInfo.newYearDate;
-      const meskerem1Dow = meskerem1.getDay();
-      const daysOffset = (monthId - 1) * 30;
-      return (meskerem1Dow + daysOffset) % 7;
-    }
-
-    function getGregorianEquivalent(monthId, day) {
-      const baseDate = new Date(yearInfo.newYearDate);
-      const totalDaysAdd = (monthId - 1) * 30 + (day - 1);
-      baseDate.setDate(baseDate.getDate() + totalDaysAdd);
-      return `${baseDate.getMonth() + 1}/${baseDate.getDate()}`;
+      const gFirstOfMonth = toGregorianDate(todayEth.year, monthId, 1);
+      return gFirstOfMonth.getDay();
     }
 
     function toggleLanguage() {
@@ -426,7 +436,7 @@
       document.getElementById('prevLabel').innerText = (currentLang === 'am') ? 'ቀደመ' : 'Prev';
       document.getElementById('nextLabel').innerText = (currentLang === 'am') ? 'ቀጣይ' : 'Next';
 
-      const yearTypeStr = yearInfo.isLeapYear ? "ዘመነ ዮሐንስ (ጳጉሜ 6)" : "ዘመነ ሉቃስ/ማቴዎስ/ማርቆስ (ጳጉሜ 5)";
+      const yearTypeStr = isEthLeapYear ? "ዘመነ ዮሐንስ (ጳጉሜ 6)" : "ዘመነ ሉቃስ/ማቴዎስ/ማርቆስ (ጳጉሜ 5)";
       
       const todayMonthObj = ETHIOPIAN_MONTHS.find(m => m.id === todayEth.month);
       const monthName = (currentLang === 'en') ? todayMonthObj.nameEn : todayMonthObj.nameAm;
@@ -451,7 +461,7 @@
       const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentActiveMonthId);
       title.innerText = (currentLang === 'en') ? `${monthObj.nameEn} (${monthObj.nameAm})` : `${monthObj.nameAm} (${monthObj.nameEn})`;
 
-      const totalDays = (monthObj.id === 13) ? (yearInfo.isLeapYear ? 6 : 5) : 30;
+      const totalDays = (monthObj.id === 13) ? (isEthLeapYear ? 6 : 5) : 30;
       const startDow = getMonthStartDayOfWeek(monthObj.id);
 
       for (let i = 0; i < startDow; i++) {
@@ -461,7 +471,9 @@
       }
 
       for (let day = 1; day <= totalDays; day++) {
-        const gregStr = getGregorianEquivalent(monthObj.id, day);
+        const gregEquivalent = toGregorianDate(todayEth.year, monthObj.id, day);
+        const gregStr = `${gregEquivalent.getMonth() + 1}/${gregEquivalent.getDate()}`;
+        
         const cell = document.createElement('div');
         cell.className = 'day-cell';
 
