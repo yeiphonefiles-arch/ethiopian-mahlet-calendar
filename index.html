@@ -174,7 +174,40 @@
       border-radius: 0 0 8px 8px;
       box-shadow: var(--shadow);
       overflow: hidden;
+      position: relative; /* anchor point for the year badge */
     }
+
+    /* Ethiopian year badge, pinned to the top-right corner of the calendar
+       grid itself (distinct from the month nav bar above it), with small
+       ‹ › arrows to jump a whole year forward/backward. */
+    .year-badge {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.6rem;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--maroon-dark);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .year-nav-btn {
+      background: none;
+      border: none;
+      color: var(--gold-light);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0 0.15rem;
+      line-height: 1;
+    }
+    .year-nav-btn:hover { color: var(--gold); }
 
     .weekdays-header {
       display: grid;
@@ -459,6 +492,11 @@
     </div>
 
     <div class="calendar-container">
+      <div class="year-badge">
+        <button class="year-nav-btn" onclick="navigateYear(-1)" title="Previous year">‹</button>
+        <span id="yearBadge">----</span>
+        <button class="year-nav-btn" onclick="navigateYear(1)" title="Next year">›</button>
+      </div>
       <div class="weekdays-header">
         <div class="weekday-name" id="wd-sun">እሑድ<br>(Sun)</div>
         <div class="weekday-name" id="wd-mon">ሰኞ<br>(Mon)</div>
@@ -494,7 +532,7 @@
       <input type="password" id="passwordInput" placeholder="Password / የይለፍ ቃል" onkeydown="handleKeySubmit(event)" />
       <button class="modal-submit-btn" id="unlockBtn" onclick="submitPassword()">Unlock / ክፈት</button>
       <div class="spinner" id="decryptSpinner"></div>
-      <div class="error-msg" id="errorMsg">Incorrect password. / የተሳሳተ የይለፍ ቃል።</div>
+      <div class="error-msg" id="errorMsg"></div>
     </div>
   </div>
 
@@ -548,6 +586,26 @@
       const m = RESOURCE_MANIFEST[monthId];
       if (m && m[day] && m[day][resourceKey] !== undefined) {
         return m[day][resourceKey];
+      }
+      return true;
+    }
+
+    // ---- Movable/special feast resource manifest ------------------------
+    // Movable feasts (Nineveh Fast, Great Lent, Easter, etc.) and the two
+    // fixed-annual feasts with dedicated services (Genna, Timkat) don't live
+    // in the regular per-day folders, since their Ethiopian-calendar date
+    // shifts (or is otherwise treated as a special occasion) from year to
+    // year. Instead their PDFs live in a SEPARATE, year-independent folder:
+    //   pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
+    // e.g. pdfs/movable-feasts/easter/mahlet.pdf.enc
+    //      pdfs/movable-feasts/great-lent/qedassie.pdf.enc
+    // Structure: MOVABLE_FEAST_MANIFEST[slug][resourceKey] = true/false
+    const MOVABLE_FEAST_MANIFEST = {};
+
+    function isMovableFeastResourceAvailable(slug, resourceKey) {
+      const m = MOVABLE_FEAST_MANIFEST[slug];
+      if (m && m[resourceKey] !== undefined) {
+        return m[resourceKey];
       }
       return true;
     }
@@ -722,44 +780,55 @@
       const tewsak = tewsakMap[tewsakDay];
 
       const nineveh = monthday(metqMonth, metq, tewsak);
-      holidays[`${nineveh.month}-${nineveh.day}`] = { name: "ጾመ ነነዌ (Nineveh Fast)", type: "movable" };
+      holidays[`${nineveh.month}-${nineveh.day}`] = { name: "ጾመ ነነዌ (Nineveh Fast)", type: "movable", slug: "nineveh-fast" };
 
       const lent = monthday(nineveh.month, nineveh.day, 14);
-      holidays[`${lent.month}-${lent.day}`] = { name: "ዐቢይ ጾም (Great Lent)", type: "movable" };
+      holidays[`${lent.month}-${lent.day}`] = { name: "ዐቢይ ጾም (Great Lent)", type: "movable", slug: "great-lent" };
 
       const debre = monthday(lent.month, lent.day, 27);
-      holidays[`${debre.month}-${debre.day}`] = { name: "ደብረ ዘይት (Mount of Olives)", type: "movable" };
+      holidays[`${debre.month}-${debre.day}`] = { name: "ደብረ ዘይት (Mount of Olives)", type: "movable", slug: "debre-zeit" };
 
       const goodFriday = monthday(debre.month, debre.day, 26);
-      holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት (Good Friday)", type: "movable" };
+      holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት (Good Friday)", type: "movable", slug: "good-friday" };
 
       const easter = monthday(debre.month, debre.day, 28);
-      holidays[`${easter.month}-${easter.day}`] = { name: "ትንሣኤ (Easter)", type: "movable-major" };
+      holidays[`${easter.month}-${easter.day}`] = { name: "ትንሣኤ (Easter)", type: "movable-major", slug: "easter" };
 
       const rk = monthday(easter.month, easter.day, 24);
-      holidays[`${rk.month}-${rk.day}`] = { name: "ርክበ ካህናት", type: "movable" };
+      holidays[`${rk.month}-${rk.day}`] = { name: "ርክበ ካህናት", type: "movable", slug: "rikbe-kahnat" };
 
       const ascension = monthday(easter.month, easter.day, 39);
-      holidays[`${ascension.month}-${ascension.day}`] = { name: "ዕርገት (Ascension)", type: "movable" };
+      holidays[`${ascension.month}-${ascension.day}`] = { name: "ዕርገት (Ascension)", type: "movable", slug: "ascension" };
 
       const pentecost = monthday(easter.month, easter.day, 49);
-      holidays[`${pentecost.month}-${pentecost.day}`] = { name: "ጰራቅሊጦስ (Pentecost)", type: "movable" };
+      holidays[`${pentecost.month}-${pentecost.day}`] = { name: "ጰራቅሊጦስ (Pentecost)", type: "movable", slug: "pentecost" };
 
       const apostlesFast = monthday(easter.month, easter.day, 50);
-      holidays[`${apostlesFast.month}-${apostlesFast.day}`] = { name: "ጾመ ሐዋርያት", type: "movable" };
+      holidays[`${apostlesFast.month}-${apostlesFast.day}`] = { name: "ጾመ ሐዋርያት", type: "movable", slug: "apostles-fast" };
 
       return holidays;
     }
 
+    // Movable feasts that ALSO have a fixed slug used for the dedicated
+    // pdfs/movable-feasts/<slug>/ folder below. Genna (Christmas) and Timkat
+    // (Epiphany) are fixed-annual (not movable) but their services are also
+    // special/non-recurring, so they get slugs too, sharing the same folder
+    // convention: pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
+    const FIXED_ANNUAL_FEAST_SLUGS = {
+      "4-29": "genna",   // Christmas
+      "5-11": "timkat"   // Epiphany
+    };
+
     // Precedence: movable > fixed annual > fixed monthly. Pagume (month 13)
     // is excluded from the fixed monthly commemorations, same as before.
-    function getFeastInfo(month, day) {
+    function getFeastInfo(year, month, day) {
       const key = `${month}-${day}`;
-      if (movableFeastsForYear && movableFeastsForYear[key]) {
-        return movableFeastsForYear[key];
+      const movableFeasts = getMovableFeastsForYear(year);
+      if (movableFeasts && movableFeasts[key]) {
+        return movableFeasts[key];
       }
       if (FIXED_ANNUAL_FEASTS[key]) {
-        return { name: FIXED_ANNUAL_FEASTS[key], type: "annual" };
+        return { name: FIXED_ANNUAL_FEASTS[key], type: "annual", slug: FIXED_ANNUAL_FEAST_SLUGS[key] || null };
       }
       if (FIXED_MONTHLY_FEASTS[day] && month !== 13) {
         return { name: FIXED_MONTHLY_FEASTS[day], type: "monthly" };
@@ -781,16 +850,33 @@
     // =========================================================================
     const todayGreg = new Date();
     const todayEth = toEthiopianDate(todayGreg.getFullYear(), todayGreg.getMonth() + 1, todayGreg.getDate());
-    const isEthLeapYear = (todayEth.year % 4 === 3);
-    const movableFeastsForYear = calculateBahireHasabMovableFeasts(todayEth.year);
 
+    function isLeapEthYear(y) { return y % 4 === 3; }
+
+    // Bahire Hasab results are cached per Ethiopian year so navigating within
+    // the same year doesn't recompute them on every render.
+    const _movableFeastCache = {};
+    function getMovableFeastsForYear(y) {
+      if (!_movableFeastCache[y]) {
+        _movableFeastCache[y] = calculateBahireHasabMovableFeasts(y);
+      }
+      return _movableFeastCache[y];
+    }
+
+    // currentActiveYear/currentActiveMonthId track WHICH Ethiopian year+month
+    // the grid is currently displaying (independent of "today"), so that
+    // browsing across a New Year boundary (Pagume -> Meskerem or vice versa)
+    // correctly increments/decrements the year and every displayed date is
+    // the real date for whichever year is being viewed.
+    let currentActiveYear = todayEth.year;
     let currentActiveMonthId = todayEth.month;
     let currentSelectedMonth = null;
     let currentSelectedDay = null;
     let currentSelectedResourceKey = null;
+    let currentSelectedFeastSlug = null; // set when the selected day is a special/movable feast
 
-    function getMonthStartDayOfWeek(monthId) {
-      const gFirstOfMonth = toGregorianDate(todayEth.year, monthId, 1);
+    function getMonthStartDayOfWeek(year, monthId) {
+      const gFirstOfMonth = toGregorianDate(year, monthId, 1);
       return gFirstOfMonth.getDay();
     }
 
@@ -816,7 +902,7 @@
       document.getElementById('errorMsg').innerText = t.incorrectPw;
       document.getElementById('footerDisclaimer').innerHTML = t.footer;
 
-      const yearTypeStr = isEthLeapYear
+      const yearTypeStr = isLeapEthYear(todayEth.year)
         ? (currentLang === 'am' ? "ዘመነ ዮሐንስ (ጳጉሜ 6)" : "Year of John (Pagume has 6 days)")
         : (currentLang === 'am' ? "ጳጉሜ 5 ቀናት" : "Pagume has 5 days");
 
@@ -832,8 +918,16 @@
     // =========================================================================
     function navigateMonth(delta) {
       currentActiveMonthId += delta;
-      if (currentActiveMonthId > 13) currentActiveMonthId = 1;
-      if (currentActiveMonthId < 1) currentActiveMonthId = 13;
+      if (currentActiveMonthId > 13) { currentActiveMonthId = 1; currentActiveYear++; }
+      if (currentActiveMonthId < 1) { currentActiveMonthId = 13; currentActiveYear--; }
+      renderCalendar();
+    }
+
+    // Jump a whole Ethiopian year forward/backward while staying on the same
+    // month (e.g. Meskerem 2017 -> Meskerem 2018). Wired to the ‹ › arrows
+    // next to the year badge in the top-right corner of the calendar.
+    function navigateYear(delta) {
+      currentActiveYear += delta;
       renderCalendar();
     }
 
@@ -848,8 +942,17 @@
         ? `${monthObj.nameEn} (${monthObj.nameAm})`
         : `${monthObj.nameAm} (${monthObj.nameEn})`;
 
-      const totalDays = (monthObj.id === 13) ? (isEthLeapYear ? 6 : 5) : 30;
-      const startDow = getMonthStartDayOfWeek(monthObj.id);
+      // Year badge, top-right corner of the calendar grid.
+      const yearBadge = document.getElementById('yearBadge');
+      if (yearBadge) {
+        yearBadge.innerText = (currentLang === 'en')
+          ? `${currentActiveYear} E.C.`
+          : `${currentActiveYear} ዓ.ም.`;
+      }
+
+      const leap = isLeapEthYear(currentActiveYear);
+      const totalDays = (monthObj.id === 13) ? (leap ? 6 : 5) : 30;
+      const startDow = getMonthStartDayOfWeek(currentActiveYear, monthObj.id);
 
       for (let i = 0; i < startDow; i++) {
         const empty = document.createElement('div');
@@ -858,13 +961,13 @@
       }
 
       for (let day = 1; day <= totalDays; day++) {
-        const gregEquivalent = toGregorianDate(todayEth.year, monthObj.id, day);
+        const gregEquivalent = toGregorianDate(currentActiveYear, monthObj.id, day);
         const gregStr = `${gregEquivalent.getMonth() + 1}/${gregEquivalent.getDate()}`;
-        const feast = getFeastInfo(monthObj.id, day);
+        const feast = getFeastInfo(currentActiveYear, monthObj.id, day);
 
         const cell = document.createElement('div');
         let cls = 'day-cell';
-        if (currentActiveMonthId === todayEth.month && day === todayEth.day) cls += ' today-cell';
+        if (currentActiveYear === todayEth.year && currentActiveMonthId === todayEth.month && day === todayEth.day) cls += ' today-cell';
         if (feast) {
           if (feast.type === 'movable-major') cls += ' feast-major';
           else if (feast.type === 'movable') cls += ' feast-movable';
@@ -872,11 +975,13 @@
           else if (feast.type === 'monthly') cls += ' feast-monthly';
         }
         cell.className = cls;
-        cell.onclick = () => openDayResourceModal(monthObj, day);
+        cell.onclick = () => openDayResourceModal(monthObj, day, feast);
 
         let dotsHtml = '';
         RESOURCE_TYPES.forEach(r => {
-          const avail = isResourceAvailable(monthObj.id, day, r.key);
+          const avail = feast && feast.slug
+            ? isMovableFeastResourceAvailable(feast.slug, r.key)
+            : isResourceAvailable(monthObj.id, day, r.key);
           dotsHtml += `<span class="res-dot ${avail ? 'active' : ''}" title="${currentLang === 'en' ? r.nameEn : r.nameAm}"></span>`;
         });
 
@@ -898,17 +1003,24 @@
     // =========================================================================
     // 07. DAY RESOURCE PICKER MODAL (Mahlet / Gitsawe / Mezmur / Qedassie)
     // =========================================================================
-    function openDayResourceModal(monthObj, day) {
+    function openDayResourceModal(monthObj, day, feast) {
       currentSelectedMonth = monthObj;
       currentSelectedDay = day;
+      currentSelectedFeastSlug = (feast && feast.slug) ? feast.slug : null;
 
       const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
-      document.getElementById('dayResourceTitle').innerText = UI_TEXT[currentLang].pickResourceTitle(monthName, day);
+      let titleText = UI_TEXT[currentLang].pickResourceTitle(monthName, day);
+      if (feast) {
+        titleText += ` — ${localizeFeastName(feast.name, currentLang)}`;
+      }
+      document.getElementById('dayResourceTitle').innerText = titleText;
 
       const pickGrid = document.getElementById('resourcePickGrid');
       pickGrid.innerHTML = '';
       RESOURCE_TYPES.forEach(r => {
-        const avail = isResourceAvailable(monthObj.id, day, r.key);
+        const avail = currentSelectedFeastSlug
+          ? isMovableFeastResourceAvailable(currentSelectedFeastSlug, r.key)
+          : isResourceAvailable(monthObj.id, day, r.key);
         const btn = document.createElement('button');
         btn.className = 'resource-pick-btn';
         btn.innerText = (currentLang === 'en') ? r.nameEn : r.nameAm;
@@ -916,7 +1028,7 @@
         if (avail) {
           btn.onclick = () => {
             closeDayResourceModal();
-            openPasswordModal(monthObj, day, r);
+            openPasswordModal(monthObj, day, r, currentSelectedFeastSlug);
           };
         }
         pickGrid.appendChild(btn);
@@ -932,14 +1044,16 @@
     // =========================================================================
     // 08. PASSWORD MODAL + AES-GCM DECRYPTION
     // =========================================================================
-    function openPasswordModal(monthObj, day, resource) {
+    function openPasswordModal(monthObj, day, resource, feastSlug) {
       currentSelectedMonth = monthObj;
       currentSelectedDay = day;
       currentSelectedResourceKey = resource.key;
+      currentSelectedFeastSlug = feastSlug || null;
 
       const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
       const resName = (currentLang === 'en') ? resource.nameEn : resource.nameAm;
-      document.getElementById('modalTitle').innerText = `${monthName} ${day} - ${resName}`;
+      const label = currentSelectedFeastSlug ? currentSelectedFeastSlug.replace(/-/g, ' ') : `${monthName} ${day}`;
+      document.getElementById('modalTitle').innerText = `${label} - ${resName}`;
       document.getElementById('passwordInput').value = '';
       document.getElementById('errorMsg').style.display = 'none';
       document.getElementById('decryptSpinner').style.display = 'none';
@@ -1021,15 +1135,39 @@
       const resourceKey = currentSelectedResourceKey;
       const dayPadded = String(day).padStart(2, '0');
 
-      // File naming convention: pdfs/<month-folder>/<DD>-<resourceKey>.pdf.enc
-      const filePath = `pdfs/${monthObj.folder}/${dayPadded}-${resourceKey}.pdf.enc`;
+      // File path depends on whether this day is a movable/special feast:
+      //   Regular day:      pdfs/<month-folder>/<DD>-<resourceKey>.pdf.enc
+      //   Movable/special:  pdfs/movable-feasts/<slug>/<resourceKey>.pdf.enc
+      const filePath = currentSelectedFeastSlug
+        ? `pdfs/movable-feasts/${currentSelectedFeastSlug}/${resourceKey}.pdf.enc`
+        : `pdfs/${monthObj.folder}/${dayPadded}-${resourceKey}.pdf.enc`;
 
       spinner.style.display = 'block';
+
+      // Step 1: fetch the encrypted file. Failures here mean the file is
+      // missing/misnamed or the site isn't running under http(s):// — NOT a
+      // wrong password. Reported separately from decryption failures below.
+      let encryptedBuffer;
       try {
         const response = await fetch(filePath);
-        if (!response.ok) throw new Error("File not found: " + filePath);
-        const encryptedBuffer = await response.arrayBuffer();
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        encryptedBuffer = await response.arrayBuffer();
+      } catch (fetchErr) {
+        console.error('Fetch failed for', filePath, fetchErr);
+        spinner.style.display = 'none';
+        const t = UI_TEXT[currentLang];
+        errorMsg.innerText = (currentLang === 'en')
+          ? `File not found at "${filePath}". Check the filename/folder, and make sure the site is running over http(s):// (not opened directly as a local file).`
+          : `ፋይሉ አልተገኘም፦ "${filePath}"። ስሙንና አቃፊውን ያረጋግጡ፣ እንዲሁም ገጹ በ http(s):// ላይ እየሮጠ መሆኑን ያረጋግጡ (እንደ local ፋይል ብቻ ተከፍቶ ካልሆነ በስተቀር)።`;
+        errorMsg.style.display = 'block';
+        return;
+      }
 
+      // Step 2: attempt decryption. A failure here (after a successful fetch)
+      // means the password (or the file itself) is genuinely wrong/corrupted.
+      try {
         const decryptedBuffer = await decryptPdfBuffer(encryptedBuffer, password);
 
         const blob = new Blob([decryptedBuffer], { type: 'application/pdf' });
@@ -1045,9 +1183,10 @@
         spinner.style.display = 'none';
         closePasswordModal();
         document.getElementById('viewerModal').classList.add('active');
-      } catch (err) {
-        console.error(err);
+      } catch (decryptErr) {
+        console.error('Decryption failed for', filePath, decryptErr);
         spinner.style.display = 'none';
+        errorMsg.innerText = UI_TEXT[currentLang].incorrectPw;
         errorMsg.style.display = 'block';
       }
     }
