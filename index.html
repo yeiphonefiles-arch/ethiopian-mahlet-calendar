@@ -209,6 +209,52 @@
     }
     .year-nav-btn:hover { color: var(--gold); }
 
+    /* Movable feast(s) falling within the currently-shown month, pinned to
+       the top-left corner of the calendar grid (mirrors .year-badge on the
+       right). Hidden entirely when the current month has none. Each entry
+       is clickable and opens the same day-resource picker as clicking the
+       day cell itself. */
+    .movable-feast-link-container {
+      position: absolute;
+      top: 0.5rem;
+      left: 0.6rem;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      max-width: 55%;
+    }
+
+    .movable-feast-link {
+      background: var(--feast-movable-bg);
+      color: var(--feast-movable-text);
+      border: 1px solid var(--feast-movable-text);
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: transform 0.15s;
+    }
+    .movable-feast-link:hover {
+      transform: translateY(-1px);
+      text-decoration: underline;
+    }
+    .movable-feast-link.major {
+      background: var(--feast-major-bg);
+      color: var(--feast-major-text);
+      border-color: var(--maroon-dark);
+    }
+    .movable-feast-link.annual {
+      background: var(--feast-annual-bg);
+      color: var(--feast-annual-text);
+      border-color: var(--feast-annual-text);
+    }
+
     .weekdays-header {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -492,6 +538,7 @@
     </div>
 
     <div class="calendar-container">
+      <div class="movable-feast-link-container" id="movableFeastLinkContainer"></div>
       <div class="year-badge">
         <button class="year-nav-btn" onclick="navigateYear(-1)" title="Previous year">‹</button>
         <span id="yearBadge">----</span>
@@ -597,7 +644,7 @@
     // shifts (or is otherwise treated as a special occasion) from year to
     // year. Instead their PDFs live in a SEPARATE, year-independent folder:
     //   pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
-    // e.g. pdfs/movable-feasts/easter/mahlet.pdf.enc
+    // e.g. pdfs/movable-feasts/tinsae/mahlet.pdf.enc
     //      pdfs/movable-feasts/great-lent/qedassie.pdf.enc
     // Structure: MOVABLE_FEAST_MANIFEST[slug][resourceKey] = true/false
     const MOVABLE_FEAST_MANIFEST = {};
@@ -780,31 +827,31 @@
       const tewsak = tewsakMap[tewsakDay];
 
       const nineveh = monthday(metqMonth, metq, tewsak);
-      holidays[`${nineveh.month}-${nineveh.day}`] = { name: "ጾመ ነነዌ (Nineveh Fast)", type: "movable", slug: "nineveh-fast" };
+      holidays[`${nineveh.month}-${nineveh.day}`] = { name: "ጾመ ነነዌ (Nineveh Fast)", type: "movable", slug: "tsome-nenewe" };
 
       const lent = monthday(nineveh.month, nineveh.day, 14);
-      holidays[`${lent.month}-${lent.day}`] = { name: "ዐቢይ ጾም (Great Lent)", type: "movable", slug: "great-lent" };
+      holidays[`${lent.month}-${lent.day}`] = { name: "ዐቢይ ጾም (Great Lent)", type: "movable", slug: "abiy-tsom" };
 
       const debre = monthday(lent.month, lent.day, 27);
       holidays[`${debre.month}-${debre.day}`] = { name: "ደብረ ዘይት (Mount of Olives)", type: "movable", slug: "debre-zeit" };
 
       const goodFriday = monthday(debre.month, debre.day, 26);
-      holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት (Good Friday)", type: "movable", slug: "good-friday" };
+      holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት (Good Friday)", type: "movable", slug: "siklet" };
 
       const easter = monthday(debre.month, debre.day, 28);
-      holidays[`${easter.month}-${easter.day}`] = { name: "ትንሣኤ (Easter)", type: "movable-major", slug: "easter" };
+      holidays[`${easter.month}-${easter.day}`] = { name: "ትንሣኤ (Easter)", type: "movable-major", slug: "tinsae" };
 
       const rk = monthday(easter.month, easter.day, 24);
       holidays[`${rk.month}-${rk.day}`] = { name: "ርክበ ካህናት", type: "movable", slug: "rikbe-kahnat" };
 
       const ascension = monthday(easter.month, easter.day, 39);
-      holidays[`${ascension.month}-${ascension.day}`] = { name: "ዕርገት (Ascension)", type: "movable", slug: "ascension" };
+      holidays[`${ascension.month}-${ascension.day}`] = { name: "ዕርገት (Ascension)", type: "movable", slug: "irget" };
 
       const pentecost = monthday(easter.month, easter.day, 49);
-      holidays[`${pentecost.month}-${pentecost.day}`] = { name: "ጰራቅሊጦስ (Pentecost)", type: "movable", slug: "pentecost" };
+      holidays[`${pentecost.month}-${pentecost.day}`] = { name: "ጰራቅሊጦስ (Pentecost)", type: "movable", slug: "peraklitos" };
 
       const apostlesFast = monthday(easter.month, easter.day, 50);
-      holidays[`${apostlesFast.month}-${apostlesFast.day}`] = { name: "ጾመ ሐዋርያት", type: "movable", slug: "apostles-fast" };
+      holidays[`${apostlesFast.month}-${apostlesFast.day}`] = { name: "ጾመ ሐዋርያት", type: "movable", slug: "tsome-hawaryat" };
 
       return holidays;
     }
@@ -836,13 +883,26 @@
       return null;
     }
 
-    // Pull the language-appropriate slice of a bilingual feast string like
-    // "ቅዱስ ሚካኤል (St. Michael)" -> Amharic: "ቅዱስ ሚካኤል", English: "St. Michael".
-    // Falls back to the full string if no "(...)" segment is present.
+    // Pull the language-appropriate slice of a bilingual feast string.
+    // Two formats appear in FIXED_MONTHLY_FEASTS / FIXED_ANNUAL_FEASTS:
+    //   "ቅዱስ ሚካኤል (St. Michael)"  -> Amharic: "ቅዱስ ሚካኤል", English: "St. Michael"
+    //   "እንቁጣጣሽ / New Year"       -> Amharic: "እንቁጣጣሽ", English: "New Year"
+    // " / " is checked first since a few entries contain both ("ልደት / Christmas
+    // (Genna)"), where the slash split is the one that actually matters.
+    // Falls back to the full string if neither pattern is present (some
+    // Amharic-only annual feasts have no separate English name yet).
     function localizeFeastName(fullName, lang) {
+      if (fullName.includes(' / ')) {
+        const idx = fullName.indexOf(' / ');
+        const amPart = fullName.slice(0, idx).trim();
+        const enPart = fullName.slice(idx + 3).trim();
+        return lang === 'en' ? enPart : amPart;
+      }
       const match = fullName.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
-      if (!match) return fullName;
-      return lang === 'en' ? match[2] : match[1];
+      if (match) {
+        return lang === 'en' ? match[2] : match[1].trim();
+      }
+      return fullName;
     }
 
     // =========================================================================
@@ -960,6 +1020,12 @@
         grid.appendChild(empty);
       }
 
+      // Collected while building the day cells below, then rendered as
+      // clickable top-left links for any movable feast(s) landing in this
+      // specific month/year (there can be zero, one, or occasionally more
+      // than one movable feast in the same month).
+      const movableFeastsThisMonth = [];
+
       for (let day = 1; day <= totalDays; day++) {
         const gregEquivalent = toGregorianDate(currentActiveYear, monthObj.id, day);
         const gregStr = `${gregEquivalent.getMonth() + 1}/${gregEquivalent.getDate()}`;
@@ -976,6 +1042,10 @@
         }
         cell.className = cls;
         cell.onclick = () => openDayResourceModal(monthObj, day, feast);
+
+        if (feast && feast.type !== 'monthly') {
+          movableFeastsThisMonth.push({ day, feast });
+        }
 
         let dotsHtml = '';
         RESOURCE_TYPES.forEach(r => {
@@ -998,6 +1068,34 @@
 
         grid.appendChild(cell);
       }
+
+      renderMovableFeastLinks(monthObj, movableFeastsThisMonth);
+    }
+
+    // Renders the top-left "notable feast in this month" link(s): includes
+    // movable feasts (Bahire Hasab) AND fixed-annual feasts, but excludes the
+    // fixed-monthly commemorations (which repeat every month and would
+    // clutter this corner). Each link behaves exactly like clicking its day
+    // cell in the grid: it opens the same day-resource picker (Mahlet/
+    // Gitsawe/Mezmur/Qedassie). Hidden entirely when the current month/year
+    // has none.
+    function renderMovableFeastLinks(monthObj, movableFeastsThisMonth) {
+      const container = document.getElementById('movableFeastLinkContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      movableFeastsThisMonth.forEach(({ day, feast }) => {
+        const link = document.createElement('button');
+        let extraClass = '';
+        if (feast.type === 'movable-major') extraClass = ' major';
+        else if (feast.type === 'annual') extraClass = ' annual';
+        link.className = 'movable-feast-link' + extraClass;
+        const label = localizeFeastName(feast.name, currentLang);
+        link.innerText = `${label} — ${day}`;
+        link.title = label;
+        link.onclick = () => openDayResourceModal(monthObj, day, feast);
+        container.appendChild(link);
+      });
     }
 
     // =========================================================================

@@ -51,18 +51,50 @@
       font-size: 0.85rem;
       white-space: pre-wrap;
     }
+    .mode-toggle {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.2rem;
+    }
+    .mode-toggle label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .mode-toggle input[type="radio"] {
+      width: auto;
+    }
+    .path-preview {
+      font-size: 0.78rem;
+      color: #555;
+      background: #f4f6f8;
+      border: 1px dashed #ccc;
+      border-radius: 4px;
+      padding: 0.5rem 0.7rem;
+      margin-top: 0.4rem;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h1>EOTC Mahlet PDF Encryption Tool</h1>
+    <h1>EOTC Daily Service PDF Encryption Tool</h1>
     <p style="font-size: 0.85rem; color: #666; margin-bottom: 1.5rem;">
-      Encrypt raw Mahlet PDF files using AES-GCM 256-bit encryption with PBKDF2 key derivation (100,000 iterations). Output files can be deployed directly to the site.
+      Encrypt raw service PDFs (Mahlet, Gitsawe, Mezmur, Qedassie) using AES-GCM 256-bit encryption with PBKDF2 key derivation (100,000 iterations). Output files can be deployed directly to the site.
     </p>
 
+    <div class="mode-toggle">
+      <label><input type="radio" name="fileMode" value="regular" checked onchange="onModeChange()"> Regular Day</label>
+      <label><input type="radio" name="fileMode" value="movable" onchange="onModeChange()"> Movable / Special Feast</label>
+    </div>
+
     <div class="form-group">
-      <label>1. Select Raw Mahlet PDF File:</label>
+      <label>1. Select Raw PDF File:</label>
       <input type="file" id="pdfInput" accept="application/pdf" />
     </div>
 
@@ -71,13 +103,58 @@
       <input type="password" id="passwordInput" placeholder="Strong secret password..." />
     </div>
 
-    <div class="form-group">
-      <label>3. Ethiopian Day of Month (1-30, or 1-6 for Pagume):</label>
-      <input type="text" id="dayInput" value="01" placeholder="e.g. 01" />
+    <!-- ===== Regular-day fields ===== -->
+    <div id="regularFields">
+      <div class="form-group">
+        <label>3. Ethiopian Month:</label>
+        <select id="monthInput">
+          <option value="meskerem">Meskerem (መስከረም)</option>
+          <option value="tikimt">Tikimt (ጥቅምት)</option>
+          <option value="hidar">Hidar (ኅዳር)</option>
+          <option value="tahsas">Tahsas (ታኅሣሥ)</option>
+          <option value="tir">Tir (ጥር)</option>
+          <option value="yekatit">Yekatit (የካቲት)</option>
+          <option value="megabit">Megabit (መጋቢት)</option>
+          <option value="miazia">Miazia (ሚያዝያ)</option>
+          <option value="ginbot">Ginbot (ግንቦት)</option>
+          <option value="sene">Sene (ሰኔ)</option>
+          <option value="hamle">Hamle (ሐምሌ)</option>
+          <option value="nehase">Nehase (ነሐሴ)</option>
+          <option value="pagume">Pagume (ጳጉሜ)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>4. Ethiopian Day of Month (1-30, or 1-6 for Pagume):</label>
+        <input type="text" id="dayInput" value="01" placeholder="e.g. 01" />
+      </div>
+    </div>
+
+    <!-- ===== Movable/special-feast fields ===== -->
+    <div id="movableFields" style="display: none;">
+      <div class="form-group">
+        <label>3. Movable / Special Feast:</label>
+        <select id="feastSlugInput">
+          <option value="tsome-nenewe">Tsome Nenewe / Nineveh Fast (ጾመ ነነዌ)</option>
+          <option value="abiy-tsom">Abiy Tsom / Great Lent (ዐቢይ ጾም)</option>
+          <option value="debre-zeit">Debre Zeit / Mount of Olives (ደብረ ዘይት)</option>
+          <option value="siklet">Siklet / Good Friday (ስቅለት)</option>
+          <option value="tinsae">Tinsae / Easter (ትንሣኤ)</option>
+          <option value="rikbe-kahnat">Rikbe Kahnat (ርክበ ካህናት)</option>
+          <option value="irget">Irget / Ascension (ዕርገት)</option>
+          <option value="peraklitos">Peraklitos / Pentecost (ጰራቅሊጦስ)</option>
+          <option value="tsome-hawaryat">Tsome Hawaryat / Apostles' Fast (ጾመ ሐዋርያት)</option>
+          <option value="genna">Genna / Christmas (ልደት)</option>
+          <option value="timkat">Timkat / Epiphany (ጥምቀት)</option>
+        </select>
+        <p style="font-size: 0.75rem; color: #888; margin-top: 0.3rem;">
+          These dates shift every Ethiopian year (except Genna/Timkat, which are fixed but still get their own special service files), so they live in one shared folder instead of a specific day-of-month folder.
+        </p>
+      </div>
     </div>
 
     <div class="form-group">
-      <label>4. Resource Type:</label>
+      <label>5. Resource Type:</label>
       <select id="resourceTypeInput">
         <option value="mahlet">Mahlet (ማኅሌት)</option>
         <option value="gitsawe">Gitsawe (ግጻዌ)</option>
@@ -87,12 +164,9 @@
     </div>
 
     <div class="form-group">
-      <label>5. Output Filename (auto-generated, editable):</label>
+      <label>6. Output Filename (auto-generated, editable):</label>
       <input type="text" id="filenameInput" value="01-mahlet.pdf.enc" />
-      <p style="font-size: 0.75rem; color: #888; margin-top: 0.3rem;">
-        Save this file into: <code>pdfs/&lt;month-folder&gt;/</code> on the site
-        (e.g. <code>pdfs/meskerem/01-mahlet.pdf.enc</code>).
-      </p>
+      <div class="path-preview" id="pathPreview">Save to: pdfs/meskerem/01-mahlet.pdf.enc</div>
     </div>
 
     <button onclick="encryptAndDownload()">Encrypt & Download .enc File</button>
@@ -101,16 +175,41 @@
   </div>
 
   <script>
-    // Keep the suggested output filename in sync with the day + resource type,
-    // e.g. day "01" + resource "mahlet" -> "01-mahlet.pdf.enc". The field
-    // stays editable in case you need a different naming scheme.
-    function updateSuggestedFilename() {
-      const day = (document.getElementById('dayInput').value || '01').padStart(2, '0');
-      const resourceType = document.getElementById('resourceTypeInput').value;
-      document.getElementById('filenameInput').value = `${day}-${resourceType}.pdf.enc`;
+    // Toggle which field group is visible based on the selected mode, and
+    // refresh the filename/path preview to match.
+    function onModeChange() {
+      const mode = document.querySelector('input[name="fileMode"]:checked').value;
+      document.getElementById('regularFields').style.display = (mode === 'regular') ? 'block' : 'none';
+      document.getElementById('movableFields').style.display = (mode === 'movable') ? 'block' : 'none';
+      updateSuggestedFilename();
     }
+
+    // Keeps the suggested output filename AND the full destination path
+    // preview in sync with the current mode + fields:
+    //   Regular day:  pdfs/<month>/<DD>-<resourceType>.pdf.enc
+    //   Movable feast: pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
+    function updateSuggestedFilename() {
+      const mode = document.querySelector('input[name="fileMode"]:checked').value;
+      const resourceType = document.getElementById('resourceTypeInput').value;
+
+      if (mode === 'regular') {
+        const month = document.getElementById('monthInput').value;
+        const day = (document.getElementById('dayInput').value || '01').padStart(2, '0');
+        const filename = `${day}-${resourceType}.pdf.enc`;
+        document.getElementById('filenameInput').value = filename;
+        document.getElementById('pathPreview').innerText = `Save to: pdfs/${month}/${filename}`;
+      } else {
+        const slug = document.getElementById('feastSlugInput').value;
+        const filename = `${resourceType}.pdf.enc`;
+        document.getElementById('filenameInput').value = filename;
+        document.getElementById('pathPreview').innerText = `Save to: pdfs/movable-feasts/${slug}/${filename}`;
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('monthInput').addEventListener('change', updateSuggestedFilename);
       document.getElementById('dayInput').addEventListener('input', updateSuggestedFilename);
+      document.getElementById('feastSlugInput').addEventListener('change', updateSuggestedFilename);
       document.getElementById('resourceTypeInput').addEventListener('change', updateSuggestedFilename);
       updateSuggestedFilename();
     });
@@ -187,7 +286,12 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(downloadUrl);
 
-        log.innerText = `Success! Downloaded encrypted file: ${outputFilename}\nSize: ${finalBuffer.byteLength} bytes.`;
+        const mode = document.querySelector('input[name="fileMode"]:checked').value;
+        const destPath = (mode === 'regular')
+          ? `pdfs/${document.getElementById('monthInput').value}/${outputFilename}`
+          : `pdfs/movable-feasts/${document.getElementById('feastSlugInput').value}/${outputFilename}`;
+
+        log.innerText = `Success! Downloaded: ${outputFilename}\nSize: ${finalBuffer.byteLength} bytes.\nUpload it to: ${destPath}`;
 
       } catch (err) {
         console.error(err);
