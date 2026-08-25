@@ -472,15 +472,32 @@
       cursor: not-allowed;
     }
 
-    .modal-box input[type="password"] {
+    .modal-box .password-input-field {
       width: 100%;
       padding: 0.75rem 0.7rem;
       border: 1px solid var(--border-color);
       border-radius: 6px;
       font-size: 1rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
       font-family: inherit;
       min-height: 46px;
+    }
+
+    .show-password-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .show-password-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--maroon);
     }
 
     .modal-submit-btn {
@@ -646,7 +663,11 @@
     <div class="modal-box">
       <button class="modal-close" onclick="closePasswordModal()">&times;</button>
       <div class="modal-title" id="modalTitle">-- -- --</div>
-      <input type="password" id="passwordInput" placeholder="Password / የይለፍ ቃል" onkeydown="handleKeySubmit(event)" />
+      <input type="password" id="passwordInput" class="password-input-field" placeholder="Password / የይለፍ ቃል" onkeydown="handleKeySubmit(event)" />
+      <label class="show-password-label">
+        <input type="checkbox" id="showPasswordCheckbox" onchange="toggleShowPassword()" />
+        <span id="showPasswordLabelText">Show password / የይለፍ ቃል አሳይ</span>
+      </label>
       <button class="modal-submit-btn" id="unlockBtn" onclick="submitPassword()">Unlock / ክፈት</button>
       <div class="spinner" id="decryptSpinner"></div>
       <div class="error-msg" id="errorMsg"></div>
@@ -850,25 +871,38 @@
       "1-1": "እንቁጣጣሽ / New Year",
       "1-17": "መስቀል / Meskel",
       "1-21": "ብዙኃን ማርያም",
+      "1-29": "ቅድስት አርሴማ / Kidist Arsema",
+      "2-5": "አቡነ ገብረ መንፈስ ቅዱስ (አቦ) / Abune Gebre Menfes Kidus",
+      "2-14": "አቡነ አረጋዊ / Abune Aregawi",
       "2-27": "የመድኃኔዓለም ዓመታዊ በዓል",
       "3-6": "ደብረ ቁስቋም",
+      "3-7": "ቅዱስ ጊዮርጊስ (ቤተ ክርስቲያን) / St. George (Church Consecration)",
+      "3-12": "ቅዱስ ሚካኤል / Archangel Michael",
       "3-21": "ጽዮን ማርያም",
+      "4-3": "በዓታ ለማርያም / Presentation of Mary",
+      "4-17": "ቅዱስ እስጢፋኖስ / St. Stephen",
       "4-19": "በዓለ ቅዱስ ገብርኤል",
+      "4-24": "አቡነ ተክለ ሃይማኖት (ልደት) / Abune Tekle Haymanot",
       "4-29": "ልደት / Christmas (Genna)",
       "5-11": "ጥምቀት / Timkat",
       "5-12": "ቃና ዘገሊላ",
       "5-21": "አስተርእዮ ማርያም",
+      "5-22": "ቅዱስ ዑራኤል / Archangel Uriel",
       "6-16": "በዓለ ቅድስት ኪዳነ ምሕረት",
+      "7-5": "አቡነ ገብረ መንፈስ ቅዱስ (እረፍት) / Abune Gebre Menfes Kidus",
       "7-27": "በዓለ መድኃኔዓለም",
       "8-23": "በዓለ ቅዱስ ጊዮርጊስ",
       "9-1": "ልደታ ለማርያም",
+      "9-11": "ቅዱስ ያሬድ / St. Yared",
       "9-21": "ደብረ ምጥማቅ",
       "10-12": "በዓለ ቅዱስ ሚካኤል",
       "10-21": "ሕንጸተ ቤታ ለማርያም",
       "11-5": "ጴጥሮስ ወጳውሎስ",
       "11-19": "በዓለ ቅዱስ ገብርኤል",
       "12-13": "ደብረ ታቦር / Buhe",
-      "12-16": "ፍልሰታ ለማርያም"
+      "12-16": "ፍልሰታ ለማርያም",
+      "12-24": "አቡነ ተክለ ሃይማኖት (እረፍት) / Abune Tekle Haymanot",
+      "13-3": "ቅዱስ ሩፋኤል / Archangel Raphael"
     };
 
     function calculateBahireHasabMovableFeasts(ethiopianYear) {
@@ -904,6 +938,11 @@
 
       const debre = monthday(lent.month, lent.day, 27);
       holidays[`${debre.month}-${debre.day}`] = { name: "ደብረ ዘይት (Mount of Olives)", type: "movable", slug: "debre-zeit" };
+
+      // Hosanna (Palm Sunday) is exactly 7 days before Easter, equivalently
+      // 21 days after Debre Zeit (28 - 7 = 21).
+      const hosanna = monthday(debre.month, debre.day, 21);
+      holidays[`${hosanna.month}-${hosanna.day}`] = { name: "ሆሣዕና (Hosanna / Palm Sunday)", type: "movable", slug: "hosanna" };
 
       const goodFriday = monthday(debre.month, debre.day, 26);
       holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት (Good Friday)", type: "movable", slug: "siklet" };
@@ -1223,10 +1262,22 @@
       const label = currentSelectedFeastSlug ? currentSelectedFeastSlug.replace(/-/g, ' ') : `${monthName} ${day}`;
       document.getElementById('modalTitle').innerText = `${label} - ${resName}`;
       document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').type = 'password';
+      document.getElementById('showPasswordCheckbox').checked = false;
       document.getElementById('errorMsg').style.display = 'none';
       document.getElementById('decryptSpinner').style.display = 'none';
       document.getElementById('passwordModal').classList.add('active');
       setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+    }
+
+    // Toggles the password field between masked (type="password") and
+    // plain text (type="text") so the person can double-check what they
+    // typed before submitting — helpful given how easy it is to mistype a
+    // password with no visual feedback otherwise.
+    function toggleShowPassword() {
+      const input = document.getElementById('passwordInput');
+      const checked = document.getElementById('showPasswordCheckbox').checked;
+      input.type = checked ? 'text' : 'password';
     }
 
     function closePasswordModal() {
@@ -1311,6 +1362,22 @@
         : `pdfs/${monthObj.folder}/${dayPadded}-${resourceKey}.pdf.enc`;
 
       spinner.style.display = 'block';
+
+      // Step 0: the Web Crypto API (crypto.subtle) is ONLY available in a
+      // secure context (https://, or localhost) — browsers disable it
+      // entirely on plain http://. If that's the situation, decryption
+      // cannot possibly work regardless of password, so we detect this
+      // upfront and give an honest, specific message instead of the
+      // misleading "incorrect password" that a crypto.subtle failure would
+      // otherwise produce below.
+      if (!window.isSecureContext || !window.crypto || !window.crypto.subtle) {
+        spinner.style.display = 'none';
+        errorMsg.innerText = (currentLang === 'en')
+          ? "This page isn't loaded over a secure (https://) connection, so the browser blocks the decryption feature entirely — this is not a wrong password. Please reload the site using https:// (or wait until HTTPS is enabled for this domain) and try again."
+          : "ይህ ገጽ በአስተማማኝ (https://) ግንኙነት አልተከፈተም፤ ስለዚህ አሳሹ የመፍቻ ተግባሩን ሙሉ በሙሉ ያግዳል — ይህ የተሳሳተ የይለፍ ቃል አይደለም። እባክዎ ገጹን በ https:// በመክፈት (ወይም ለዚህ ጎራ HTTPS እስኪነቃ ድረስ በመጠበቅ) እንደገና ይሞክሩ።";
+        errorMsg.style.display = 'block';
+        return;
+      }
 
       // Step 1: fetch the encrypted file. Failures here mean the file is
       // missing/misnamed or the site isn't running under http(s):// — NOT a
