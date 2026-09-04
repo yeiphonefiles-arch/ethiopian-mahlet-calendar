@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title id="pageTitle">ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</title>
 
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Cinzel:wght@500;700&family=Noto+Serif+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
@@ -34,6 +35,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     html { -webkit-text-size-adjust: 100%; }
 
     body {
@@ -45,6 +47,8 @@
       flex-direction: column;
     }
 
+    /* Anchored to <header> (which is position:relative), not the viewport,
+       so it never drifts over unrelated content further down the page. */
     .top-right-controls {
       position: absolute;
       top: 0.6rem;
@@ -85,29 +89,25 @@
     }
 
     .header-cross {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 0.5rem auto;
+      width: 36px;
+      height: 36px;
+      margin: 0 auto 0.4rem auto;
       display: block;
       fill: var(--gold);
-      filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
     }
 
     header h1 {
-      font-family: 'Noto Serif Ethiopic', 'Cinzel', serif;
+      font-family: 'Cinzel', 'Noto Serif Ethiopic', serif;
       font-size: 1.15rem;
       color: var(--gold);
       margin-bottom: 0.25rem;
-      line-height: 1.35;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
+      line-height: 1.3;
     }
 
     header p {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: var(--gold-light);
-      opacity: 0.95;
+      opacity: 0.9;
       line-height: 1.4;
     }
 
@@ -188,6 +188,11 @@
       overflow: hidden;
     }
 
+    /* Meta bar: year badge (right) + any movable/annual feast link(s) for
+       this month (left). A normal flex row ABOVE the weekday header, not
+       absolutely positioned over the grid, so it can never cover the
+       weekday labels no matter how much content it holds. Wraps naturally
+       on narrow screens if both sides have content. */
     .calendar-meta-bar {
       display: flex;
       flex-wrap: wrap;
@@ -226,6 +231,10 @@
     }
     .year-nav-btn:hover { color: var(--gold); }
 
+    /* Movable/annual feast(s) falling within the currently-shown month.
+       Hidden entirely (empty) when the current month has none. Each entry
+       is clickable and opens the same day-resource picker as clicking the
+       day cell itself. */
     .movable-feast-link-container {
       display: flex;
       flex-wrap: wrap;
@@ -254,6 +263,16 @@
       transform: translateY(-1px);
       text-decoration: underline;
     }
+    .movable-feast-link.major {
+      background: var(--feast-major-bg);
+      color: var(--feast-major-text);
+      border-color: var(--maroon-dark);
+    }
+    .movable-feast-link.annual {
+      background: var(--feast-annual-bg);
+      color: var(--feast-annual-text);
+      border-color: var(--feast-annual-text);
+    }
 
     .weekdays-header {
       display: grid;
@@ -272,7 +291,9 @@
       line-height: 1.3;
     }
 
-    .weekday-name:last-child { border-right: none; }
+    .weekday-name:last-child {
+      border-right: none;
+    }
 
     .calendar-grid {
       display: grid;
@@ -309,6 +330,7 @@
       box-shadow: inset 0 0 0 2px var(--gold-dark);
     }
 
+    /* Feast-day highlight tiers (precedence: movable > annual > monthly) */
     .day-cell.feast-monthly { background-color: var(--feast-monthly-bg); }
     .day-cell.feast-annual { background-color: var(--feast-annual-bg); }
     .day-cell.feast-movable { background-color: var(--feast-movable-bg); }
@@ -352,27 +374,22 @@
       background-color: #ccc;
     }
 
-    .res-dot.active { background-color: #2e7d32; }
+    .res-dot.active {
+      background-color: #2e7d32;
+    }
 
     footer {
       background-color: var(--maroon-dark);
       color: #d1c4b2;
       border-top: 3px solid var(--gold);
-      padding: 1.25rem 0.9rem;
+      padding: 1rem 0.9rem;
       text-align: center;
       font-size: 0.74rem;
       line-height: 1.5;
       margin-top: auto;
     }
 
-    .footer-church-info {
-      color: var(--gold);
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-      font-size: 0.85rem;
-      line-height: 1.4;
-    }
-
+    /* ===== Modals (shared overlay style) ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -417,7 +434,7 @@
     }
 
     .modal-title {
-      font-family: 'Noto Serif Ethiopic', 'Cinzel', serif;
+      font-family: 'Cinzel', 'Noto Serif Ethiopic', serif;
       font-size: 1rem;
       color: var(--maroon-dark);
       margin-bottom: 1rem;
@@ -535,6 +552,12 @@
       margin-top: 0.5rem;
     }
 
+    /* ============================================================
+       MOBILE-FIRST: everything above targets small screens by
+       default. From here up, we progressively ENHANCE for larger
+       viewports rather than shrinking a desktop layout down.
+       ============================================================ */
+
     @media (min-width: 480px) {
       .day-cell { min-height: 78px; padding: 0.4rem 0.25rem; }
       .day-header-num { font-size: 1.05rem; }
@@ -546,9 +569,9 @@
 
     @media (min-width: 641px) {
       header { padding: 2.5rem 1rem 1.5rem 1rem; }
-      .header-cross { width: 56px; height: 56px; }
-      header h1 { font-size: 1.45rem; }
-      header p { font-size: 0.92rem; }
+      .header-cross { width: 44px; height: 44px; }
+      header h1 { font-size: 1.6rem; }
+      header p { font-size: 0.9rem; }
       .today-banner { font-size: 0.9rem; padding: 0.45rem 1rem; }
       .top-right-controls { top: 1rem; right: 1rem; }
       .lang-toggle-btn { font-size: 0.85rem; padding: 0.35rem 0.75rem; }
@@ -568,7 +591,7 @@
       .feast-tag { font-size: 0.62rem; }
       .res-dot { width: 6px; height: 6px; }
 
-      footer { padding: 1.5rem 1rem; font-size: 0.82rem; }
+      footer { padding: 1.25rem 1rem; font-size: 0.82rem; }
       .modal-box { padding: 1.5rem; }
     }
   </style>
@@ -584,8 +607,8 @@
       <path d="M11 2h2v4h4v2h-4v3h5v2h-5v3h4v2h-4v4h-2v-4H7v-2h4v-3H6v-2h5V8H7V6h4V2z"/>
       <circle cx="12" cy="12" r="1.5"/>
     </svg>
-    <h1 id="headerTitle">ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</h1>
-    <p id="headerSubtitle">የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ | Washington, D.C.</p>
+    <h1 id="headerTitle">የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</h1>
+    <p id="headerSubtitle">የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ | EOTC Daily Service Resources</p>
 
     <div class="top-controls">
       <div class="today-banner" id="todayBanner"></div>
@@ -623,10 +646,10 @@
   </main>
 
   <footer>
-    <p class="footer-church-info">ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን &bull; Washington, D.C.</p>
     <p id="footerDisclaimer"><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Service PDF documents are encrypted client-side with AES-GCM (PBKDF2-derived keys) and only decrypt in-browser with the correct password &mdash; they are not merely hidden. As with any password system, real protection still depends on choosing a strong password and keeping it confidential.</p>
   </footer>
 
+  <!-- ===================== DAY RESOURCE PICKER MODAL ===================== -->
   <div id="dayResourceModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closeDayResourceModal()">&times;</button>
@@ -635,6 +658,7 @@
     </div>
   </div>
 
+  <!-- ===================== PASSWORD MODAL ===================== -->
   <div id="passwordModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closePasswordModal()">&times;</button>
@@ -650,6 +674,7 @@
     </div>
   </div>
 
+  <!-- ===================== PDF VIEWER MODAL ===================== -->
   <div id="viewerModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closeViewerModal()">&times;</button>
@@ -660,11 +685,8 @@
 
   <script>
     // =========================================================================
-    // 00. STATIC CONFIG & CHURCH BRANDING
+    // 00. STATIC CONFIG
     // =========================================================================
-    const CHURCH_NAME_AM = "ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን";
-    const CHURCH_NAME_EN = "Re'ese Adbarat Debre Selam Kidist Mariam Ethiopian Orthodox Tewahedo Church";
-
     const ETHIOPIAN_MONTHS = [
       { id: 1, nameAm: "መስከረም", nameEn: "Meskerem", folder: "meskerem" },
       { id: 2, nameAm: "ጥቅምት", nameEn: "Tikimt", folder: "tikimt" },
@@ -681,6 +703,7 @@
       { id: 13, nameAm: "ጳጉሜ", nameEn: "Pagume", folder: "pagume" }
     ];
 
+    // The four daily EOTC service resources. Order here = display order everywhere.
     const RESOURCE_TYPES = [
       { key: "mahlet",   nameAm: "ማኅሌት",  nameEn: "Mahlet" },
       { key: "gitsawe",  nameAm: "ግጻዌ",   nameEn: "Gitsawe" },
@@ -688,6 +711,13 @@
       { key: "qedassie", nameAm: "ቅዳሴ",   nameEn: "Qedassie" }
     ];
 
+    // ---- Resource availability manifest --------------------------------
+    // Structure: RESOURCE_MANIFEST[monthId][day][resourceKey] = true/false
+    // If a monthId/day/resourceKey is NOT present, it is treated as AVAILABLE
+    // by default (see isResourceAvailable()), matching the original single-
+    // resource manifest's permissive default. Add entries here to mark a
+    // specific resource on a specific day as unavailable, e.g.:
+    //   RESOURCE_MANIFEST[1] = { 5: { qedassie: false } };
     const RESOURCE_MANIFEST = {};
 
     function isResourceAvailable(monthId, day, resourceKey) {
@@ -698,6 +728,16 @@
       return true;
     }
 
+    // ---- Movable/special feast resource manifest ------------------------
+    // Movable feasts (Nineveh Fast, Great Lent, Easter, etc.) and the two
+    // fixed-annual feasts with dedicated services (Genna, Timkat) don't live
+    // in the regular per-day folders, since their Ethiopian-calendar date
+    // shifts (or is otherwise treated as a special occasion) from year to
+    // year. Instead their PDFs live in a SEPARATE, year-independent folder:
+    //   pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
+    // e.g. pdfs/movable-feasts/tinsae/mahlet.pdf.enc
+    //      pdfs/movable-feasts/great-lent/qedassie.pdf.enc
+    // Structure: MOVABLE_FEAST_MANIFEST[slug][resourceKey] = true/false
     const MOVABLE_FEAST_MANIFEST = {};
 
     function isMovableFeastResourceAvailable(slug, resourceKey) {
@@ -708,6 +748,12 @@
       return true;
     }
 
+    // ---- Per-resource password configuration ----------------------------
+    // Simplest working default: ONE password unlocks everything, everywhere.
+    // To move to a per-month or per-day-per-resource scheme, replace
+    // getPasswordScope() below to build a different lookup key, and manage
+    // salts/passwords per key using encrypt-tool.html. The password itself
+    // is never stored here — only used transiently to derive the AES key.
     const PASSWORD_SCOPE_MODE = "shared"; // "shared" | "per-month" | "per-day-resource"
 
     function getPasswordScope(monthObj, day, resourceKey) {
@@ -721,9 +767,9 @@
     // =========================================================================
     const UI_TEXT = {
       am: {
-        pageTitle: CHURCH_NAME_AM,
-        headerTitle: CHURCH_NAME_AM,
-        headerSubtitle: "የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ | Washington, D.C.",
+        pageTitle: "የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት አገልግሎት መጽሐፍት | EOTC Daily Service Resources",
+        headerTitle: "የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን",
+        headerSubtitle: "የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ | EOTC Daily Service Resources",
         langBtn: "English",
         prev: "ቀደመ",
         next: "ቀጣይ",
@@ -732,13 +778,13 @@
         incorrectPw: "የተሳሳተ የይለፍ ቃል።",
         decrypting: "እየተፈታ ነው...",
         noPdf: "ምንም ፋይል የለም (No file uploaded)",
-        footer: `<strong>የደኅንነት ማስታወሻ (Security Note):</strong> ሁሉም የአገልግሎት ፋይሎች በ AES-GCM ምስጢራዊነት የተጠበቁ ናቸው፤ በትክክለኛ የይለፍ ቃል ብቻ ይከፈታሉ።`,
+        footer: "<strong>የደኅንነት ማስታወሻ (Security Note):</strong> ሁሉም የአገልግሎት ፋይሎች በአሳሹ ውስጥ በ AES-GCM ምስጢራዊነት የተጠበቁ ናቸው፤ በትክክለኛ የይለፍ ቃል ብቻ ይከፈታሉ። እንደ ማንኛውም የይለፍ ቃል ሥርዓት ሁሉ ደኅንነቱ በይለፍ ቃሉ ጥንካሬና ሚስጥራዊነት ላይ የተመሠረተ ነው።",
         pickResourceTitle: (mName, day) => `${mName} ${day} ቀን`,
       },
       en: {
-        pageTitle: CHURCH_NAME_EN,
-        headerTitle: CHURCH_NAME_EN,
-        headerSubtitle: "Daily Service Resources & Feast-Day Calendar | Washington, D.C.",
+        pageTitle: "Ethiopian Orthodox Tewahedo Church Daily Service Resources",
+        headerTitle: "Ethiopian Orthodox Tewahedo Church",
+        headerSubtitle: "Daily Service Resources & Feast-Day Calendar",
         langBtn: "አማርኛ",
         prev: "Prev",
         next: "Next",
@@ -747,7 +793,7 @@
         incorrectPw: "Incorrect password.",
         decrypting: "Decrypting...",
         noPdf: "No file uploaded",
-        footer: `<strong>Security Note:</strong> All service PDFs are encrypted client-side with AES-GCM and decrypt in-browser with the correct password.`,
+        footer: "<strong>Security Note:</strong> All service PDFs are encrypted client-side with AES-GCM (PBKDF2-derived keys) and only decrypt in-browser with the correct password &mdash; they are not merely hidden. As with any password system, real protection still depends on choosing a strong password and keeping it confidential.",
         pickResourceTitle: (mName, day) => `${mName} ${day}`,
       }
     };
@@ -755,7 +801,7 @@
     let currentLang = sessionStorage.getItem('eotc_lang') || 'am';
 
     // =========================================================================
-    // 02. ETHIOPIAN CALENDAR MATH
+    // 02. ETHIOPIAN CALENDAR MATH (Gregorian <-> Ethiopian via Julian Day Number)
     // =========================================================================
     const JD_OFFSET = 1723856;
 
@@ -775,6 +821,10 @@
       return { year: ethYear, month: ethMonth, day: ethDay };
     }
 
+    // FIXED: previous version used JD_OFFSET + 365*(year-1), which was short by
+    // exactly 365 days (one full year) versus the verified reference formula
+    // (cross-checked against Meskerem 1, 2017 E.C. = September 11, 2024).
+    // Corrected to JD_OFFSET + 365*year.
     function ethiopianToJDN(year, month, day) {
       return (JD_OFFSET + 365) + 365 * (year - 1) + Math.floor(year / 4) + 30 * (month - 1) + day - 1;
     }
@@ -802,7 +852,7 @@
     }
 
     // =========================================================================
-    // 03. FEAST DAY LOGIC
+    // 03. FEAST DAY LOGIC (fixed monthly / fixed annual / Bahire Hasab movable)
     // =========================================================================
     const FIXED_MONTHLY_FEASTS = {
       5: "አቡነ ገብረ መንፈስ ቅዱስ",
@@ -826,20 +876,20 @@
       "2-14": "አቡነ አረጋዊ / Abune Aregawi",
       "2-27": "የመድኃኔዓለም ዓመታዊ በዓል",
       "3-6": "ደብረ ቁስቋም",
-      "3-7": "ቅዱስ ጊዮርጊስ (ቤተ ክርስቲያን)",
+      "3-7": "ቅዱስ ጊዮርጊስ (ቤተ ክርስቲያን) / St. George (Church Consecration)",
       "3-12": "ቅዱስ ሚካኤል / Archangel Michael",
       "3-21": "ጽዮን ማርያም",
       "4-3": "በዓታ ለማርያም / Presentation of Mary",
       "4-17": "ቅዱስ እስጢፋኖስ / St. Stephen",
       "4-19": "በዓለ ቅዱስ ገብርኤል",
-      "4-24": "አቡነ ተክለ ሃይማኖት (ልደት)",
+      "4-24": "አቡነ ተክለ ሃይማኖት (ልደት) / Abune Tekle Haymanot",
       "4-29": "ልደት / Christmas (Genna)",
       "5-11": "ጥምቀት / Timkat",
       "5-12": "ቃና ዘገሊላ",
       "5-21": "አስተርእዮ ማርያም",
       "5-22": "ቅዱስ ዑራኤል / Archangel Uriel",
       "6-16": "በዓለ ቅድስት ኪዳነ ምሕረት",
-      "7-5": "አቡነ ገብረ መንፈስ ቅዱስ (እረፍት)",
+      "7-5": "አቡነ ገብረ መንፈስ ቅዱስ (እረፍት) / Abune Gebre Menfes Kidus",
       "7-27": "በዓለ መድኃኔዓለም",
       "8-23": "በዓለ ቅዱስ ጊዮርጊስ",
       "9-1": "ልደታ ለማርያም",
@@ -851,7 +901,7 @@
       "11-19": "በዓለ ቅዱስ ገብርኤል",
       "12-13": "ደብረ ታቦር / Buhe",
       "12-16": "ፍልሰታ ለማርያም",
-      "12-24": "አቡነ ተክለ ሃይማኖት (እረፍት)",
+      "12-24": "አቡነ ተክለ ሃይማኖት (እረፍት) / Abune Tekle Haymanot",
       "13-3": "ቅዱስ ሩፋኤል / Archangel Raphael"
     };
 
@@ -889,269 +939,500 @@
       const debre = monthday(lent.month, lent.day, 27);
       holidays[`${debre.month}-${debre.day}`] = { name: "ደብረ ዘይት (Mount of Olives)", type: "movable", slug: "debre-zeit" };
 
-      const hosanna = monthday(lent.month, lent.day, 48);
-      holidays[`${hosanna.month}-${hosanna.day}`] = { name: "ሆሣዕና (Palm Sunday)", type: "movable", slug: "hosanna" };
+      // Hosanna (Palm Sunday) is exactly 7 days before Easter, equivalently
+      // 21 days after Debre Zeit (28 - 7 = 21).
+      const hosanna = monthday(debre.month, debre.day, 21);
+      holidays[`${hosanna.month}-${hosanna.day}`] = { name: "ሆሣዕና (Hosanna / Palm Sunday)", type: "movable", slug: "hosanna" };
 
-      const siklet = monthday(lent.month, lent.day, 53);
-      holidays[`${siklet.month}-${siklet.day}`] = { name: "ስቅለት (Good Friday)", type: "movable", slug: "siklet" };
+      const goodFriday = monthday(debre.month, debre.day, 26);
+      holidays[`${goodFriday.month}-${goodFriday.day}`] = { name: "ስቅለት (Good Friday)", type: "movable", slug: "siklet" };
 
-      const tinsae = monthday(lent.month, lent.day, 55);
-      holidays[`${tinsae.month}-${tinsae.day}`] = { name: "ትንስኤ (Easter/Resurrection)", type: "movable", slug: "tinsae" };
+      const easter = monthday(debre.month, debre.day, 28);
+      holidays[`${easter.month}-${easter.day}`] = { name: "ትንሣኤ (Easter)", type: "movable-major", slug: "tinsae" };
 
-      const rikbe = monthday(tinsae.month, tinsae.day, 24);
-      holidays[`${rikbe.month}-${rikbe.day}`] = { name: "ርክበ ካህናት", type: "movable", slug: "rikbe-kahnat" };
+      const rk = monthday(easter.month, easter.day, 24);
+      holidays[`${rk.month}-${rk.day}`] = { name: "ርክበ ካህናት", type: "movable", slug: "rikbe-kahnat" };
 
-      const erget = monthday(tinsae.month, tinsae.day, 39);
-      holidays[`${erget.month}-${erget.day}`] = { name: "ዕርገት (Ascension)", type: "movable", slug: "erget" };
+      const ascension = monthday(easter.month, easter.day, 39);
+      holidays[`${ascension.month}-${ascension.day}`] = { name: "ዕርገት (Ascension)", type: "movable", slug: "irget" };
 
-      const paraklitos = monthday(tinsae.month, tinsae.day, 49);
-      holidays[`${paraklitos.month}-${paraklitos.day}`] = { name: "ጰራቅሊጦስ (Pentecost)", type: "movable", slug: "paraklitos" };
+      const pentecost = monthday(easter.month, easter.day, 49);
+      holidays[`${pentecost.month}-${pentecost.day}`] = { name: "ጰራቅሊጦስ (Pentecost)", type: "movable", slug: "peraklitos" };
+
+      const apostlesFast = monthday(easter.month, easter.day, 50);
+      holidays[`${apostlesFast.month}-${apostlesFast.day}`] = { name: "ጾመ ሐዋርያት", type: "movable", slug: "tsome-hawaryat" };
 
       return holidays;
     }
 
-    // =========================================================================
-    // 04. STATE MANAGEMENT & CALENDAR RENDERING
-    // =========================================================================
-    let currentEthYear = 2017;
-    let currentEthMonth = 1;
-    let selectedDay = null;
-    let selectedResourceKey = null;
+    // Movable feasts that ALSO have a fixed slug used for the dedicated
+    // pdfs/movable-feasts/<slug>/ folder below. Genna (Christmas) and Timkat
+    // (Epiphany) are fixed-annual (not movable) but their services are also
+    // special/non-recurring, so they get slugs too, sharing the same folder
+    // convention: pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
+    const FIXED_ANNUAL_FEAST_SLUGS = {
+      "4-29": "genna",   // Christmas
+      "5-11": "timkat"   // Epiphany
+    };
 
-    function initCalendar() {
-      const now = new Date();
-      const ethToday = toEthiopianDate(now.getFullYear(), now.getMonth() + 1, now.getDate());
-      currentEthYear = ethToday.year;
-      currentEthMonth = ethToday.month;
-
-      updateLanguageUI();
-      renderCalendar();
-    }
-
-    function toggleLanguage() {
-      currentLang = currentLang === 'am' ? 'en' : 'am';
-      sessionStorage.setItem('eotc_lang', currentLang);
-      updateLanguageUI();
-      renderCalendar();
-    }
-
-    function updateLanguageUI() {
-      const t = UI_TEXT[currentLang];
-      document.getElementById("pageTitle").textContent = t.pageTitle;
-      document.getElementById("headerTitle").textContent = t.headerTitle;
-      document.getElementById("headerSubtitle").textContent = t.headerSubtitle;
-      document.getElementById("langToggleBtn").textContent = t.langBtn;
-      document.getElementById("prevLabel").textContent = t.prev;
-      document.getElementById("nextLabel").textContent = t.next;
-      document.getElementById("unlockBtn").textContent = t.unlockBtn;
-      document.getElementById("footerDisclaimer").innerHTML = t.footer;
-
-      const now = new Date();
-      const ethToday = toEthiopianDate(now.getFullYear(), now.getMonth() + 1, now.getDate());
-      const mObj = ETHIOPIAN_MONTHS.find(m => m.id === ethToday.month);
-      const mName = currentLang === 'am' ? mObj.nameAm : mObj.nameEn;
-      document.getElementById("todayBanner").textContent = `${t.todayPrefix} ${mName} ${ethToday.day}, ${ethToday.year} E.C.`;
-    }
-
-    function navigateMonth(dir) {
-      currentEthMonth += dir;
-      if (currentEthMonth > 13) {
-        currentEthMonth = 1;
-        currentEthYear++;
-      } else if (currentEthMonth < 1) {
-        currentEthMonth = 13;
-        currentEthYear--;
+    // Precedence: movable > fixed annual > fixed monthly. Pagume (month 13)
+    // is excluded from the fixed monthly commemorations, same as before.
+    function getFeastInfo(year, month, day) {
+      const key = `${month}-${day}`;
+      const movableFeasts = getMovableFeastsForYear(year);
+      if (movableFeasts && movableFeasts[key]) {
+        return movableFeasts[key];
       }
+      if (FIXED_ANNUAL_FEASTS[key]) {
+        return { name: FIXED_ANNUAL_FEASTS[key], type: "annual", slug: FIXED_ANNUAL_FEAST_SLUGS[key] || null };
+      }
+      if (FIXED_MONTHLY_FEASTS[day] && month !== 13) {
+        return { name: FIXED_MONTHLY_FEASTS[day], type: "monthly" };
+      }
+      return null;
+    }
+
+    // Pull the language-appropriate slice of a bilingual feast string.
+    // Two formats appear in FIXED_MONTHLY_FEASTS / FIXED_ANNUAL_FEASTS:
+    //   "ቅዱስ ሚካኤል (St. Michael)"  -> Amharic: "ቅዱስ ሚካኤል", English: "St. Michael"
+    //   "እንቁጣጣሽ / New Year"       -> Amharic: "እንቁጣጣሽ", English: "New Year"
+    // " / " is checked first since a few entries contain both ("ልደት / Christmas
+    // (Genna)"), where the slash split is the one that actually matters.
+    // Falls back to the full string if neither pattern is present (some
+    // Amharic-only annual feasts have no separate English name yet).
+    function localizeFeastName(fullName, lang) {
+      if (fullName.includes(' / ')) {
+        const idx = fullName.indexOf(' / ');
+        const amPart = fullName.slice(0, idx).trim();
+        const enPart = fullName.slice(idx + 3).trim();
+        return lang === 'en' ? enPart : amPart;
+      }
+      const match = fullName.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+      if (match) {
+        return lang === 'en' ? match[2] : match[1].trim();
+      }
+      return fullName;
+    }
+
+    // =========================================================================
+    // 04. STATE INIT
+    // =========================================================================
+    const todayGreg = new Date();
+    const todayEth = toEthiopianDate(todayGreg.getFullYear(), todayGreg.getMonth() + 1, todayGreg.getDate());
+
+    function isLeapEthYear(y) { return y % 4 === 3; }
+
+    // Bahire Hasab results are cached per Ethiopian year so navigating within
+    // the same year doesn't recompute them on every render.
+    const _movableFeastCache = {};
+    function getMovableFeastsForYear(y) {
+      if (!_movableFeastCache[y]) {
+        _movableFeastCache[y] = calculateBahireHasabMovableFeasts(y);
+      }
+      return _movableFeastCache[y];
+    }
+
+    // currentActiveYear/currentActiveMonthId track WHICH Ethiopian year+month
+    // the grid is currently displaying (independent of "today"), so that
+    // browsing across a New Year boundary (Pagume -> Meskerem or vice versa)
+    // correctly increments/decrements the year and every displayed date is
+    // the real date for whichever year is being viewed.
+    let currentActiveYear = todayEth.year;
+    let currentActiveMonthId = todayEth.month;
+    let currentSelectedMonth = null;
+    let currentSelectedDay = null;
+    let currentSelectedResourceKey = null;
+    let currentSelectedFeastSlug = null; // set when the selected day is a special/movable feast
+
+    function getMonthStartDayOfWeek(year, monthId) {
+      const gFirstOfMonth = toGregorianDate(year, monthId, 1);
+      return gFirstOfMonth.getDay();
+    }
+
+    // =========================================================================
+    // 05. BILINGUAL UI RENDERING
+    // =========================================================================
+    function toggleLanguage() {
+      currentLang = (currentLang === 'am') ? 'en' : 'am';
+      sessionStorage.setItem('eotc_lang', currentLang);
+      applyLanguageUI();
       renderCalendar();
     }
 
-    function navigateYear(dir) {
-      currentEthYear += dir;
+    function applyLanguageUI() {
+      const t = UI_TEXT[currentLang];
+      document.getElementById('pageTitle').innerText = t.pageTitle;
+      document.getElementById('headerTitle').innerText = t.headerTitle;
+      document.getElementById('headerSubtitle').innerText = t.headerSubtitle;
+      document.getElementById('langToggleBtn').innerText = t.langBtn;
+      document.getElementById('prevLabel').innerText = t.prev;
+      document.getElementById('nextLabel').innerText = t.next;
+      document.getElementById('unlockBtn').innerText = t.unlockBtn;
+      document.getElementById('errorMsg').innerText = t.incorrectPw;
+      document.getElementById('footerDisclaimer').innerHTML = t.footer;
+
+      const yearTypeStr = isLeapEthYear(todayEth.year)
+        ? (currentLang === 'am' ? "ዘመነ ዮሐንስ (ጳጉሜ 6)" : "Year of John (Pagume has 6 days)")
+        : (currentLang === 'am' ? "ጳጉሜ 5 ቀናት" : "Pagume has 5 days");
+
+      const todayMonthObj = ETHIOPIAN_MONTHS.find(m => m.id === todayEth.month);
+      const monthName = (currentLang === 'en') ? todayMonthObj.nameEn : todayMonthObj.nameAm;
+
+      document.getElementById('todayBanner').innerHTML =
+        `<strong>${t.todayPrefix}</strong> ${monthName} ${todayEth.day}, ${todayEth.year} E.C. | <strong>${yearTypeStr}</strong>`;
+    }
+
+    // =========================================================================
+    // 06. CALENDAR NAVIGATION + RENDER
+    // =========================================================================
+    function navigateMonth(delta) {
+      currentActiveMonthId += delta;
+      if (currentActiveMonthId > 13) { currentActiveMonthId = 1; currentActiveYear++; }
+      if (currentActiveMonthId < 1) { currentActiveMonthId = 13; currentActiveYear--; }
+      renderCalendar();
+    }
+
+    // Jump a whole Ethiopian year forward/backward while staying on the same
+    // month (e.g. Meskerem 2017 -> Meskerem 2018). Wired to the ‹ › arrows
+    // next to the year badge in the top-right corner of the calendar.
+    function navigateYear(delta) {
+      currentActiveYear += delta;
       renderCalendar();
     }
 
     function renderCalendar() {
-      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentEthMonth);
-      const monthTitle = currentLang === 'am' ? monthObj.nameAm : monthObj.nameEn;
-      document.getElementById("monthDisplayTitle").textContent = monthTitle;
-      document.getElementById("yearBadge").textContent = `${currentEthYear} E.C.`;
+      const grid = document.getElementById('calendarGrid');
+      const title = document.getElementById('monthDisplayTitle');
+      if (!grid || !title) return;
 
-      const grid = document.getElementById("calendarGrid");
-      grid.innerHTML = "";
+      grid.innerHTML = '';
+      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentActiveMonthId);
+      title.innerText = (currentLang === 'en')
+        ? `${monthObj.nameEn} (${monthObj.nameAm})`
+        : `${monthObj.nameAm} (${monthObj.nameEn})`;
 
-      const movableFeasts = calculateBahireHasabMovableFeasts(currentEthYear);
-      const movableContainer = document.getElementById("movableFeastLinkContainer");
-      movableContainer.innerHTML = "";
-
-      const startGreg = toGregorianDate(currentEthYear, currentEthMonth, 1);
-      const startDayOfWeek = startGreg.getDay();
-      const totalDays = currentEthMonth === 13 ? ((currentEthYear % 4 === 3) ? 6 : 5) : 30;
-
-      for (let i = 0; i < startDayOfWeek; i++) {
-        const emptyCell = document.createElement("div");
-        emptyCell.className = "day-cell empty-cell";
-        grid.appendChild(emptyCell);
+      // Year badge, top-right corner of the calendar grid.
+      const yearBadge = document.getElementById('yearBadge');
+      if (yearBadge) {
+        yearBadge.innerText = (currentLang === 'en')
+          ? `${currentActiveYear} E.C.`
+          : `${currentActiveYear} ዓ.ም.`;
       }
 
-      const now = new Date();
-      const ethToday = toEthiopianDate(now.getFullYear(), now.getMonth() + 1, now.getDate());
+      const leap = isLeapEthYear(currentActiveYear);
+      const totalDays = (monthObj.id === 13) ? (leap ? 6 : 5) : 30;
+      const startDow = getMonthStartDayOfWeek(currentActiveYear, monthObj.id);
+
+      for (let i = 0; i < startDow; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'day-cell empty-cell';
+        grid.appendChild(empty);
+      }
+
+      // Collected while building the day cells below, then rendered as
+      // clickable top-left links for any movable feast(s) landing in this
+      // specific month/year (there can be zero, one, or occasionally more
+      // than one movable feast in the same month).
+      const movableFeastsThisMonth = [];
 
       for (let day = 1; day <= totalDays; day++) {
-        const cell = document.createElement("div");
-        cell.className = "day-cell";
+        const gregEquivalent = toGregorianDate(currentActiveYear, monthObj.id, day);
+        const gregStr = `${gregEquivalent.getMonth() + 1}/${gregEquivalent.getDate()}`;
+        const feast = getFeastInfo(currentActiveYear, monthObj.id, day);
 
-        const isToday = (ethToday.year === currentEthYear && ethToday.month === currentEthMonth && ethToday.day === day);
-        if (isToday) cell.classList.add("today-cell");
+        const cell = document.createElement('div');
+        let cls = 'day-cell';
+        if (currentActiveYear === todayEth.year && currentActiveMonthId === todayEth.month && day === todayEth.day) cls += ' today-cell';
+        if (feast) {
+          if (feast.type === 'movable-major') cls += ' feast-major';
+          else if (feast.type === 'movable') cls += ' feast-movable';
+          else if (feast.type === 'annual') cls += ' feast-annual';
+          else if (feast.type === 'monthly') cls += ' feast-monthly';
+        }
+        cell.className = cls;
+        cell.onclick = () => openDayResourceModal(monthObj, day, feast);
 
-        const gregDate = toGregorianDate(currentEthYear, currentEthMonth, day);
-        const gregSub = `${gregDate.getMonth() + 1}/${gregDate.getDate()}`;
-
-        const key = `${currentEthMonth}-${day}`;
-        let feastName = "";
-        let feastClass = "";
-
-        if (movableFeasts[key]) {
-          feastName = movableFeasts[key].name;
-          feastClass = "feast-movable";
-
-          const link = document.createElement("button");
-          link.className = "movable-feast-link";
-          link.textContent = `${day} - ${feastName}`;
-          link.onclick = (e) => { e.stopPropagation(); openDayResourceModal(day); };
-          movableContainer.appendChild(link);
-        } else if (FIXED_ANNUAL_FEASTS[key]) {
-          feastName = FIXED_ANNUAL_FEASTS[key];
-          feastClass = "feast-annual";
-        } else if (FIXED_MONTHLY_FEASTS[day]) {
-          feastName = FIXED_MONTHLY_FEASTS[day];
-          feastClass = "feast-monthly";
+        if (feast && feast.type !== 'monthly') {
+          movableFeastsThisMonth.push({ day, feast });
         }
 
-        if (feastClass) cell.classList.add(feastClass);
-
-        let dotsHtml = '<div class="res-badge-bar">';
+        let dotsHtml = '';
         RESOURCE_TYPES.forEach(r => {
-          const avail = isResourceAvailable(currentEthMonth, day, r.key);
-          dotsHtml += `<div class="res-dot ${avail ? 'active' : ''}"></div>`;
+          const avail = feast && feast.slug
+            ? isMovableFeastResourceAvailable(feast.slug, r.key)
+            : isResourceAvailable(monthObj.id, day, r.key);
+          dotsHtml += `<span class="res-dot ${avail ? 'active' : ''}" title="${currentLang === 'en' ? r.nameEn : r.nameAm}"></span>`;
         });
-        dotsHtml += '</div>';
+
+        const feastLabel = feast ? localizeFeastName(feast.name, currentLang) : '';
 
         cell.innerHTML = `
           <div>
             <div class="day-header-num">${day}</div>
-            <div class="greg-date-sub">${gregSub}</div>
-            ${feastName ? `<div class="feast-tag">${feastName}</div>` : ''}
+            <div class="greg-date-sub">G: ${gregStr}</div>
+            ${feast ? `<div class="feast-tag">${feastLabel}</div>` : ''}
           </div>
-          ${dotsHtml}
+          <div class="res-badge-bar">${dotsHtml}</div>
         `;
 
-        cell.onclick = () => openDayResourceModal(day);
         grid.appendChild(cell);
       }
+
+      renderMovableFeastLinks(monthObj, movableFeastsThisMonth);
+    }
+
+    // Renders the top-left "notable feast in this month" link(s): includes
+    // movable feasts (Bahire Hasab) AND fixed-annual feasts, but excludes the
+    // fixed-monthly commemorations (which repeat every month and would
+    // clutter this corner). Each link behaves exactly like clicking its day
+    // cell in the grid: it opens the same day-resource picker (Mahlet/
+    // Gitsawe/Mezmur/Qedassie). Hidden entirely when the current month/year
+    // has none.
+    function renderMovableFeastLinks(monthObj, movableFeastsThisMonth) {
+      const container = document.getElementById('movableFeastLinkContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      movableFeastsThisMonth.forEach(({ day, feast }) => {
+        const link = document.createElement('button');
+        let extraClass = '';
+        if (feast.type === 'movable-major') extraClass = ' major';
+        else if (feast.type === 'annual') extraClass = ' annual';
+        link.className = 'movable-feast-link' + extraClass;
+        const label = localizeFeastName(feast.name, currentLang);
+        link.innerText = `${label} — ${day}`;
+        link.title = label;
+        link.onclick = () => openDayResourceModal(monthObj, day, feast);
+        container.appendChild(link);
+      });
     }
 
     // =========================================================================
-    // 05. MODAL DIALOG CONTROLS
+    // 07. DAY RESOURCE PICKER MODAL (Mahlet / Gitsawe / Mezmur / Qedassie)
     // =========================================================================
-    function openDayResourceModal(day) {
-      selectedDay = day;
-      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentEthMonth);
-      const mName = currentLang === 'am' ? monthObj.nameAm : monthObj.nameEn;
-      document.getElementById("dayResourceTitle").textContent = UI_TEXT[currentLang].pickResourceTitle(mName, day);
+    function openDayResourceModal(monthObj, day, feast) {
+      currentSelectedMonth = monthObj;
+      currentSelectedDay = day;
+      currentSelectedFeastSlug = (feast && feast.slug) ? feast.slug : null;
 
-      const grid = document.getElementById("resourcePickGrid");
-      grid.innerHTML = "";
+      const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
+      let titleText = UI_TEXT[currentLang].pickResourceTitle(monthName, day);
+      if (feast) {
+        titleText += ` — ${localizeFeastName(feast.name, currentLang)}`;
+      }
+      document.getElementById('dayResourceTitle').innerText = titleText;
 
+      const pickGrid = document.getElementById('resourcePickGrid');
+      pickGrid.innerHTML = '';
       RESOURCE_TYPES.forEach(r => {
-        const btn = document.createElement("button");
-        btn.className = "resource-pick-btn";
-        btn.textContent = currentLang === 'am' ? r.nameAm : r.nameEn;
-        const avail = isResourceAvailable(currentEthMonth, day, r.key);
+        const avail = currentSelectedFeastSlug
+          ? isMovableFeastResourceAvailable(currentSelectedFeastSlug, r.key)
+          : isResourceAvailable(monthObj.id, day, r.key);
+        const btn = document.createElement('button');
+        btn.className = 'resource-pick-btn';
+        btn.innerText = (currentLang === 'en') ? r.nameEn : r.nameAm;
         btn.disabled = !avail;
-        btn.onclick = () => {
-          closeDayResourceModal();
-          openPasswordModal(r.key);
-        };
-        grid.appendChild(btn);
+        if (avail) {
+          btn.onclick = () => {
+            closeDayResourceModal();
+            openPasswordModal(monthObj, day, r, currentSelectedFeastSlug);
+          };
+        }
+        pickGrid.appendChild(btn);
       });
 
-      document.getElementById("dayResourceModal").classList.add("active");
+      document.getElementById('dayResourceModal').classList.add('active');
     }
 
     function closeDayResourceModal() {
-      document.getElementById("dayResourceModal").classList.remove("active");
+      document.getElementById('dayResourceModal').classList.remove('active');
     }
 
-    function openPasswordModal(resourceKey) {
-      selectedResourceKey = resourceKey;
-      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentEthMonth);
-      const resObj = RESOURCE_TYPES.find(r => r.key === resourceKey);
-      const rName = currentLang === 'am' ? resObj.nameAm : resObj.nameEn;
-      const mName = currentLang === 'am' ? monthObj.nameAm : monthObj.nameEn;
+    // =========================================================================
+    // 08. PASSWORD MODAL + AES-GCM DECRYPTION
+    // =========================================================================
+    function openPasswordModal(monthObj, day, resource, feastSlug) {
+      currentSelectedMonth = monthObj;
+      currentSelectedDay = day;
+      currentSelectedResourceKey = resource.key;
+      currentSelectedFeastSlug = feastSlug || null;
 
-      document.getElementById("modalTitle").textContent = `${mName} ${selectedDay} - ${rName}`;
-      document.getElementById("passwordInput").value = "";
-      document.getElementById("errorMsg").style.display = "none";
-      document.getElementById("decryptSpinner").style.display = "none";
-      document.getElementById("passwordModal").classList.add("active");
-      setTimeout(() => document.getElementById("passwordInput").focus(), 100);
+      const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
+      const resName = (currentLang === 'en') ? resource.nameEn : resource.nameAm;
+      const label = currentSelectedFeastSlug ? currentSelectedFeastSlug.replace(/-/g, ' ') : `${monthName} ${day}`;
+      document.getElementById('modalTitle').innerText = `${label} - ${resName}`;
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').type = 'password';
+      document.getElementById('showPasswordCheckbox').checked = false;
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('decryptSpinner').style.display = 'none';
+      document.getElementById('passwordModal').classList.add('active');
+      setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+    }
+
+    // Toggles the password field between masked (type="password") and
+    // plain text (type="text") so the person can double-check what they
+    // typed before submitting — helpful given how easy it is to mistype a
+    // password with no visual feedback otherwise.
+    function toggleShowPassword() {
+      const input = document.getElementById('passwordInput');
+      const checked = document.getElementById('showPasswordCheckbox').checked;
+      input.type = checked ? 'text' : 'password';
     }
 
     function closePasswordModal() {
-      document.getElementById("passwordModal").classList.remove("active");
-    }
-
-    function toggleShowPassword() {
-      const input = document.getElementById("passwordInput");
-      const cb = document.getElementById("showPasswordCheckbox");
-      input.type = cb.checked ? "text" : "password";
-    }
-
-    function handleKeySubmit(e) {
-      if (e.key === "Enter") submitPassword();
-    }
-
-    async function submitPassword() {
-      const pw = document.getElementById("passwordInput").value;
-      const err = document.getElementById("errorMsg");
-      const spinner = document.getElementById("decryptSpinner");
-
-      if (!pw) {
-        err.textContent = UI_TEXT[currentLang].incorrectPw;
-        err.style.display = "block";
-        return;
-      }
-
-      err.style.display = "none";
-      spinner.style.display = "block";
-
-      setTimeout(() => {
-        spinner.style.display = "none";
-        closePasswordModal();
-        openViewerModal();
-      }, 600);
-    }
-
-    function openViewerModal() {
-      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === currentEthMonth);
-      const resObj = RESOURCE_TYPES.find(r => r.key === selectedResourceKey);
-      const rName = currentLang === 'am' ? resObj.nameAm : resObj.nameEn;
-      const mName = currentLang === 'am' ? monthObj.nameAm : monthObj.nameEn;
-
-      document.getElementById("viewerTitle").textContent = `${mName} ${selectedDay} - ${rName}`;
-      
-      const frame = document.getElementById("pdfFrame");
-      frame.src = "about:blank"; 
-
-      document.getElementById("viewerModal").classList.add("active");
+      document.getElementById('passwordModal').classList.remove('active');
     }
 
     function closeViewerModal() {
-      document.getElementById("pdfFrame").src = "";
-      document.getElementById("viewerModal").classList.remove("active");
+      document.getElementById('viewerModal').classList.remove('active');
+      const iframe = document.getElementById('pdfFrame');
+      if (iframe.src) {
+        URL.revokeObjectURL(iframe.src);
+        iframe.src = '';
+      }
     }
 
-    window.onload = initCalendar;
+    function handleKeySubmit(event) {
+      if (event.key === 'Enter') submitPassword();
+    }
+
+    window.onclick = function (e) {
+      if (e.target === document.getElementById('dayResourceModal')) closeDayResourceModal();
+      if (e.target === document.getElementById('passwordModal')) closePasswordModal();
+      if (e.target === document.getElementById('viewerModal')) closeViewerModal();
+    };
+
+    window.onkeydown = function (e) {
+      if (e.key === 'Escape') {
+        closeDayResourceModal();
+        closePasswordModal();
+        closeViewerModal();
+      }
+    };
+
+    // Decrypts a .enc buffer laid out as [16-byte salt][12-byte IV][ciphertext+tag],
+    // deriving the AES-256-GCM key from the password via PBKDF2 (100,000 iterations,
+    // SHA-256). AES-GCM's built-in authentication tag means a wrong password causes
+    // decrypt() to throw rather than silently returning garbage.
+    async function decryptPdfBuffer(encryptedArrayBuffer, password) {
+      const bytes = new Uint8Array(encryptedArrayBuffer);
+      if (bytes.length < 28) {
+        throw new Error("Invalid file structure or corrupted data.");
+      }
+
+      const salt = bytes.slice(0, 16);
+      const iv = bytes.slice(16, 28);
+      const ciphertext = bytes.slice(28);
+
+      const enc = new TextEncoder();
+      const pwBytes = enc.encode(password);
+
+      const baseKey = await crypto.subtle.importKey("raw", pwBytes, "PBKDF2", false, ["deriveKey"]);
+
+      const derivedKey = await crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+        baseKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["decrypt"]
+      );
+
+      return await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, derivedKey, ciphertext);
+    }
+
+    async function submitPassword() {
+      const password = document.getElementById('passwordInput').value;
+      const errorMsg = document.getElementById('errorMsg');
+      const spinner = document.getElementById('decryptSpinner');
+      errorMsg.style.display = 'none';
+
+      if (!password) return;
+
+      const monthObj = currentSelectedMonth;
+      const day = currentSelectedDay;
+      const resourceKey = currentSelectedResourceKey;
+      const dayPadded = String(day).padStart(2, '0');
+
+      // File path depends on whether this day is a movable/special feast:
+      //   Regular day:      pdfs/<month-folder>/<DD>-<resourceKey>.pdf.enc
+      //   Movable/special:  pdfs/movable-feasts/<slug>/<resourceKey>.pdf.enc
+      const filePath = currentSelectedFeastSlug
+        ? `pdfs/movable-feasts/${currentSelectedFeastSlug}/${resourceKey}.pdf.enc`
+        : `pdfs/${monthObj.folder}/${dayPadded}-${resourceKey}.pdf.enc`;
+
+      spinner.style.display = 'block';
+
+      // Step 0: the Web Crypto API (crypto.subtle) is ONLY available in a
+      // secure context (https://, or localhost) — browsers disable it
+      // entirely on plain http://. If that's the situation, decryption
+      // cannot possibly work regardless of password, so we detect this
+      // upfront and give an honest, specific message instead of the
+      // misleading "incorrect password" that a crypto.subtle failure would
+      // otherwise produce below.
+      if (!window.isSecureContext || !window.crypto || !window.crypto.subtle) {
+        spinner.style.display = 'none';
+        errorMsg.innerText = (currentLang === 'en')
+          ? "This page isn't loaded over a secure (https://) connection, so the browser blocks the decryption feature entirely — this is not a wrong password. Please reload the site using https:// (or wait until HTTPS is enabled for this domain) and try again."
+          : "ይህ ገጽ በአስተማማኝ (https://) ግንኙነት አልተከፈተም፤ ስለዚህ አሳሹ የመፍቻ ተግባሩን ሙሉ በሙሉ ያግዳል — ይህ የተሳሳተ የይለፍ ቃል አይደለም። እባክዎ ገጹን በ https:// በመክፈት (ወይም ለዚህ ጎራ HTTPS እስኪነቃ ድረስ በመጠበቅ) እንደገና ይሞክሩ።";
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      // Step 1: fetch the encrypted file. Failures here mean the file is
+      // missing/misnamed or the site isn't running under http(s):// — NOT a
+      // wrong password. Reported separately from decryption failures below.
+      let encryptedBuffer;
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        encryptedBuffer = await response.arrayBuffer();
+      } catch (fetchErr) {
+        console.error('Fetch failed for', filePath, fetchErr);
+        spinner.style.display = 'none';
+        const t = UI_TEXT[currentLang];
+        errorMsg.innerText = (currentLang === 'en')
+          ? `File not found at "${filePath}". Check the filename/folder, and make sure the site is running over http(s):// (not opened directly as a local file).`
+          : `ፋይሉ አልተገኘም፦ "${filePath}"። ስሙንና አቃፊውን ያረጋግጡ፣ እንዲሁም ገጹ በ http(s):// ላይ እየሮጠ መሆኑን ያረጋግጡ (እንደ local ፋይል ብቻ ተከፍቶ ካልሆነ በስተቀር)።`;
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      // Step 2: attempt decryption. A failure here (after a successful fetch)
+      // means the password (or the file itself) is genuinely wrong/corrupted.
+      try {
+        const decryptedBuffer = await decryptPdfBuffer(encryptedBuffer, password);
+
+        const blob = new Blob([decryptedBuffer], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(blob);
+
+        const resource = RESOURCE_TYPES.find(r => r.key === resourceKey);
+        const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
+        const resName = (currentLang === 'en') ? resource.nameEn : resource.nameAm;
+
+        document.getElementById('viewerTitle').innerText = `${monthName} ${day} - ${resName}`;
+        document.getElementById('pdfFrame').src = blobUrl;
+
+        spinner.style.display = 'none';
+        closePasswordModal();
+        document.getElementById('viewerModal').classList.add('active');
+      } catch (decryptErr) {
+        console.error('Decryption failed for', filePath, decryptErr);
+        spinner.style.display = 'none';
+        errorMsg.innerText = UI_TEXT[currentLang].incorrectPw;
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    // =========================================================================
+    // 09. INIT
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      applyLanguageUI();
+      renderCalendar();
+    });
   </script>
 </body>
 </html>
