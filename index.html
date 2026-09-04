@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title id="pageTitle">ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን | DSK Mariam EOTC Washington DC</title>
+  <title id="pageTitle">ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</title>
 
-  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Abyssinica+SIL&family=Cinzel:wght@500;700&family=Noto+Serif+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet">
@@ -86,19 +85,23 @@
     }
 
     .header-cross {
-      width: 42px;
-      height: 42px;
-      margin: 0 auto 0.4rem auto;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 0.5rem auto;
       display: block;
       fill: var(--gold);
+      filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
     }
 
     header h1 {
-      font-family: 'Cinzel', 'Noto Serif Ethiopic', serif;
-      font-size: 1.25rem;
+      font-family: 'Noto Serif Ethiopic', 'Cinzel', serif;
+      font-size: 1.15rem;
       color: var(--gold);
       margin-bottom: 0.25rem;
-      line-height: 1.3;
+      line-height: 1.35;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     header p {
@@ -106,14 +109,6 @@
       color: var(--gold-light);
       opacity: 0.95;
       line-height: 1.4;
-    }
-
-    .church-domain {
-      font-size: 0.75rem;
-      color: var(--gold);
-      letter-spacing: 1px;
-      margin-top: 0.2rem;
-      font-family: monospace, sans-serif;
     }
 
     .top-controls {
@@ -363,7 +358,7 @@
       background-color: var(--maroon-dark);
       color: #d1c4b2;
       border-top: 3px solid var(--gold);
-      padding: 1rem 0.9rem;
+      padding: 1.25rem 0.9rem;
       text-align: center;
       font-size: 0.74rem;
       line-height: 1.5;
@@ -374,6 +369,8 @@
       color: var(--gold);
       font-weight: 600;
       margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      line-height: 1.4;
     }
 
     .modal-overlay {
@@ -420,7 +417,7 @@
     }
 
     .modal-title {
-      font-family: 'Cinzel', 'Noto Serif Ethiopic', serif;
+      font-family: 'Noto Serif Ethiopic', 'Cinzel', serif;
       font-size: 1rem;
       color: var(--maroon-dark);
       margin-bottom: 1rem;
@@ -549,8 +546,8 @@
 
     @media (min-width: 641px) {
       header { padding: 2.5rem 1rem 1.5rem 1rem; }
-      .header-cross { width: 48px; height: 48px; }
-      header h1 { font-size: 1.65rem; }
+      .header-cross { width: 56px; height: 56px; }
+      header h1 { font-size: 1.45rem; }
       header p { font-size: 0.92rem; }
       .today-banner { font-size: 0.9rem; padding: 0.45rem 1rem; }
       .top-right-controls { top: 1rem; right: 1rem; }
@@ -571,7 +568,7 @@
       .feast-tag { font-size: 0.62rem; }
       .res-dot { width: 6px; height: 6px; }
 
-      footer { padding: 1.25rem 1rem; font-size: 0.82rem; }
+      footer { padding: 1.5rem 1rem; font-size: 0.82rem; }
       .modal-box { padding: 1.5rem; }
     }
   </style>
@@ -583,14 +580,12 @@
       <button id="langToggleBtn" class="lang-toggle-btn" onclick="toggleLanguage()">English</button>
     </div>
 
-    <!-- Ethiopian Cross SVG -->
     <svg class="header-cross" viewBox="0 0 24 24">
       <path d="M11 2h2v4h4v2h-4v3h5v2h-5v3h4v2h-4v4h-2v-4H7v-2h4v-3H6v-2h5V8H7V6h4V2z"/>
       <circle cx="12" cy="12" r="1.5"/>
     </svg>
-    <h1 id="headerTitle">ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</h1>
+    <h1 id="headerTitle">ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን</h1>
     <p id="headerSubtitle">የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ | Washington, D.C.</p>
-    <div class="church-domain">dskmariamdc.org</div>
 
     <div class="top-controls">
       <div class="today-banner" id="todayBanner"></div>
@@ -628,11 +623,10 @@
   </main>
 
   <footer>
-    <p class="footer-church-info">ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን &bull; Washington, D.C. &bull; dskmariamdc.org</p>
+    <p class="footer-church-info">ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን &bull; Washington, D.C.</p>
     <p id="footerDisclaimer"><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Service PDF documents are encrypted client-side with AES-GCM (PBKDF2-derived keys) and only decrypt in-browser with the correct password &mdash; they are not merely hidden. As with any password system, real protection still depends on choosing a strong password and keeping it confidential.</p>
   </footer>
 
-  <!-- ===================== DAY RESOURCE PICKER MODAL ===================== -->
   <div id="dayResourceModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closeDayResourceModal()">&times;</button>
@@ -641,7 +635,6 @@
     </div>
   </div>
 
-  <!-- ===================== PASSWORD MODAL ===================== -->
   <div id="passwordModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closePasswordModal()">&times;</button>
@@ -657,7 +650,6 @@
     </div>
   </div>
 
-  <!-- ===================== PDF VIEWER MODAL ===================== -->
   <div id="viewerModal" class="modal-overlay">
     <div class="modal-box">
       <button class="modal-close" onclick="closeViewerModal()">&times;</button>
@@ -670,9 +662,8 @@
     // =========================================================================
     // 00. STATIC CONFIG & CHURCH BRANDING
     // =========================================================================
-    const CHURCH_NAME_AM = "ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን";
-    const CHURCH_NAME_EN = "Debre Selam Kidist Mariam Ethiopian Orthodox Tewahedo Church";
-    const CHURCH_DOMAIN = "dskmariamdc.org";
+    const CHURCH_NAME_AM = "ርእሰ አድባራት ደብረ ሰላም ቅድስት ማርያም የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን";
+    const CHURCH_NAME_EN = "Re'ese Adbarat Debre Selam Kidist Mariam Ethiopian Orthodox Tewahedo Church";
 
     const ETHIOPIAN_MONTHS = [
       { id: 1, nameAm: "መስከረም", nameEn: "Meskerem", folder: "meskerem" },
@@ -730,7 +721,7 @@
     // =========================================================================
     const UI_TEXT = {
       am: {
-        pageTitle: `${CHURCH_NAME_AM} | ${CHURCH_DOMAIN}`,
+        pageTitle: CHURCH_NAME_AM,
         headerTitle: CHURCH_NAME_AM,
         headerSubtitle: "የዕለት አገልግሎት መጽሐፍትና የበዓላት መቁጠሪያ | Washington, D.C.",
         langBtn: "English",
@@ -745,7 +736,7 @@
         pickResourceTitle: (mName, day) => `${mName} ${day} ቀን`,
       },
       en: {
-        pageTitle: `${CHURCH_NAME_EN} | ${CHURCH_DOMAIN}`,
+        pageTitle: CHURCH_NAME_EN,
         headerTitle: CHURCH_NAME_EN,
         headerSubtitle: "Daily Service Resources & Feast-Day Calendar | Washington, D.C.",
         langBtn: "አማርኛ",
