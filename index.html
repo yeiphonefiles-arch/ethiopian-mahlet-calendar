@@ -326,6 +326,103 @@
       gap: 1px;
     }
 
+    /* ===== 7 Major Canonical Fasts — collapsible section ===== */
+    .fasting-details {
+      margin-top: 1.1rem;
+      background-color: var(--cream-card);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .fasting-details summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.75rem 0.9rem;
+      background-color: var(--maroon-dark);
+      color: var(--gold);
+      font-family: 'Cinzel', 'Noto Serif Ethiopic', serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+    .fasting-details summary::-webkit-details-marker { display: none; }
+    .fasting-details summary::marker { content: ''; }
+    .fasting-details summary::after {
+      content: '▾';
+      flex-shrink: 0;
+      font-size: 1rem;
+      color: var(--gold);
+      transition: transform 0.2s ease;
+    }
+    .fasting-details[open] summary::after {
+      transform: rotate(180deg);
+    }
+    .fasting-details summary:focus-visible {
+      outline: 2px solid var(--gold-light);
+      outline-offset: -2px;
+    }
+
+    .fasting-list {
+      padding: 0.4rem 0.9rem 0.6rem 0.9rem;
+    }
+
+    .fasting-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.2rem 0.9rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .fasting-row:last-child { border-bottom: none; }
+
+    .fasting-name-wrap {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+
+    .fasting-name {
+      font-weight: 700;
+      color: var(--maroon-dark);
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .fasting-duration {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    .fasting-note {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 0.15rem;
+      line-height: 1.3;
+    }
+
+    .fasting-dates {
+      flex: 0 0 auto;
+      text-align: right;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 420px) {
+      .fasting-row { justify-content: flex-start; }
+      .fasting-dates { text-align: left; white-space: normal; }
+    }
+
     .day-cell {
       background-color: var(--cream-card);
       min-height: 64px;
@@ -639,6 +736,12 @@
       .feast-tag { font-size: 0.62rem; }
       .res-dot { width: 6px; height: 6px; }
 
+      .fasting-details summary { font-size: 1rem; padding: 0.9rem 1.1rem; }
+      .fasting-list { padding: 0.5rem 1.1rem 0.9rem 1.1rem; }
+      .fasting-name { font-size: 0.92rem; }
+      .fasting-duration { font-size: 0.76rem; }
+      .fasting-dates { font-size: 0.86rem; }
+
       footer { padding: 1.25rem 1rem; font-size: 0.82rem; }
       .modal-box { padding: 1.5rem; }
     }
@@ -694,6 +797,13 @@
 
       <div id="calendarGrid" class="calendar-grid"></div>
     </div>
+
+    <details class="fasting-details" id="fastingDetails">
+      <summary>
+        <span id="fastingSectionTitle">የ7ቱ ዐበይት አጽዋማት (7 Major Canonical Fasts)</span>
+      </summary>
+      <div class="fasting-list" id="fastingListContainer"></div>
+    </details>
   </main>
 
   <footer>
@@ -842,6 +952,8 @@
         gotoInvalidYear: "እባክዎ ትክክለኛ የዓመት ቁጥር ያስገቡ።",
         resourceMissingMsg: (resName, label) => `${resName} ለ${label} አልተገኘም። እባክዎ ቆይተው እንደገና ይሞክሩ።`,
         loadingResource: "እየተጫነ ነው...",
+        fastingSectionTitle: "የ7ቱ ዐበይት አጽዋማት (7 Major Canonical Fasts)",
+        fastingYearRound: "ዓመቱን ሙሉ",
       },
       en: {
         pageTitle: "Ethiopian Orthodox Tewahedo Church Daily Service Resources",
@@ -866,6 +978,8 @@
         gotoInvalidYear: "Please enter a valid year number.",
         resourceMissingMsg: (resName, label) => `No ${resName} file is available for ${label} yet. Please check back later.`,
         loadingResource: "Loading...",
+        fastingSectionTitle: "7 Major Canonical Fasts (የ7ቱ ዐበይት አጽዋማት)",
+        fastingYearRound: "Year-round",
       }
     };
 
@@ -1152,6 +1266,7 @@
       document.getElementById('gotoMonthLabel').innerText = t.gotoMonthLabel;
       document.getElementById('gotoDayLabel').innerText = t.gotoDayLabel;
       document.getElementById('gotoGoBtn').innerText = t.gotoGoBtn;
+      document.getElementById('fastingSectionTitle').innerText = t.fastingSectionTitle;
       populateGotoMonthOptions();
 
       const yearTypeStr = isLeapEthYear(todayEth.year)
@@ -1267,6 +1382,7 @@
       }
 
       renderMovableFeastLinks(monthObj, movableFeastsThisMonth);
+      updateFastingCalendar(currentActiveYear);
     }
 
     // Renders the top-left "notable feast in this month" link(s): includes
@@ -1292,6 +1408,190 @@
         link.title = label;
         link.onclick = () => { jumpSelectedDate = null; openDayResourceModal(monthObj, day, feast); };
         container.appendChild(link);
+      });
+    }
+
+    // =========================================================================
+    // 06b. 7 MAJOR CANONICAL FASTS
+    // Every date below is DERIVED from the existing Bahire Hasab output
+    // (getMovableFeastsForYear / calculateBahireHasabMovableFeasts) and the
+    // existing Ethiopian→Gregorian converter (toGregorianDate). Nothing here
+    // re-implements Easter or calendar math — it only reads the same
+    // month/day results already computed for the movable-feast links and
+    // day-picker, then formats them for this section.
+    // =========================================================================
+
+    // Looks up the Ethiopian {month, day} of a movable feast already computed
+    // by calculateBahireHasabMovableFeasts() for the given year, by its slug
+    // (e.g. 'tsome-nenewe', 'abiy-tsom', 'tsome-hawaryat', 'tinsae').
+    function findMovableFeastDate(movableFeasts, slug) {
+      for (const key in movableFeasts) {
+        if (movableFeasts[key].slug === slug) {
+          const [m, d] = key.split('-').map(Number);
+          return { month: m, day: d };
+        }
+      }
+      return null;
+    }
+
+    // Plain Gregorian day arithmetic (safe here since these offsets are only
+    // ever a few days — no Ethiopian-calendar leap logic involved).
+    function addGregDays(date, delta) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + delta);
+      return d;
+    }
+
+    function formatGregDate(date) {
+      if (!date) return '--';
+      if (currentLang === 'en') {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      return `${dd}/${mm}/${date.getFullYear()}`;
+    }
+
+    function formatGregRange(startDate, endDate) {
+      if (!startDate) return '--';
+      if (!endDate || startDate.getTime() === endDate.getTime()) return formatGregDate(startDate);
+      return `${formatGregDate(startDate)} – ${formatGregDate(endDate)}`;
+    }
+
+    // The 7 Major Canonical Fasts. Movable ones reuse the slugs already
+    // produced by calculateBahireHasabMovableFeasts(); fixed ones reuse the
+    // same ETHIOPIAN_MONTHS ids + toGregorianDate() used everywhere else.
+    const MAJOR_FASTS = [
+      {
+        key: 'tsome-nenewe',
+        nameAm: 'ጾመ ነነዌ', nameEn: 'Fast of Nineveh',
+        durationAm: '3 ቀናት', durationEn: '3 days',
+        resolve(year, movableFeasts) {
+          const start = findMovableFeastDate(movableFeasts, 'tsome-nenewe');
+          if (!start) return null;
+          const startGreg = toGregorianDate(year, start.month, start.day);
+          return { startGreg, endGreg: addGregDays(startGreg, 2) };
+        }
+      },
+      {
+        key: 'abiy-tsom',
+        nameAm: 'ዐቢይ ጾም', nameEn: 'Great Lent (Abiy Tsom)',
+        durationAm: '55 ቀናት', durationEn: '55 days',
+        resolve(year, movableFeasts) {
+          const start = findMovableFeastDate(movableFeasts, 'abiy-tsom');
+          const easter = findMovableFeastDate(movableFeasts, 'tinsae');
+          if (!start || !easter) return null;
+          const startGreg = toGregorianDate(year, start.month, start.day);
+          const easterGreg = toGregorianDate(year, easter.month, easter.day);
+          return { startGreg, endGreg: addGregDays(easterGreg, -1) };
+        }
+      },
+      {
+        key: 'tsome-hawaryat',
+        nameAm: 'ጾመ ሐዋርያት', nameEn: 'Fast of the Apostles',
+        durationAm: 'ተለዋዋጭ (እስከ ሐምሌ 5)', durationEn: 'Variable (through Hamle 5)',
+        resolve(year, movableFeasts) {
+          const start = findMovableFeastDate(movableFeasts, 'tsome-hawaryat');
+          if (!start) return null;
+          const startGreg = toGregorianDate(year, start.month, start.day);
+          const endGreg = toGregorianDate(year, 11, 5); // Hamle 5
+          return { startGreg, endGreg };
+        }
+      },
+      {
+        key: 'tsome-nebiyat',
+        nameAm: 'ጾመ ነቢያት', nameEn: 'Fast of the Prophets (Advent)',
+        durationAm: '43 ቀናት', durationEn: '43 days',
+        resolve(year) {
+          const startGreg = toGregorianDate(year, 3, 15);  // Hidar 15
+          const endGreg = toGregorianDate(year, 4, 28);    // Tahsas 28
+          return { startGreg, endGreg };
+        }
+      },
+      {
+        key: 'tsome-filseta',
+        nameAm: 'ጾመ ፍልሰታ', nameEn: 'Fast of Filseta (Assumption of St. Mary)',
+        durationAm: '16 ቀናት', durationEn: '16 days',
+        resolve(year) {
+          const startGreg = toGregorianDate(year, 12, 1);  // Nahase 1
+          const endGreg = toGregorianDate(year, 12, 16);   // Nahase 16
+          return { startGreg, endGreg };
+        }
+      },
+      {
+        key: 'tsome-gahad',
+        nameAm: 'ጾመ ገሃድ', nameEn: 'Gahad (Vigils of Genna & Timkat)',
+        durationAm: '2 የተናጠል ቀናት', durationEn: '2 single days',
+        resolve(year) {
+          const gennaVigil = toGregorianDate(year, 4, 28);  // Tahsas 28
+          const timkatVigil = toGregorianDate(year, 5, 10); // Tir 10
+          return { multi: [gennaVigil, timkatVigil] };
+        }
+      },
+      {
+        key: 'tsome-dihnet',
+        nameAm: 'ጾመ ድኅነት', nameEn: 'Fast of Dihnet (Wed & Fri)',
+        durationAm: 'ሳምንታዊ (ረቡዕ እና አርብ)', durationEn: 'Weekly (Wed & Fri)',
+        recurring: true,
+        noteAm: 'ከትንሣኤ በኋላ ላሉት 50 ቀናት አይካተትም (እስከ ጰራቅሊጦስ)።',
+        noteEn: 'Excludes the 50 days following Tinsae, through Pentecost.'
+      }
+    ];
+
+    // Renders the collapsible list. Called from renderCalendar() so it stays
+    // in sync with whatever Ethiopian year is currently displayed, and from
+    // toggleLanguage()/applyLanguageUI() indirectly since renderCalendar()
+    // already runs on every language switch.
+    function updateFastingCalendar(selectedYear) {
+      const container = document.getElementById('fastingListContainer');
+      if (!container) return;
+
+      const movableFeasts = getMovableFeastsForYear(selectedYear);
+      container.innerHTML = '';
+
+      MAJOR_FASTS.forEach(fast => {
+        const row = document.createElement('div');
+        row.className = 'fasting-row';
+
+        const nameWrap = document.createElement('div');
+        nameWrap.className = 'fasting-name-wrap';
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'fasting-name';
+        nameEl.innerText = (currentLang === 'en') ? `${fast.nameEn} (${fast.nameAm})` : `${fast.nameAm} (${fast.nameEn})`;
+        nameWrap.appendChild(nameEl);
+
+        const durationEl = document.createElement('div');
+        durationEl.className = 'fasting-duration';
+        durationEl.innerText = (currentLang === 'en') ? fast.durationEn : fast.durationAm;
+        nameWrap.appendChild(durationEl);
+
+        if (fast.noteEn) {
+          const noteEl = document.createElement('div');
+          noteEl.className = 'fasting-note';
+          noteEl.innerText = (currentLang === 'en') ? fast.noteEn : fast.noteAm;
+          nameWrap.appendChild(noteEl);
+        }
+
+        const datesEl = document.createElement('div');
+        datesEl.className = 'fasting-dates';
+
+        if (fast.recurring) {
+          datesEl.innerText = UI_TEXT[currentLang].fastingYearRound;
+        } else {
+          const result = fast.resolve(selectedYear, movableFeasts);
+          if (!result) {
+            datesEl.innerText = '--';
+          } else if (result.multi) {
+            datesEl.innerText = result.multi.map(d => formatGregDate(d)).join(' & ');
+          } else {
+            datesEl.innerText = formatGregRange(result.startGreg, result.endGreg);
+          }
+        }
+
+        row.appendChild(nameWrap);
+        row.appendChild(datesEl);
+        container.appendChild(row);
       });
     }
 
