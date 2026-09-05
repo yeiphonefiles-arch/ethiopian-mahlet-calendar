@@ -32,6 +32,8 @@
       --feast-movable-text: #7a1010;
       --feast-major-bg: #d4af37;
       --feast-major-text: #3b0a0a;
+      --fasting-day-bg: #e7e0f3;
+      --fasting-day-border: #6b4f9e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -457,6 +459,16 @@
       box-shadow: inset 0 0 0 3px var(--maroon-dark);
     }
 
+    /* Fasting-day shade: applied to any weekday (never Sat/Sun) that falls
+       within one of the 7 Major Canonical Fasts. Placed BEFORE the feast-tier
+       rules below so that when a day is both a feast and a fast (e.g. a
+       movable feast landing inside Great Lent), the feast's own color wins —
+       same class-specificity, later rule in the cascade takes it. */
+    .day-cell.fasting-day {
+      background-color: var(--fasting-day-bg);
+      box-shadow: inset 3px 0 0 var(--fasting-day-border);
+    }
+
     /* Feast-day highlight tiers (precedence: movable > annual > monthly) */
     .day-cell.feast-monthly { background-color: var(--feast-monthly-bg); }
     .day-cell.feast-annual { background-color: var(--feast-annual-bg); }
@@ -503,17 +515,6 @@
 
     .res-dot.active {
       background-color: #2e7d32;
-    }
-
-    footer {
-      background-color: var(--maroon-dark);
-      color: #d1c4b2;
-      border-top: 3px solid var(--gold);
-      padding: 1rem 0.9rem;
-      text-align: center;
-      font-size: 0.74rem;
-      line-height: 1.5;
-      margin-top: auto;
     }
 
     /* ===== Modals (shared overlay style) ===== */
@@ -742,7 +743,6 @@
       .fasting-duration { font-size: 0.76rem; }
       .fasting-dates { font-size: 0.86rem; }
 
-      footer { padding: 1.25rem 1rem; font-size: 0.82rem; }
       .modal-box { padding: 1.5rem; }
     }
   </style>
@@ -805,10 +805,6 @@
       <div class="fasting-list" id="fastingListContainer"></div>
     </details>
   </main>
-
-  <footer>
-    <p id="footerDisclaimer">All Service PDF documents are freely available to view and download &mdash; no password required.</p>
-  </footer>
 
   <!-- ===================== DAY RESOURCE PICKER MODAL ===================== -->
   <div id="dayResourceModal" class="modal-overlay">
@@ -940,7 +936,6 @@
         loadError: "ፋይሉ ሊገኝ አልቻለም።",
         loading: "እየተጫነ ነው...",
         noPdf: "ምንም ፋይል የለም (No file uploaded)",
-        footer: "ሁሉም የአገልግሎት ፋይሎች ያለ የይለፍ ቃል ለሁሉም ክፍት ናቸው፤ በነጻ ይታያሉ እና ይወርዳሉ።",
         pickResourceTitle: (mName, day) => `${mName} ${day} ቀን`,
         downloadBtn: "አውርድ (Download)",
         gotoBtnTitle: "ወደ ቀን ሂድ",
@@ -966,7 +961,6 @@
         loadError: "Could not load the file.",
         loading: "Loading...",
         noPdf: "No file uploaded",
-        footer: "All service PDFs are freely available to everyone to view and download &mdash; no password required.",
         pickResourceTitle: (mName, day) => `${mName} ${day}`,
         downloadBtn: "Download",
         gotoBtnTitle: "Go to date",
@@ -1258,7 +1252,6 @@
       document.getElementById('prevLabel').innerText = t.prev;
       document.getElementById('nextLabel').innerText = t.next;
       document.getElementById('errorMsg').innerText = t.loadError;
-      document.getElementById('footerDisclaimer').innerHTML = t.footer;
       document.getElementById('viewerDownloadBtn').innerText = t.downloadBtn;
       document.getElementById('gotoDateBtn').title = t.gotoBtnTitle;
       document.getElementById('gotoDateTitle').innerText = t.gotoTitle;
@@ -1300,6 +1293,73 @@
       renderCalendar();
     }
 
+    // Computes, once per year, the Julian-Day-Number ranges for the 6
+    // date-bound Major Canonical Fasts (everything except the weekly
+    // Dihnet fast), plus the Tinsae -> Pentecost window during which the
+    // Dihnet exclusion applies. Reuses MAJOR_FASTS.resolve() — the exact
+    // same logic that drives the collapsible fasting list — so the shading
+    // and the list can never disagree.
+    const _fastingRangesCache = {};
+    function getFastingRangesForYear(year) {
+      if (_fastingRangesCache[year]) return _fastingRangesCache[year];
+
+      const movableFeasts = getMovableFeastsForYear(year);
+      const ranges = [];
+
+      MAJOR_FASTS.forEach(fast => {
+        if (fast.recurring) return; // Dihnet is handled separately below
+        const result = fast.resolve(year, movableFeasts);
+        if (!result) return;
+        if (result.multi) {
+          result.multi.forEach(d => {
+            const jdn = ethiopianToJDN(d.year, d.month, d.day);
+            ranges.push({ startJDN: jdn, endJDN: jdn });
+          });
+        } else {
+          ranges.push({
+            startJDN: ethiopianToJDN(result.startEth.year, result.startEth.month, result.startEth.day),
+            endJDN: ethiopianToJDN(result.endEth.year, result.endEth.month, result.endEth.day)
+          });
+        }
+      });
+
+      const tinsae = findMovableFeastDate(movableFeasts, 'tinsae');
+      const pentecost = findMovableFeastDate(movableFeasts, 'peraklitos');
+      const dihnetExclude = (tinsae && pentecost)
+        ? {
+            startJDN: ethiopianToJDN(year, tinsae.month, tinsae.day),
+            endJDN: ethiopianToJDN(year, pentecost.month, pentecost.day)
+          }
+        : null;
+
+      const computed = { ranges, dihnetExclude };
+      _fastingRangesCache[year] = computed;
+      return computed;
+    }
+
+    // A day is shaded as a fasting day if it falls in one of the 6 dated
+    // fasts, OR it's a Wednesday/Friday (the weekly Dihnet fast) outside the
+    // Tinsae -> Pentecost grace window. Saturdays and Sundays are NEVER
+    // shaded, regardless of what fast they fall in.
+    function isFastingDay(year, monthId, day, gregDate, fastingRanges) {
+      const dow = gregDate.getDay(); // 0 = Sun ... 6 = Sat
+      if (dow === 0 || dow === 6) return false;
+
+      const jdn = ethiopianToJDN(year, monthId, day);
+
+      for (const r of fastingRanges.ranges) {
+        if (jdn >= r.startJDN && jdn <= r.endJDN) return true;
+      }
+
+      if (dow === 3 || dow === 5) { // Wed or Fri
+        const ex = fastingRanges.dihnetExclude;
+        if (ex && jdn >= ex.startJDN && jdn <= ex.endJDN) return false;
+        return true;
+      }
+
+      return false;
+    }
+
     function renderCalendar() {
       const grid = document.getElementById('calendarGrid');
       const title = document.getElementById('monthDisplayTitle');
@@ -1322,6 +1382,7 @@
       const leap = isLeapEthYear(currentActiveYear);
       const totalDays = (monthObj.id === 13) ? (leap ? 6 : 5) : 30;
       const startDow = getMonthStartDayOfWeek(currentActiveYear, monthObj.id);
+      const fastingRanges = getFastingRangesForYear(currentActiveYear);
 
       for (let i = 0; i < startDow; i++) {
         const empty = document.createElement('div');
@@ -1339,6 +1400,7 @@
         const gregEquivalent = toGregorianDate(currentActiveYear, monthObj.id, day);
         const gregStr = `${gregEquivalent.getMonth() + 1}/${gregEquivalent.getDate()}`;
         const feast = getFeastInfo(currentActiveYear, monthObj.id, day);
+        const isFasting = isFastingDay(currentActiveYear, monthObj.id, day, gregEquivalent, fastingRanges);
 
         const cell = document.createElement('div');
         let cls = 'day-cell';
@@ -1346,6 +1408,7 @@
         if (jumpSelectedDate && jumpSelectedDate.year === currentActiveYear && jumpSelectedDate.month === monthObj.id && jumpSelectedDate.day === day) {
           cls += ' jump-selected-cell';
         }
+        if (isFasting) cls += ' fasting-day';
         if (feast) {
           if (feast.type === 'movable-major') cls += ' feast-major';
           else if (feast.type === 'movable') cls += ' feast-movable';
@@ -1415,10 +1478,11 @@
     // 06b. 7 MAJOR CANONICAL FASTS
     // Every date below is DERIVED from the existing Bahire Hasab output
     // (getMovableFeastsForYear / calculateBahireHasabMovableFeasts) and the
-    // existing Ethiopian→Gregorian converter (toGregorianDate). Nothing here
-    // re-implements Easter or calendar math — it only reads the same
-    // month/day results already computed for the movable-feast links and
-    // day-picker, then formats them for this section.
+    // existing Ethiopian Julian-Day-Number converters (ethiopianToJDN /
+    // jdnToEthiopian). Nothing here re-implements Easter or calendar math —
+    // it only reads the same month/day results already computed for the
+    // movable-feast links and day-picker, then formats them in the Ethiopian
+    // calendar for this section.
     // =========================================================================
 
     // Looks up the Ethiopian {month, day} of a movable feast already computed
@@ -1434,33 +1498,46 @@
       return null;
     }
 
-    // Plain Gregorian day arithmetic (safe here since these offsets are only
-    // ever a few days — no Ethiopian-calendar leap logic involved).
-    function addGregDays(date, delta) {
-      const d = new Date(date);
-      d.setDate(d.getDate() + delta);
-      return d;
+    // Adds/subtracts days to an Ethiopian calendar date correctly across
+    // month and Pagume-leap boundaries, by reusing the existing JDN
+    // converters (ethiopianToJDN / jdnToEthiopian) already used for the
+    // Gregorian <-> Ethiopian conversion elsewhere on the site.
+    function addEthDays(year, month, day, delta) {
+      const jdn = ethiopianToJDN(year, month, day) + delta;
+      return jdnToEthiopian(jdn);
     }
 
-    function formatGregDate(date) {
-      if (!date) return '--';
-      if (currentLang === 'en') {
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    function formatEthDate(ethDate) {
+      if (!ethDate) return '--';
+      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === ethDate.month);
+      const monthName = monthObj ? ((currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm) : '?';
+      return (currentLang === 'en')
+        ? `${monthName} ${ethDate.day}, ${ethDate.year} E.C.`
+        : `${monthName} ${ethDate.day}, ${ethDate.year} ዓ.ም.`;
+    }
+
+    function formatEthRange(startEth, endEth) {
+      if (!startEth) return '--';
+      if (!endEth || (startEth.year === endEth.year && startEth.month === endEth.month && startEth.day === endEth.day)) {
+        return formatEthDate(startEth);
       }
-      const dd = String(date.getDate()).padStart(2, '0');
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      return `${dd}/${mm}/${date.getFullYear()}`;
-    }
-
-    function formatGregRange(startDate, endDate) {
-      if (!startDate) return '--';
-      if (!endDate || startDate.getTime() === endDate.getTime()) return formatGregDate(startDate);
-      return `${formatGregDate(startDate)} – ${formatGregDate(endDate)}`;
+      // Same month+year on both ends: skip repeating the month/year for the
+      // start date, e.g. "Nahase 1–16, 2017 E.C." instead of the full form
+      // twice.
+      if (startEth.year === endEth.year && startEth.month === endEth.month) {
+        const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === startEth.month);
+        const monthName = monthObj ? ((currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm) : '?';
+        return (currentLang === 'en')
+          ? `${monthName} ${startEth.day}–${endEth.day}, ${startEth.year} E.C.`
+          : `${monthName} ${startEth.day}–${endEth.day}, ${startEth.year} ዓ.ም.`;
+      }
+      return `${formatEthDate(startEth)} – ${formatEthDate(endEth)}`;
     }
 
     // The 7 Major Canonical Fasts. Movable ones reuse the slugs already
     // produced by calculateBahireHasabMovableFeasts(); fixed ones reuse the
-    // same ETHIOPIAN_MONTHS ids + toGregorianDate() used everywhere else.
+    // same ETHIOPIAN_MONTHS ids used everywhere else on the site. All dates
+    // stay in the Ethiopian calendar (no Gregorian conversion).
     const MAJOR_FASTS = [
       {
         key: 'tsome-nenewe',
@@ -1469,8 +1546,8 @@
         resolve(year, movableFeasts) {
           const start = findMovableFeastDate(movableFeasts, 'tsome-nenewe');
           if (!start) return null;
-          const startGreg = toGregorianDate(year, start.month, start.day);
-          return { startGreg, endGreg: addGregDays(startGreg, 2) };
+          const startEth = { year, month: start.month, day: start.day };
+          return { startEth, endEth: addEthDays(year, start.month, start.day, 2) };
         }
       },
       {
@@ -1481,9 +1558,9 @@
           const start = findMovableFeastDate(movableFeasts, 'abiy-tsom');
           const easter = findMovableFeastDate(movableFeasts, 'tinsae');
           if (!start || !easter) return null;
-          const startGreg = toGregorianDate(year, start.month, start.day);
-          const easterGreg = toGregorianDate(year, easter.month, easter.day);
-          return { startGreg, endGreg: addGregDays(easterGreg, -1) };
+          const startEth = { year, month: start.month, day: start.day };
+          const endEth = addEthDays(year, easter.month, easter.day, -1);
+          return { startEth, endEth };
         }
       },
       {
@@ -1493,9 +1570,9 @@
         resolve(year, movableFeasts) {
           const start = findMovableFeastDate(movableFeasts, 'tsome-hawaryat');
           if (!start) return null;
-          const startGreg = toGregorianDate(year, start.month, start.day);
-          const endGreg = toGregorianDate(year, 11, 5); // Hamle 5
-          return { startGreg, endGreg };
+          const startEth = { year, month: start.month, day: start.day };
+          const endEth = { year, month: 11, day: 5 }; // Hamle 5
+          return { startEth, endEth };
         }
       },
       {
@@ -1503,9 +1580,7 @@
         nameAm: 'ጾመ ነቢያት', nameEn: 'Fast of the Prophets (Advent)',
         durationAm: '43 ቀናት', durationEn: '43 days',
         resolve(year) {
-          const startGreg = toGregorianDate(year, 3, 15);  // Hidar 15
-          const endGreg = toGregorianDate(year, 4, 28);    // Tahsas 28
-          return { startGreg, endGreg };
+          return { startEth: { year, month: 3, day: 15 }, endEth: { year, month: 4, day: 28 } }; // Hidar 15 -> Tahsas 28
         }
       },
       {
@@ -1513,9 +1588,7 @@
         nameAm: 'ጾመ ፍልሰታ', nameEn: 'Fast of Filseta (Assumption of St. Mary)',
         durationAm: '16 ቀናት', durationEn: '16 days',
         resolve(year) {
-          const startGreg = toGregorianDate(year, 12, 1);  // Nahase 1
-          const endGreg = toGregorianDate(year, 12, 16);   // Nahase 16
-          return { startGreg, endGreg };
+          return { startEth: { year, month: 12, day: 1 }, endEth: { year, month: 12, day: 16 } }; // Nahase 1 -> Nahase 16
         }
       },
       {
@@ -1523,8 +1596,8 @@
         nameAm: 'ጾመ ገሃድ', nameEn: 'Gahad (Vigils of Genna & Timkat)',
         durationAm: '2 የተናጠል ቀናት', durationEn: '2 single days',
         resolve(year) {
-          const gennaVigil = toGregorianDate(year, 4, 28);  // Tahsas 28
-          const timkatVigil = toGregorianDate(year, 5, 10); // Tir 10
+          const gennaVigil = { year, month: 4, day: 28 };  // Tahsas 28
+          const timkatVigil = { year, month: 5, day: 10 }; // Tir 10
           return { multi: [gennaVigil, timkatVigil] };
         }
       },
@@ -1583,9 +1656,9 @@
           if (!result) {
             datesEl.innerText = '--';
           } else if (result.multi) {
-            datesEl.innerText = result.multi.map(d => formatGregDate(d)).join(' & ');
+            datesEl.innerText = result.multi.map(d => formatEthDate(d)).join(' & ');
           } else {
-            datesEl.innerText = formatGregRange(result.startGreg, result.endGreg);
+            datesEl.innerText = formatEthRange(result.startEth, result.endEth);
           }
         }
 
