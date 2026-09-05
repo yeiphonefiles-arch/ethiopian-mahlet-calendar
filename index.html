@@ -204,6 +204,31 @@
       border-bottom: 1px solid var(--gold);
     }
 
+    .meta-right-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .goto-date-btn {
+      background: var(--maroon);
+      color: var(--gold-light);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      padding: 0.25rem 0.55rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      line-height: 1;
+      min-height: 30px;
+      transition: all 0.15s;
+    }
+    .goto-date-btn:hover {
+      background: var(--maroon-light);
+      transform: translateY(-1px);
+    }
+
     .year-badge {
       display: flex;
       align-items: center;
@@ -216,7 +241,6 @@
       font-size: 0.72rem;
       font-weight: 700;
       flex-shrink: 0;
-      margin-left: auto;
     }
 
     .year-nav-btn {
@@ -472,34 +496,43 @@
       cursor: not-allowed;
     }
 
-    .modal-box .password-input-field {
+    .spinner {
+      display: none;
+      width: 26px;
+      height: 26px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--maroon);
+      border-radius: 50%;
+      margin: 0.75rem auto 0 auto;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== Goto-date modal form fields ===== */
+    .goto-field { margin-bottom: 0.9rem; }
+    .goto-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--maroon-dark);
+      margin-bottom: 0.3rem;
+    }
+    .goto-input, .goto-select {
       width: 100%;
-      padding: 0.75rem 0.7rem;
+      padding: 0.65rem 0.6rem;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
       font-family: inherit;
       min-height: 46px;
+      background: #fff;
+      color: var(--text-dark);
     }
-
-    .show-password-label {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 0.9rem;
-      cursor: pointer;
-      user-select: none;
+    .goto-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
     }
-    .show-password-label input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      accent-color: var(--maroon);
-    }
-
     .modal-submit-btn {
       width: 100%;
       background-color: var(--maroon-dark);
@@ -523,18 +556,6 @@
       line-height: 1.4;
     }
 
-    .spinner {
-      display: none;
-      width: 26px;
-      height: 26px;
-      border: 3px solid var(--border-color);
-      border-top-color: var(--maroon);
-      border-radius: 50%;
-      margin: 0.75rem auto 0 auto;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
     #viewerModal .modal-box {
       max-width: 900px;
       width: 100%;
@@ -544,6 +565,27 @@
       flex-direction: column;
       padding: 0.75rem;
     }
+    .viewer-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .viewer-download-btn {
+      background: var(--maroon-dark);
+      color: var(--gold-light);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      padding: 0.5rem 0.9rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .viewer-download-btn:hover { background: var(--maroon); }
     #pdfFrame {
       flex: 1;
       width: 100%;
@@ -625,10 +667,13 @@
     <div class="calendar-container">
       <div class="calendar-meta-bar">
         <div class="movable-feast-link-container" id="movableFeastLinkContainer"></div>
-        <div class="year-badge">
-          <button class="year-nav-btn" onclick="navigateYear(-1)" title="Previous year">‹</button>
-          <span id="yearBadge">----</span>
-          <button class="year-nav-btn" onclick="navigateYear(1)" title="Next year">›</button>
+        <div class="meta-right-controls">
+          <button class="goto-date-btn" id="gotoDateBtn" onclick="openGotoDateModal()" title="Go to date">📅</button>
+          <div class="year-badge">
+            <button class="year-nav-btn" onclick="navigateYear(-1)" title="Previous year">‹</button>
+            <span id="yearBadge">----</span>
+            <button class="year-nav-btn" onclick="navigateYear(1)" title="Next year">›</button>
+          </div>
         </div>
       </div>
       <div class="weekdays-header">
@@ -646,7 +691,7 @@
   </main>
 
   <footer>
-    <p id="footerDisclaimer"><strong>የደኅንነት ማስታወሻ (Security Note):</strong> All Service PDF documents are encrypted client-side with AES-GCM (PBKDF2-derived keys) and only decrypt in-browser with the correct password &mdash; they are not merely hidden. As with any password system, real protection still depends on choosing a strong password and keeping it confidential.</p>
+    <p id="footerDisclaimer">All Service PDF documents are freely available to view and download &mdash; no password required.</p>
   </footer>
 
   <!-- ===================== DAY RESOURCE PICKER MODAL ===================== -->
@@ -655,22 +700,35 @@
       <button class="modal-close" onclick="closeDayResourceModal()">&times;</button>
       <div class="modal-title" id="dayResourceTitle">-- -- --</div>
       <div class="resource-pick-grid" id="resourcePickGrid"></div>
+      <div class="spinner" id="loadSpinner"></div>
+      <div class="error-msg" id="errorMsg"></div>
     </div>
   </div>
 
-  <!-- ===================== PASSWORD MODAL ===================== -->
-  <div id="passwordModal" class="modal-overlay">
+  <!-- ===================== GO TO DATE MODAL ===================== -->
+  <div id="gotoDateModal" class="modal-overlay">
     <div class="modal-box">
-      <button class="modal-close" onclick="closePasswordModal()">&times;</button>
-      <div class="modal-title" id="modalTitle">-- -- --</div>
-      <input type="password" id="passwordInput" class="password-input-field" placeholder="Password / የይለፍ ቃል" onkeydown="handleKeySubmit(event)" />
-      <label class="show-password-label">
-        <input type="checkbox" id="showPasswordCheckbox" onchange="toggleShowPassword()" />
-        <span id="showPasswordLabelText">Show password / የይለፍ ቃል አሳይ</span>
-      </label>
-      <button class="modal-submit-btn" id="unlockBtn" onclick="submitPassword()">Unlock / ክፈት</button>
-      <div class="spinner" id="decryptSpinner"></div>
-      <div class="error-msg" id="errorMsg"></div>
+      <button class="modal-close" onclick="closeGotoDateModal()">&times;</button>
+      <div class="modal-title" id="gotoDateTitle">Go to Date</div>
+
+      <div class="goto-field">
+        <label for="gotoYearInput" id="gotoYearLabel">Year (E.C.)</label>
+        <input type="number" id="gotoYearInput" class="goto-input" inputmode="numeric" step="1" onkeydown="handleGotoKeySubmit(event)" />
+      </div>
+
+      <div class="goto-row">
+        <div class="goto-field">
+          <label for="gotoMonthSelect" id="gotoMonthLabel">Month</label>
+          <select id="gotoMonthSelect" class="goto-select" onchange="updateGotoDayOptions()"></select>
+        </div>
+        <div class="goto-field">
+          <label for="gotoDaySelect" id="gotoDayLabel">Day</label>
+          <select id="gotoDaySelect" class="goto-select" onkeydown="handleGotoKeySubmit(event)"></select>
+        </div>
+      </div>
+
+      <button class="modal-submit-btn" id="gotoGoBtn" onclick="submitGotoDate()">Go</button>
+      <div class="error-msg" id="gotoDateError"></div>
     </div>
   </div>
 
@@ -679,6 +737,9 @@
     <div class="modal-box">
       <button class="modal-close" onclick="closeViewerModal()">&times;</button>
       <div class="modal-title" id="viewerTitle">-- -- --</div>
+      <div class="viewer-toolbar">
+        <a id="viewerDownloadBtn" class="viewer-download-btn" href="#" download>Download / አውርድ</a>
+      </div>
       <iframe id="pdfFrame"></iframe>
     </div>
   </div>
@@ -734,9 +795,9 @@
     // in the regular per-day folders, since their Ethiopian-calendar date
     // shifts (or is otherwise treated as a special occasion) from year to
     // year. Instead their PDFs live in a SEPARATE, year-independent folder:
-    //   pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
-    // e.g. pdfs/movable-feasts/tinsae/mahlet.pdf.enc
-    //      pdfs/movable-feasts/great-lent/qedassie.pdf.enc
+    //   pdfs/movable-feasts/<slug>/<resourceType>.pdf
+    // e.g. pdfs/movable-feasts/tinsae/mahlet.pdf
+    //      pdfs/movable-feasts/great-lent/qedassie.pdf
     // Structure: MOVABLE_FEAST_MANIFEST[slug][resourceKey] = true/false
     const MOVABLE_FEAST_MANIFEST = {};
 
@@ -746,20 +807,6 @@
         return m[resourceKey];
       }
       return true;
-    }
-
-    // ---- Per-resource password configuration ----------------------------
-    // Simplest working default: ONE password unlocks everything, everywhere.
-    // To move to a per-month or per-day-per-resource scheme, replace
-    // getPasswordScope() below to build a different lookup key, and manage
-    // salts/passwords per key using encrypt-tool.html. The password itself
-    // is never stored here — only used transiently to derive the AES key.
-    const PASSWORD_SCOPE_MODE = "shared"; // "shared" | "per-month" | "per-day-resource"
-
-    function getPasswordScope(monthObj, day, resourceKey) {
-      if (PASSWORD_SCOPE_MODE === "per-month") return monthObj.folder;
-      if (PASSWORD_SCOPE_MODE === "per-day-resource") return `${monthObj.folder}-${day}-${resourceKey}`;
-      return "shared";
     }
 
     // =========================================================================
@@ -774,12 +821,19 @@
         prev: "ቀደመ",
         next: "ቀጣይ",
         todayPrefix: "ዛሬ (Today):",
-        unlockBtn: "ክፈት (Unlock)",
-        incorrectPw: "የተሳሳተ የይለፍ ቃል።",
-        decrypting: "እየተፈታ ነው...",
+        loadError: "ፋይሉ ሊገኝ አልቻለም።",
+        loading: "እየተጫነ ነው...",
         noPdf: "ምንም ፋይል የለም (No file uploaded)",
-        footer: "<strong>የደኅንነት ማስታወሻ (Security Note):</strong> ሁሉም የአገልግሎት ፋይሎች በአሳሹ ውስጥ በ AES-GCM ምስጢራዊነት የተጠበቁ ናቸው፤ በትክክለኛ የይለፍ ቃል ብቻ ይከፈታሉ። እንደ ማንኛውም የይለፍ ቃል ሥርዓት ሁሉ ደኅንነቱ በይለፍ ቃሉ ጥንካሬና ሚስጥራዊነት ላይ የተመሠረተ ነው።",
+        footer: "ሁሉም የአገልግሎት ፋይሎች ያለ የይለፍ ቃል ለሁሉም ክፍት ናቸው፤ በነጻ ይታያሉ እና ይወርዳሉ።",
         pickResourceTitle: (mName, day) => `${mName} ${day} ቀን`,
+        downloadBtn: "አውርድ (Download)",
+        gotoBtnTitle: "ወደ ቀን ሂድ",
+        gotoTitle: "ወደ ተለየ ቀን ሂድ",
+        gotoYearLabel: "ዓመት (ዓ.ም.)",
+        gotoMonthLabel: "ወር",
+        gotoDayLabel: "ቀን",
+        gotoGoBtn: "ሂድ",
+        gotoInvalidYear: "እባክዎ ትክክለኛ የዓመት ቁጥር ያስገቡ።",
       },
       en: {
         pageTitle: "Ethiopian Orthodox Tewahedo Church Daily Service Resources",
@@ -789,12 +843,19 @@
         prev: "Prev",
         next: "Next",
         todayPrefix: "Today:",
-        unlockBtn: "Unlock",
-        incorrectPw: "Incorrect password.",
-        decrypting: "Decrypting...",
+        loadError: "Could not load the file.",
+        loading: "Loading...",
         noPdf: "No file uploaded",
-        footer: "<strong>Security Note:</strong> All service PDFs are encrypted client-side with AES-GCM (PBKDF2-derived keys) and only decrypt in-browser with the correct password &mdash; they are not merely hidden. As with any password system, real protection still depends on choosing a strong password and keeping it confidential.",
+        footer: "All service PDFs are freely available to everyone to view and download &mdash; no password required.",
         pickResourceTitle: (mName, day) => `${mName} ${day}`,
+        downloadBtn: "Download",
+        gotoBtnTitle: "Go to date",
+        gotoTitle: "Go to a Specific Date",
+        gotoYearLabel: "Year (E.C.)",
+        gotoMonthLabel: "Month",
+        gotoDayLabel: "Day",
+        gotoGoBtn: "Go",
+        gotoInvalidYear: "Please enter a valid year number.",
       }
     };
 
@@ -969,7 +1030,7 @@
     // pdfs/movable-feasts/<slug>/ folder below. Genna (Christmas) and Timkat
     // (Epiphany) are fixed-annual (not movable) but their services are also
     // special/non-recurring, so they get slugs too, sharing the same folder
-    // convention: pdfs/movable-feasts/<slug>/<resourceType>.pdf.enc
+    // convention: pdfs/movable-feasts/<slug>/<resourceType>.pdf
     const FIXED_ANNUAL_FEAST_SLUGS = {
       "4-29": "genna",   // Christmas
       "5-11": "timkat"   // Epiphany
@@ -1041,7 +1102,6 @@
     let currentActiveMonthId = todayEth.month;
     let currentSelectedMonth = null;
     let currentSelectedDay = null;
-    let currentSelectedResourceKey = null;
     let currentSelectedFeastSlug = null; // set when the selected day is a special/movable feast
 
     function getMonthStartDayOfWeek(year, monthId) {
@@ -1067,9 +1127,16 @@
       document.getElementById('langToggleBtn').innerText = t.langBtn;
       document.getElementById('prevLabel').innerText = t.prev;
       document.getElementById('nextLabel').innerText = t.next;
-      document.getElementById('unlockBtn').innerText = t.unlockBtn;
-      document.getElementById('errorMsg').innerText = t.incorrectPw;
+      document.getElementById('errorMsg').innerText = t.loadError;
       document.getElementById('footerDisclaimer').innerHTML = t.footer;
+      document.getElementById('viewerDownloadBtn').innerText = t.downloadBtn;
+      document.getElementById('gotoDateBtn').title = t.gotoBtnTitle;
+      document.getElementById('gotoDateTitle').innerText = t.gotoTitle;
+      document.getElementById('gotoYearLabel').innerText = t.gotoYearLabel;
+      document.getElementById('gotoMonthLabel').innerText = t.gotoMonthLabel;
+      document.getElementById('gotoDayLabel').innerText = t.gotoDayLabel;
+      document.getElementById('gotoGoBtn').innerText = t.gotoGoBtn;
+      populateGotoMonthOptions();
 
       const yearTypeStr = isLeapEthYear(todayEth.year)
         ? (currentLang === 'am' ? "ዘመነ ዮሐንስ (ጳጉሜ 6)" : "Year of John (Pagume has 6 days)")
@@ -1221,6 +1288,7 @@
         titleText += ` — ${localizeFeastName(feast.name, currentLang)}`;
       }
       document.getElementById('dayResourceTitle').innerText = titleText;
+      document.getElementById('errorMsg').style.display = 'none';
 
       const pickGrid = document.getElementById('resourcePickGrid');
       pickGrid.innerHTML = '';
@@ -1233,10 +1301,7 @@
         btn.innerText = (currentLang === 'en') ? r.nameEn : r.nameAm;
         btn.disabled = !avail;
         if (avail) {
-          btn.onclick = () => {
-            closeDayResourceModal();
-            openPasswordModal(monthObj, day, r, currentSelectedFeastSlug);
-          };
+          btn.onclick = () => openPdf(monthObj, day, r, currentSelectedFeastSlug);
         }
         pickGrid.appendChild(btn);
       });
@@ -1249,185 +1314,149 @@
     }
 
     // =========================================================================
-    // 08. PASSWORD MODAL + AES-GCM DECRYPTION
+    // 08. GO TO DATE MODAL (jump to any Ethiopian year/month/day)
     // =========================================================================
-    function openPasswordModal(monthObj, day, resource, feastSlug) {
-      currentSelectedMonth = monthObj;
-      currentSelectedDay = day;
-      currentSelectedResourceKey = resource.key;
-      currentSelectedFeastSlug = feastSlug || null;
-
-      const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
-      const resName = (currentLang === 'en') ? resource.nameEn : resource.nameAm;
-      const label = currentSelectedFeastSlug ? currentSelectedFeastSlug.replace(/-/g, ' ') : `${monthName} ${day}`;
-      document.getElementById('modalTitle').innerText = `${label} - ${resName}`;
-      document.getElementById('passwordInput').value = '';
-      document.getElementById('passwordInput').type = 'password';
-      document.getElementById('showPasswordCheckbox').checked = false;
-      document.getElementById('errorMsg').style.display = 'none';
-      document.getElementById('decryptSpinner').style.display = 'none';
-      document.getElementById('passwordModal').classList.add('active');
-      setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+    function populateGotoMonthOptions() {
+      const select = document.getElementById('gotoMonthSelect');
+      if (!select) return;
+      const prevValue = select.value;
+      select.innerHTML = '';
+      ETHIOPIAN_MONTHS.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.innerText = (currentLang === 'en') ? `${m.nameEn} (${m.nameAm})` : `${m.nameAm} (${m.nameEn})`;
+        select.appendChild(opt);
+      });
+      if (prevValue) select.value = prevValue;
     }
 
-    // Toggles the password field between masked (type="password") and
-    // plain text (type="text") so the person can double-check what they
-    // typed before submitting — helpful given how easy it is to mistype a
-    // password with no visual feedback otherwise.
-    function toggleShowPassword() {
-      const input = document.getElementById('passwordInput');
-      const checked = document.getElementById('showPasswordCheckbox').checked;
-      input.type = checked ? 'text' : 'password';
+    // Rebuilds the Day dropdown to match however many days the currently
+    // selected Month + Year combination actually has (30 for normal months,
+    // 5 or 6 for Pagume depending on whether the typed year is a leap year).
+    function updateGotoDayOptions() {
+      const monthSelect = document.getElementById('gotoMonthSelect');
+      const daySelect = document.getElementById('gotoDaySelect');
+      const yearInput = document.getElementById('gotoYearInput');
+      if (!monthSelect || !daySelect || !yearInput) return;
+
+      const monthId = parseInt(monthSelect.value, 10);
+      const year = parseInt(yearInput.value, 10) || currentActiveYear;
+      const leap = isLeapEthYear(year);
+      const totalDays = (monthId === 13) ? (leap ? 6 : 5) : 30;
+
+      const prevDay = parseInt(daySelect.value, 10);
+      daySelect.innerHTML = '';
+      for (let d = 1; d <= totalDays; d++) {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.innerText = d;
+        daySelect.appendChild(opt);
+      }
+      if (prevDay && prevDay <= totalDays) daySelect.value = prevDay;
     }
 
-    function closePasswordModal() {
-      document.getElementById('passwordModal').classList.remove('active');
+    function openGotoDateModal() {
+      document.getElementById('gotoDateError').style.display = 'none';
+      populateGotoMonthOptions();
+
+      document.getElementById('gotoYearInput').value = currentActiveYear;
+      document.getElementById('gotoMonthSelect').value = currentActiveMonthId;
+      updateGotoDayOptions();
+
+      const todayDay = (currentActiveMonthId === todayEth.month && currentActiveYear === todayEth.year) ? todayEth.day : 1;
+      const daySelect = document.getElementById('gotoDaySelect');
+      if ([...daySelect.options].some(o => parseInt(o.value, 10) === todayDay)) {
+        daySelect.value = todayDay;
+      }
+
+      document.getElementById('gotoDateModal').classList.add('active');
+      setTimeout(() => document.getElementById('gotoYearInput').focus(), 100);
     }
 
+    function closeGotoDateModal() {
+      document.getElementById('gotoDateModal').classList.remove('active');
+    }
+
+    function handleGotoKeySubmit(event) {
+      if (event.key === 'Enter') submitGotoDate();
+    }
+
+    function submitGotoDate() {
+      const errorEl = document.getElementById('gotoDateError');
+      errorEl.style.display = 'none';
+
+      const year = parseInt(document.getElementById('gotoYearInput').value, 10);
+      const monthId = parseInt(document.getElementById('gotoMonthSelect').value, 10);
+      const day = parseInt(document.getElementById('gotoDaySelect').value, 10);
+
+      if (!year || year < 1 || year > 9999 || !monthId || !day) {
+        errorEl.innerText = UI_TEXT[currentLang].gotoInvalidYear;
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      currentActiveYear = year;
+      currentActiveMonthId = monthId;
+      renderCalendar();
+      closeGotoDateModal();
+
+      const monthObj = ETHIOPIAN_MONTHS.find(m => m.id === monthId);
+      const feast = getFeastInfo(year, monthId, day);
+      openDayResourceModal(monthObj, day, feast);
+    }
+
+    // =========================================================================
+    // 09. PDF VIEWER (freely accessible, no password/decryption required)
+    // =========================================================================
     function closeViewerModal() {
       document.getElementById('viewerModal').classList.remove('active');
-      const iframe = document.getElementById('pdfFrame');
-      if (iframe.src) {
-        URL.revokeObjectURL(iframe.src);
-        iframe.src = '';
-      }
-    }
-
-    function handleKeySubmit(event) {
-      if (event.key === 'Enter') submitPassword();
+      document.getElementById('pdfFrame').src = '';
     }
 
     window.onclick = function (e) {
       if (e.target === document.getElementById('dayResourceModal')) closeDayResourceModal();
-      if (e.target === document.getElementById('passwordModal')) closePasswordModal();
+      if (e.target === document.getElementById('gotoDateModal')) closeGotoDateModal();
       if (e.target === document.getElementById('viewerModal')) closeViewerModal();
     };
 
     window.onkeydown = function (e) {
       if (e.key === 'Escape') {
         closeDayResourceModal();
-        closePasswordModal();
+        closeGotoDateModal();
         closeViewerModal();
       }
     };
 
-    // Decrypts a .enc buffer laid out as [16-byte salt][12-byte IV][ciphertext+tag],
-    // deriving the AES-256-GCM key from the password via PBKDF2 (100,000 iterations,
-    // SHA-256). AES-GCM's built-in authentication tag means a wrong password causes
-    // decrypt() to throw rather than silently returning garbage.
-    async function decryptPdfBuffer(encryptedArrayBuffer, password) {
-      const bytes = new Uint8Array(encryptedArrayBuffer);
-      if (bytes.length < 28) {
-        throw new Error("Invalid file structure or corrupted data.");
-      }
-
-      const salt = bytes.slice(0, 16);
-      const iv = bytes.slice(16, 28);
-      const ciphertext = bytes.slice(28);
-
-      const enc = new TextEncoder();
-      const pwBytes = enc.encode(password);
-
-      const baseKey = await crypto.subtle.importKey("raw", pwBytes, "PBKDF2", false, ["deriveKey"]);
-
-      const derivedKey = await crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
-        baseKey,
-        { name: "AES-GCM", length: 256 },
-        false,
-        ["decrypt"]
-      );
-
-      return await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, derivedKey, ciphertext);
-    }
-
-    async function submitPassword() {
-      const password = document.getElementById('passwordInput').value;
+    // Opens the requested PDF directly — no password prompt, no client-side
+    // decryption. Files are served as plain, publicly-readable PDFs:
+    //   Regular day:      pdfs/<month-folder>/<DD>-<resourceKey>.pdf
+    //   Movable/special:  pdfs/movable-feasts/<slug>/<resourceKey>.pdf
+    function openPdf(monthObj, day, resource, feastSlug) {
       const errorMsg = document.getElementById('errorMsg');
-      const spinner = document.getElementById('decryptSpinner');
       errorMsg.style.display = 'none';
 
-      if (!password) return;
-
-      const monthObj = currentSelectedMonth;
-      const day = currentSelectedDay;
-      const resourceKey = currentSelectedResourceKey;
       const dayPadded = String(day).padStart(2, '0');
+      const filePath = feastSlug
+        ? `pdfs/movable-feasts/${feastSlug}/${resource.key}.pdf`
+        : `pdfs/${monthObj.folder}/${dayPadded}-${resource.key}.pdf`;
 
-      // File path depends on whether this day is a movable/special feast:
-      //   Regular day:      pdfs/<month-folder>/<DD>-<resourceKey>.pdf.enc
-      //   Movable/special:  pdfs/movable-feasts/<slug>/<resourceKey>.pdf.enc
-      const filePath = currentSelectedFeastSlug
-        ? `pdfs/movable-feasts/${currentSelectedFeastSlug}/${resourceKey}.pdf.enc`
-        : `pdfs/${monthObj.folder}/${dayPadded}-${resourceKey}.pdf.enc`;
+      const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
+      const resName = (currentLang === 'en') ? resource.nameEn : resource.nameAm;
+      const label = feastSlug ? feastSlug.replace(/-/g, ' ') : `${monthName} ${day}`;
 
-      spinner.style.display = 'block';
+      closeDayResourceModal();
+      document.getElementById('viewerTitle').innerText = `${label} - ${resName}`;
+      document.getElementById('pdfFrame').src = filePath;
 
-      // Step 0: the Web Crypto API (crypto.subtle) is ONLY available in a
-      // secure context (https://, or localhost) — browsers disable it
-      // entirely on plain http://. If that's the situation, decryption
-      // cannot possibly work regardless of password, so we detect this
-      // upfront and give an honest, specific message instead of the
-      // misleading "incorrect password" that a crypto.subtle failure would
-      // otherwise produce below.
-      if (!window.isSecureContext || !window.crypto || !window.crypto.subtle) {
-        spinner.style.display = 'none';
-        errorMsg.innerText = (currentLang === 'en')
-          ? "This page isn't loaded over a secure (https://) connection, so the browser blocks the decryption feature entirely — this is not a wrong password. Please reload the site using https:// (or wait until HTTPS is enabled for this domain) and try again."
-          : "ይህ ገጽ በአስተማማኝ (https://) ግንኙነት አልተከፈተም፤ ስለዚህ አሳሹ የመፍቻ ተግባሩን ሙሉ በሙሉ ያግዳል — ይህ የተሳሳተ የይለፍ ቃል አይደለም። እባክዎ ገጹን በ https:// በመክፈት (ወይም ለዚህ ጎራ HTTPS እስኪነቃ ድረስ በመጠበቅ) እንደገና ይሞክሩ።";
-        errorMsg.style.display = 'block';
-        return;
-      }
+      const downloadBtn = document.getElementById('viewerDownloadBtn');
+      downloadBtn.href = filePath;
+      downloadBtn.setAttribute('download', `${(feastSlug || monthObj.folder + '-' + dayPadded)}-${resource.key}.pdf`);
 
-      // Step 1: fetch the encrypted file. Failures here mean the file is
-      // missing/misnamed or the site isn't running under http(s):// — NOT a
-      // wrong password. Reported separately from decryption failures below.
-      let encryptedBuffer;
-      try {
-        const response = await fetch(filePath);
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        encryptedBuffer = await response.arrayBuffer();
-      } catch (fetchErr) {
-        console.error('Fetch failed for', filePath, fetchErr);
-        spinner.style.display = 'none';
-        const t = UI_TEXT[currentLang];
-        errorMsg.innerText = (currentLang === 'en')
-          ? `File not found at "${filePath}". Check the filename/folder, and make sure the site is running over http(s):// (not opened directly as a local file).`
-          : `ፋይሉ አልተገኘም፦ "${filePath}"። ስሙንና አቃፊውን ያረጋግጡ፣ እንዲሁም ገጹ በ http(s):// ላይ እየሮጠ መሆኑን ያረጋግጡ (እንደ local ፋይል ብቻ ተከፍቶ ካልሆነ በስተቀር)።`;
-        errorMsg.style.display = 'block';
-        return;
-      }
-
-      // Step 2: attempt decryption. A failure here (after a successful fetch)
-      // means the password (or the file itself) is genuinely wrong/corrupted.
-      try {
-        const decryptedBuffer = await decryptPdfBuffer(encryptedBuffer, password);
-
-        const blob = new Blob([decryptedBuffer], { type: 'application/pdf' });
-        const blobUrl = URL.createObjectURL(blob);
-
-        const resource = RESOURCE_TYPES.find(r => r.key === resourceKey);
-        const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
-        const resName = (currentLang === 'en') ? resource.nameEn : resource.nameAm;
-
-        document.getElementById('viewerTitle').innerText = `${monthName} ${day} - ${resName}`;
-        document.getElementById('pdfFrame').src = blobUrl;
-
-        spinner.style.display = 'none';
-        closePasswordModal();
-        document.getElementById('viewerModal').classList.add('active');
-      } catch (decryptErr) {
-        console.error('Decryption failed for', filePath, decryptErr);
-        spinner.style.display = 'none';
-        errorMsg.innerText = UI_TEXT[currentLang].incorrectPw;
-        errorMsg.style.display = 'block';
-      }
+      document.getElementById('viewerModal').classList.add('active');
     }
 
     // =========================================================================
-    // 09. INIT
+    // 10. INIT
     // =========================================================================
     window.addEventListener('DOMContentLoaded', () => {
       applyLanguageUI();
