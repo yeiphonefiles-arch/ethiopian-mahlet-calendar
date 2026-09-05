@@ -354,6 +354,12 @@
       box-shadow: inset 0 0 0 2px var(--gold-dark);
     }
 
+    /* Day jumped to via the "Go to date" picker — distinct ring so it's
+       clearly visible even when it also happens to be a feast day. */
+    .day-cell.jump-selected-cell {
+      box-shadow: inset 0 0 0 3px var(--maroon-dark);
+    }
+
     /* Feast-day highlight tiers (precedence: movable > annual > monthly) */
     .day-cell.feast-monthly { background-color: var(--feast-monthly-bg); }
     .day-cell.feast-annual { background-color: var(--feast-annual-bg); }
@@ -1104,6 +1110,12 @@
     let currentSelectedDay = null;
     let currentSelectedFeastSlug = null; // set when the selected day is a special/movable feast
 
+    // Tracks the day the user last jumped to via the "Go to date" picker so
+    // the main calendar grid can highlight it. Cleared whenever the person
+    // navigates by clicking a day cell directly, Prev/Next, or the year
+    // arrows, so the ring only marks an explicit jump.
+    let jumpSelectedDate = null; // { year, month, day } | null
+
     function getMonthStartDayOfWeek(year, monthId) {
       const gFirstOfMonth = toGregorianDate(year, monthId, 1);
       return gFirstOfMonth.getDay();
@@ -1153,6 +1165,7 @@
     // 06. CALENDAR NAVIGATION + RENDER
     // =========================================================================
     function navigateMonth(delta) {
+      jumpSelectedDate = null;
       currentActiveMonthId += delta;
       if (currentActiveMonthId > 13) { currentActiveMonthId = 1; currentActiveYear++; }
       if (currentActiveMonthId < 1) { currentActiveMonthId = 13; currentActiveYear--; }
@@ -1163,6 +1176,7 @@
     // month (e.g. Meskerem 2017 -> Meskerem 2018). Wired to the ‹ › arrows
     // next to the year badge in the top-right corner of the calendar.
     function navigateYear(delta) {
+      jumpSelectedDate = null;
       currentActiveYear += delta;
       renderCalendar();
     }
@@ -1210,6 +1224,9 @@
         const cell = document.createElement('div');
         let cls = 'day-cell';
         if (currentActiveYear === todayEth.year && currentActiveMonthId === todayEth.month && day === todayEth.day) cls += ' today-cell';
+        if (jumpSelectedDate && jumpSelectedDate.year === currentActiveYear && jumpSelectedDate.month === monthObj.id && jumpSelectedDate.day === day) {
+          cls += ' jump-selected-cell';
+        }
         if (feast) {
           if (feast.type === 'movable-major') cls += ' feast-major';
           else if (feast.type === 'movable') cls += ' feast-movable';
@@ -1217,7 +1234,7 @@
           else if (feast.type === 'monthly') cls += ' feast-monthly';
         }
         cell.className = cls;
-        cell.onclick = () => openDayResourceModal(monthObj, day, feast);
+        cell.onclick = () => { jumpSelectedDate = null; openDayResourceModal(monthObj, day, feast); };
 
         if (feast && feast.type !== 'monthly') {
           movableFeastsThisMonth.push({ day, feast });
@@ -1269,7 +1286,7 @@
         const label = localizeFeastName(feast.name, currentLang);
         link.innerText = `${label} — ${day}`;
         link.title = label;
-        link.onclick = () => openDayResourceModal(monthObj, day, feast);
+        link.onclick = () => { jumpSelectedDate = null; openDayResourceModal(monthObj, day, feast); };
         container.appendChild(link);
       });
     }
@@ -1397,6 +1414,7 @@
 
       currentActiveYear = year;
       currentActiveMonthId = monthId;
+      jumpSelectedDate = { year, month: monthId, day };
       renderCalendar();
       closeGotoDateModal();
 
