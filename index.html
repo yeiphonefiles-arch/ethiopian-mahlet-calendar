@@ -1611,10 +1611,27 @@
       }
     ];
 
-    // Renders the collapsible list. Called from renderCalendar() so it stays
-    // in sync with whatever Ethiopian year is currently displayed, and from
-    // toggleLanguage()/applyLanguageUI() indirectly since renderCalendar()
-    // already runs on every language switch.
+    // Returns a Julian Day Number to sort by: the fast's actual start date
+    // for the given year (earliest of the two Gahad vigil days for that
+    // entry), so the displayed order always reflects the real chronological
+    // order for whichever year is selected — movable fasts can shift from
+    // year to year relative to the fixed ones. The recurring Dihnet fast has
+    // no single start date, so it always sorts last.
+    function getFastSortKey(fast, year, movableFeasts) {
+      if (fast.recurring) return Infinity;
+      const result = fast.resolve(year, movableFeasts);
+      if (!result) return Infinity;
+      if (result.multi) {
+        return Math.min(...result.multi.map(d => ethiopianToJDN(d.year, d.month, d.day)));
+      }
+      return ethiopianToJDN(result.startEth.year, result.startEth.month, result.startEth.day);
+    }
+
+    // Renders the collapsible list, in chronological order (beginning of the
+    // Ethiopian year to the end) for whichever year is currently displayed.
+    // Called from renderCalendar() so it stays in sync with the active year,
+    // and from toggleLanguage()/applyLanguageUI() indirectly since
+    // renderCalendar() already runs on every language switch.
     function updateFastingCalendar(selectedYear) {
       const container = document.getElementById('fastingListContainer');
       if (!container) return;
@@ -1622,7 +1639,12 @@
       const movableFeasts = getMovableFeastsForYear(selectedYear);
       container.innerHTML = '';
 
-      MAJOR_FASTS.forEach(fast => {
+      const orderedFasts = MAJOR_FASTS
+        .map(fast => ({ fast, sortKey: getFastSortKey(fast, selectedYear, movableFeasts) }))
+        .sort((a, b) => a.sortKey - b.sortKey)
+        .map(entry => entry.fast);
+
+      orderedFasts.forEach(fast => {
         const row = document.createElement('div');
         row.className = 'fasting-row';
 
