@@ -840,6 +840,8 @@
         gotoDayLabel: "ቀን",
         gotoGoBtn: "ሂድ",
         gotoInvalidYear: "እባክዎ ትክክለኛ የዓመት ቁጥር ያስገቡ።",
+        resourceMissingMsg: (resName, label) => `${resName} ለ${label} አልተገኘም። እባክዎ ቆይተው እንደገና ይሞክሩ።`,
+        loadingResource: "እየተጫነ ነው...",
       },
       en: {
         pageTitle: "Ethiopian Orthodox Tewahedo Church Daily Service Resources",
@@ -862,6 +864,8 @@
         gotoDayLabel: "Day",
         gotoGoBtn: "Go",
         gotoInvalidYear: "Please enter a valid year number.",
+        resourceMissingMsg: (resName, label) => `No ${resName} file is available for ${label} yet. Please check back later.`,
+        loadingResource: "Loading...",
       }
     };
 
@@ -1449,8 +1453,9 @@
     // decryption. Files are served as plain, publicly-readable PDFs:
     //   Regular day:      pdfs/<month-folder>/<DD>-<resourceKey>.pdf
     //   Movable/special:  pdfs/movable-feasts/<slug>/<resourceKey>.pdf
-    function openPdf(monthObj, day, resource, feastSlug) {
+    async function openPdf(monthObj, day, resource, feastSlug) {
       const errorMsg = document.getElementById('errorMsg');
+      const spinner = document.getElementById('loadSpinner');
       errorMsg.style.display = 'none';
 
       const dayPadded = String(day).padStart(2, '0');
@@ -1461,6 +1466,25 @@
       const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
       const resName = (currentLang === 'en') ? resource.nameEn : resource.nameAm;
       const label = feastSlug ? feastSlug.replace(/-/g, ' ') : `${monthName} ${day}`;
+
+      // Confirm the file actually exists before opening the viewer, so a
+      // missing PDF produces a clear, specific message (e.g. "No Mahlet
+      // file is available for Meskerem 5") instead of a blank/broken frame.
+      spinner.style.display = 'block';
+      let fileExists = false;
+      try {
+        const response = await fetch(filePath, { method: 'HEAD' });
+        fileExists = response.ok;
+      } catch (err) {
+        fileExists = false;
+      }
+      spinner.style.display = 'none';
+
+      if (!fileExists) {
+        errorMsg.innerText = UI_TEXT[currentLang].resourceMissingMsg(resName, label);
+        errorMsg.style.display = 'block';
+        return;
+      }
 
       closeDayResourceModal();
       document.getElementById('viewerTitle').innerText = `${label} - ${resName}`;
