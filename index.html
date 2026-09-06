@@ -649,6 +649,61 @@
       margin-top: 0.4rem;
     }
 
+    /* Reading citations become clickable once a Gitsawe entry has real
+       text — subtle underline-on-hover so they read as tappable without
+       looking like a different kind of element. */
+    .gitsawe-reading-text.clickable-verse {
+      cursor: pointer;
+      color: var(--maroon);
+      text-decoration: underline dotted;
+      text-underline-offset: 2px;
+    }
+    .gitsawe-reading-text.clickable-verse:hover {
+      color: var(--maroon-dark);
+      text-decoration-style: solid;
+    }
+
+    /* ===== Verse Text modal (Amharic Bible popup) ===== */
+    .verse-text-subtitle {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: -0.5rem;
+      margin-bottom: 0.9rem;
+    }
+    .verse-text-content {
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+    .verse-text-item {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .verse-text-item:last-child {
+      border-bottom: none;
+    }
+    .verse-text-num {
+      flex-shrink: 0;
+      font-weight: 700;
+      color: var(--gold-dark);
+      min-width: 1.4rem;
+      text-align: right;
+    }
+    .verse-text-body {
+      color: var(--text-dark);
+    }
+    .verse-text-loading, .verse-text-not-found {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      padding: 1.25rem 0;
+      line-height: 1.5;
+    }
+
     .spinner {
       display: none;
       width: 26px;
@@ -906,6 +961,16 @@
     </div>
   </div>
 
+  <!-- ===================== VERSE TEXT MODAL ===================== -->
+  <div id="verseTextModal" class="modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeVerseTextModal()">&times;</button>
+      <div class="modal-title" id="verseTextTitle">-- -- --</div>
+      <div class="verse-text-subtitle" id="verseTextSubtitle">የአማርኛ መጽሐፍ ቅዱስ ትርጉም (Amharic Bible)</div>
+      <div class="verse-text-content" id="verseTextContent"></div>
+    </div>
+  </div>
+
   <script>
     // =========================================================================
     // 00. STATIC CONFIG
@@ -1012,6 +1077,9 @@
         evangelistMark: "ማርቆስ",
         evangelistLuke: "ሉቃስ",
         evangelistJohn: "ዮሐንስ",
+        verseTextLoading: "ጥቅሱ እየተጫነ ነው...",
+        verseTextNotFound: "ለዚህ ጥቅስ የአማርኛ ትርጉም ገና አልተጫነም። እባክዎ ቆይተው እንደገና ይሞክሩ።",
+        verseTextParseError: "ይህን ጥቅስ ማንበብ አልተቻለም።",
       },
       en: {
         pageTitle: "Ethiopian Orthodox Tewahedo Church Daily Service Resources",
@@ -1050,6 +1118,9 @@
         evangelistMark: "Mark",
         evangelistLuke: "Luke",
         evangelistJohn: "John",
+        verseTextLoading: "Loading verse text...",
+        verseTextNotFound: "No Amharic text is available for this passage yet. Please check back later.",
+        verseTextParseError: "This citation couldn't be read.",
       }
     };
 
@@ -1767,6 +1838,166 @@
     }
 
     // =========================================================================
+    // 06b2. AMHARIC VERSE TEXT POPUP
+    // Lets the person click any citation shown in the Gitsawe readings view
+    // (Pauline/Catholic/Acts/Psalm/Gospel) and see the actual Amharic Bible
+    // text for that passage in a small popup. Reuses the same fetch-once-
+    // cache pattern as loadGitsaweData(), against a separate local dataset,
+    // since a Bible text corpus is a different shape/size than the daily
+    // readings list and may be swapped out independently.
+    // =========================================================================
+
+    // NOTE: like GITSAWE_DATA_PATH, this is a relative path so it keeps
+    // working if the site is hosted in a subdirectory.
+    const AMHARIC_BIBLE_DATA_PATH = 'assets/data/amharic-bible.json';
+
+    let _amharicBibleDataPromise = null;
+    function loadAmharicBibleData() {
+      if (_amharicBibleDataPromise) return _amharicBibleDataPromise; // cached after first call
+      _amharicBibleDataPromise = fetch(AMHARIC_BIBLE_DATA_PATH)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .catch(err => {
+          console.error('Failed to load Amharic Bible dataset from', AMHARIC_BIBLE_DATA_PATH, err);
+          return null;
+        });
+      return _amharicBibleDataPromise;
+    }
+
+    // A few book names appear inconsistently across the Gitsawe data (e.g.
+    // "Psalms" vs "Psalm"). This tries the exact name first, then a couple
+    // of common alternate spellings, before giving up.
+    const BOOK_NAME_ALIASES = {
+      'Psalms': ['Psalm'],
+      'Psalm': ['Psalms']
+    };
+
+    // Parses a citation like "Hebrews 1:1-14", "Psalm 19:4", or the
+    // cross-chapter form "John 15:26 - 16:4" into its parts. Returns null if
+    // the string doesn't match a recognizable "Book chapter:verse[-verse]"
+    // pattern — the dataset itself is never re-interpreted or corrected, so
+    // a typo in the source data (e.g. a mislabeled book) simply won't match
+    // anything in the Bible dataset, rather than being silently "fixed".
+    function parseCitation(citation) {
+      if (!citation) return null;
+      const match = String(citation).trim().match(
+        /^((?:[1-3]\s)?[A-Za-z]+(?:\s[A-Za-z]+)*)\s+(\d+):(\d+)\s*(?:-\s*(?:(\d+):)?(\d+))?\s*$/
+      );
+      if (!match) return null;
+
+      const [, book, chapter, verseStart, endChapter, verseEnd] = match;
+      return {
+        book: book.trim(),
+        chapter: parseInt(chapter, 10),
+        verseStart: parseInt(verseStart, 10),
+        endChapter: endChapter ? parseInt(endChapter, 10) : null,
+        verseEnd: verseEnd ? parseInt(verseEnd, 10) : null
+      };
+    }
+
+    // Returns [{verse, text}, ...] for the verses of one chapter that fall
+    // within [minVerse, maxVerse] (either bound optional), sorted in order.
+    function getChapterVerses(bookData, chapterNum, minVerse, maxVerse) {
+      const chapterData = bookData[String(chapterNum)];
+      if (!chapterData) return [];
+      return Object.keys(chapterData)
+        .map(v => parseInt(v, 10))
+        .filter(v => (minVerse == null || v >= minVerse) && (maxVerse == null || v <= maxVerse))
+        .sort((a, b) => a - b)
+        .map(v => ({ verse: v, text: chapterData[String(v)] }));
+    }
+
+    // Looks up the Amharic text for a parsed citation, handling both a
+    // same-chapter range (or single verse) and a cross-chapter range.
+    function lookupAmharicVerses(data, parsed) {
+      if (!data || !parsed) return null;
+
+      const candidateNames = [parsed.book, ...(BOOK_NAME_ALIASES[parsed.book] || [])];
+      let bookData = null;
+      for (const name of candidateNames) {
+        if (data[name]) { bookData = data[name]; break; }
+      }
+      if (!bookData) return null;
+
+      if (parsed.endChapter && parsed.endChapter !== parsed.chapter) {
+        const verses = [];
+        verses.push(...getChapterVerses(bookData, parsed.chapter, parsed.verseStart, null));
+        for (let c = parsed.chapter + 1; c < parsed.endChapter; c++) {
+          verses.push(...getChapterVerses(bookData, c, null, null));
+        }
+        verses.push(...getChapterVerses(bookData, parsed.endChapter, null, parsed.verseEnd));
+        return verses.length ? verses : null;
+      }
+
+      const vEnd = parsed.verseEnd || parsed.verseStart;
+      const verses = getChapterVerses(bookData, parsed.chapter, parsed.verseStart, vEnd);
+      return verses.length ? verses : null;
+    }
+
+    // Opens the popup, fetches (or reuses the cached) Amharic Bible dataset,
+    // and renders the passage — or a clear "not available" message if the
+    // citation can't be parsed or isn't in the dataset yet.
+    async function openVerseTextModal(citation) {
+      document.getElementById('verseTextTitle').innerText = citation;
+      const contentEl = document.getElementById('verseTextContent');
+      contentEl.innerHTML = `<div class="verse-text-loading">${UI_TEXT[currentLang].verseTextLoading}</div>`;
+      document.getElementById('verseTextModal').classList.add('active');
+
+      const parsed = parseCitation(citation);
+      if (!parsed) {
+        contentEl.innerHTML = `<div class="verse-text-not-found">${UI_TEXT[currentLang].verseTextParseError}</div>`;
+        return;
+      }
+
+      const data = await loadAmharicBibleData();
+      const verses = lookupAmharicVerses(data, parsed);
+
+      if (!verses) {
+        contentEl.innerHTML = `<div class="verse-text-not-found">${UI_TEXT[currentLang].verseTextNotFound}</div>`;
+        return;
+      }
+
+      let html = '';
+      verses.forEach(v => {
+        html += `
+          <div class="verse-text-item">
+            <div class="verse-text-num">${v.verse}</div>
+            <div class="verse-text-body">${escapeHtml(v.text)}</div>
+          </div>
+        `;
+      });
+      contentEl.innerHTML = html;
+    }
+
+    function closeVerseTextModal() {
+      document.getElementById('verseTextModal').classList.remove('active');
+    }
+
+    // Small HTML-escaping helper for text inserted via innerHTML/attributes
+    // built from dataset content (defensive, even though the data is our
+    // own trusted JSON files).
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Event delegation: a single listener on the Gitsawe readings container
+    // handles clicks on any citation, however many times the view gets
+    // re-rendered — no need to re-attach listeners on every render.
+    function handleGitsaweReadingClick(event) {
+      const el = event.target.closest('.clickable-verse');
+      if (!el) return;
+      const citation = el.dataset.citation;
+      if (citation) openVerseTextModal(citation);
+    }
+
+    // =========================================================================
     // 06c. GITSAWE READINGS (ግጻዌ)
     // Fetches/caches the daily Gitsawe dataset once, and looks up the 5
     // canonical readings for whatever date is currently open in the day
@@ -1925,10 +2156,12 @@
       html += '<div class="gitsawe-reading-list">';
       rows.forEach(row => {
         const safeText = row.text ? String(row.text) : '--';
+        const clickable = row.text ? ' clickable-verse' : '';
+        const citationAttr = row.text ? ` data-citation="${escapeHtml(safeText)}"` : '';
         html += `
           <div class="gitsawe-reading-item">
             <div class="gitsawe-reading-label">${row.label}</div>
-            <div class="gitsawe-reading-text">${safeText}</div>
+            <div class="gitsawe-reading-text${clickable}"${citationAttr}>${escapeHtml(safeText)}</div>
           </div>
         `;
       });
@@ -2101,6 +2334,7 @@
       if (e.target === document.getElementById('dayResourceModal')) closeDayResourceModal();
       if (e.target === document.getElementById('gotoDateModal')) closeGotoDateModal();
       if (e.target === document.getElementById('viewerModal')) closeViewerModal();
+      if (e.target === document.getElementById('verseTextModal')) closeVerseTextModal();
     };
 
     window.onkeydown = function (e) {
@@ -2108,6 +2342,7 @@
         closeDayResourceModal();
         closeGotoDateModal();
         closeViewerModal();
+        closeVerseTextModal();
       }
     };
 
@@ -2166,6 +2401,7 @@
       applyLanguageUI();
       renderCalendar();
       loadGitsaweData(); // warm the cache in the background; failures are handled silently until the button is actually clicked
+      document.getElementById('gitsaweReadingsView').addEventListener('click', handleGitsaweReadingClick);
     });
   </script>
 </body>
