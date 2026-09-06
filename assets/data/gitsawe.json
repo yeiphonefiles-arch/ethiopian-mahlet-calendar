@@ -1,0 +1,49 @@
+{
+  "_readme": "SAMPLE DATA — placeholder text only, not authentic Gitsawe readings. Replace every 'pauline'/'catholic'/'acts'/'psalm'/'gospel' value below with the real scripture citations (and, where your tradition varies the Gospel reading by year, fill in 'gospelByEvangelist' with matthew/mark/luke/john keys) from your church's Gitsawe reference book. Keys under 'fixed' are '<EthiopianMonthId>-<Day>', e.g. '12-2' = Nahase 2. Keys under 'movable' are the same season/feast slugs already used elsewhere in the site's code (see MAJOR_FASTS and calculateBahireHasabMovableFeasts): 'himamat', 'abiy-tsom', 'tinsae', plus any specific movable-feast slug such as 'genna', 'timkat', 'hosanna', 'siklet', 'irget', 'peraklitos', etc. if a given feast has its own distinct Gitsawe reading rather than falling back to the season.",
+
+  "movable": {
+    "abiy-tsom": {
+      "pauline": "SAMPLE — replace with the Great Lent Pauline Epistle citation.",
+      "catholic": "SAMPLE — replace with the Great Lent Catholic Epistle citation.",
+      "acts": "SAMPLE — replace with the Great Lent Acts of the Apostles citation.",
+      "psalm": "SAMPLE — replace with the Great Lent Psalm/Mesbak.",
+      "gospel": "SAMPLE — replace with the Great Lent Gospel citation."
+    },
+    "himamat": {
+      "pauline": "SAMPLE — replace with the Holy Week Pauline Epistle citation.",
+      "catholic": "SAMPLE — replace with the Holy Week Catholic Epistle citation.",
+      "acts": "SAMPLE — replace with the Holy Week Acts of the Apostles citation.",
+      "psalm": "SAMPLE — replace with the Holy Week Psalm/Mesbak.",
+      "gospel": "SAMPLE — replace with the Holy Week Gospel citation."
+    },
+    "tinsae": {
+      "pauline": "SAMPLE — replace with the Paschal-season Pauline Epistle citation.",
+      "catholic": "SAMPLE — replace with the Paschal-season Catholic Epistle citation.",
+      "acts": "SAMPLE — replace with the Paschal-season Acts of the Apostles citation.",
+      "psalm": "SAMPLE — replace with the Paschal-season Psalm/Mesbak.",
+      "gospelByEvangelist": {
+        "matthew": "SAMPLE — Gospel reading for the Year of Matthew.",
+        "mark": "SAMPLE — Gospel reading for the Year of Mark.",
+        "luke": "SAMPLE — Gospel reading for the Year of Luke.",
+        "john": "SAMPLE — Gospel reading for the Year of John."
+      }
+    }
+  },
+
+  "fixed": {
+    "1-1": {
+      "pauline": "SAMPLE — Meskerem 1 (New Year) Pauline Epistle citation.",
+      "catholic": "SAMPLE — Meskerem 1 Catholic Epistle citation.",
+      "acts": "SAMPLE — Meskerem 1 Acts of the Apostles citation.",
+      "psalm": "SAMPLE — Meskerem 1 Psalm/Mesbak.",
+      "gospel": "SAMPLE — Meskerem 1 Gospel citation."
+    },
+    "12-2": {
+      "pauline": "SAMPLE — Nahase 2 Pauline Epistle citation.",
+      "catholic": "SAMPLE — Nahase 2 Catholic Epistle citation.",
+      "acts": "SAMPLE — Nahase 2 Acts of the Apostles citation.",
+      "psalm": "SAMPLE — Nahase 2 Psalm/Mesbak.",
+      "gospel": "SAMPLE — Nahase 2 Gospel citation."
+    }
+  }
+}
