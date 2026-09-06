@@ -1,0 +1,22 @@
+{
+  "_readme": "SAMPLE DATA — the 'Hebrews' entry below is placeholder text only, NOT the real Amharic Bible translation, so the site's developer/reviewer can confirm the click-a-citation-to-see-the-verse feature actually works end to end. Replace it, and add every other book you need, with real text from a verified Amharic Bible source (e.g. a digitized Amharic Bible text file/database your church already has, or a licensed Bible API/export) before this goes live for real use — do not leave SAMPLE text in production. Schema: top-level keys are Bible book names EXACTLY as they appear in your Gitsawe citations (e.g. 'Hebrews', '1 John', '2 Corinthians', 'Psalm' or 'Psalms' — both are recognized as aliases of each other, see BOOK_NAME_ALIASES in index.html if you need to add more spelling variants). Under each book, keys are chapter numbers as strings ('1', '2', ...), and under each chapter, keys are verse numbers as strings ('1', '2', ...) mapping to the verse's Amharic text as a plain string.",
+
+  "Hebrews": {
+    "1": {
+      "1": "SAMPLE — replace with the real Amharic text of Hebrews 1:1.",
+      "2": "SAMPLE — replace with the real Amharic text of Hebrews 1:2.",
+      "3": "SAMPLE — replace with the real Amharic text of Hebrews 1:3.",
+      "4": "SAMPLE — replace with the real Amharic text of Hebrews 1:4.",
+      "5": "SAMPLE — replace with the real Amharic text of Hebrews 1:5.",
+      "6": "SAMPLE — replace with the real Amharic text of Hebrews 1:6.",
+      "7": "SAMPLE — replace with the real Amharic text of Hebrews 1:7.",
+      "8": "SAMPLE — replace with the real Amharic text of Hebrews 1:8.",
+      "9": "SAMPLE — replace with the real Amharic text of Hebrews 1:9.",
+      "10": "SAMPLE — replace with the real Amharic text of Hebrews 1:10.",
+      "11": "SAMPLE — replace with the real Amharic text of Hebrews 1:11.",
+      "12": "SAMPLE — replace with the real Amharic text of Hebrews 1:12.",
+      "13": "SAMPLE — replace with the real Amharic text of Hebrews 1:13.",
+      "14": "SAMPLE — replace with the real Amharic text of Hebrews 1:14."
+    }
+  }
+}
