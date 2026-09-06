@@ -600,6 +600,55 @@
       cursor: not-allowed;
     }
 
+    /* ===== Gitsawe readings view (inside the day-resource modal) =====
+       Fully separate from .resource-pick-grid / .resource-pick-btn above —
+       nothing here is shared with, or overrides, the Mahlet/Mezmur/Qedassie
+       button styling. */
+    .gitsawe-readings-view {
+      display: none;
+    }
+    .gitsawe-reading-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+    .gitsawe-reading-item {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.6rem;
+    }
+    .gitsawe-reading-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .gitsawe-reading-label {
+      font-weight: 700;
+      color: var(--maroon-dark);
+      font-size: 0.8rem;
+      margin-bottom: 0.2rem;
+    }
+    .gitsawe-reading-text {
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+    .gitsawe-evangelist-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 0.75rem;
+      text-align: center;
+    }
+    .gitsawe-loading, .gitsawe-not-found {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      padding: 1rem 0;
+    }
+    .gitsawe-back-btn {
+      margin-top: 0.4rem;
+    }
+
     .spinner {
       display: none;
       width: 26px;
@@ -812,6 +861,7 @@
       <button class="modal-close" onclick="closeDayResourceModal()">&times;</button>
       <div class="modal-title" id="dayResourceTitle">-- -- --</div>
       <div class="resource-pick-grid" id="resourcePickGrid"></div>
+      <div class="gitsawe-readings-view" id="gitsaweReadingsView" style="display:none;"></div>
       <div class="spinner" id="loadSpinner"></div>
       <div class="error-msg" id="errorMsg"></div>
     </div>
@@ -949,6 +999,19 @@
         loadingResource: "እየተጫነ ነው...",
         fastingSectionTitle: "የ7ቱ ዐበይት አጽዋማት (7 Major Canonical Fasts)",
         fastingYearRound: "ዓመቱን ሙሉ",
+        gitsaweLoading: "ግጻዌ እየተጫነ ነው...",
+        gitsaweNotFound: "ለዚህ ቀን ግጻዌ ገና አልተጫነም። እባክዎ ቆይተው እንደገና ይሞክሩ።",
+        gitsaweBackBtn: "ተመለስ (Back)",
+        gitsaweLabelPauline: "መልእክተ ጳውሎስ",
+        gitsaweLabelCatholic: "መልእክተ ሐዋርያት",
+        gitsaweLabelActs: "ግብረ ሐዋርያት",
+        gitsaweLabelPsalm: "ምስባክ",
+        gitsaweLabelGospel: "ቅዱስ ወንጌል",
+        gitsaweEvangelistNote: (name) => `ዘመነ ${name}`,
+        evangelistMatthew: "ማቴዎስ",
+        evangelistMark: "ማርቆስ",
+        evangelistLuke: "ሉቃስ",
+        evangelistJohn: "ዮሐንስ",
       },
       en: {
         pageTitle: "Ethiopian Orthodox Tewahedo Church Daily Service Resources",
@@ -974,6 +1037,19 @@
         loadingResource: "Loading...",
         fastingSectionTitle: "7 Major Canonical Fasts (የ7ቱ ዐበይት አጽዋማት)",
         fastingYearRound: "Year-round",
+        gitsaweLoading: "Loading Gitsawe readings...",
+        gitsaweNotFound: "No Gitsawe readings are available for this date yet. Please check back later.",
+        gitsaweBackBtn: "Back",
+        gitsaweLabelPauline: "Pauline Epistle",
+        gitsaweLabelCatholic: "Catholic Epistle",
+        gitsaweLabelActs: "Acts of the Apostles",
+        gitsaweLabelPsalm: "Psalm of David",
+        gitsaweLabelGospel: "Holy Gospel",
+        gitsaweEvangelistNote: (name) => `Year of ${name}`,
+        evangelistMatthew: "Matthew",
+        evangelistMark: "Mark",
+        evangelistLuke: "Luke",
+        evangelistJohn: "John",
       }
     };
 
@@ -1691,6 +1767,186 @@
     }
 
     // =========================================================================
+    // 06c. GITSAWE READINGS (ግጻዌ)
+    // Fetches/caches the daily Gitsawe dataset once, and looks up the 5
+    // canonical readings for whatever date is currently open in the day
+    // picker. Reuses the existing Bahire Hasab output (getMovableFeastsForYear,
+    // findMovableFeastDate — the same helpers behind the fasting list/shading)
+    // and the existing MAJOR_FASTS 'abiy-tsom' resolver for the Great Lent
+    // date range. Nothing here touches the Mahlet/Mezmur/Qedassie flow.
+    // =========================================================================
+
+    // NOTE: this points at a relative path, matching how pdfs/... is already
+    // referenced elsewhere in this file (so it keeps working if the site is
+    // hosted in a subdirectory, e.g. a GitHub Pages project site) — adjust to
+    // an absolute /assets/data/gitsawe.json path only if your hosting setup
+    // guarantees the site is always served from the domain root.
+    const GITSAWE_DATA_PATH = 'assets/data/gitsawe.json';
+
+    let _gitsaweDataPromise = null;
+    function loadGitsaweData() {
+      if (_gitsaweDataPromise) return _gitsaweDataPromise; // cached after first call
+      _gitsaweDataPromise = fetch(GITSAWE_DATA_PATH)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .catch(err => {
+          console.error('Failed to load Gitsawe dataset from', GITSAWE_DATA_PATH, err);
+          return null;
+        });
+      return _gitsaweDataPromise;
+    }
+
+    // The 4-year Gospel-reading cycle (ዘመነ ማቴዎስ/ማርቆስ/ሉቃስ/ዮሐንስ). This reuses
+    // the same y%4 logic as the existing isLeapEthYear() — a leap year
+    // (Pagume 6) is already labeled "ዘመነ ዮሐንስ" elsewhere in this file, so
+    // y%4===3 -> John is kept consistent with that. Verify this offset
+    // against your own reference if it doesn't match — the underlying
+    // 4-year cycle is standard, but confirm the exact rotation with your
+    // church's Gitsawe book before relying on it liturgically.
+    function getEvangelistYear(year) {
+      const r = ((year % 4) + 4) % 4;
+      if (r === 3) return 'john';
+      if (r === 0) return 'matthew';
+      if (r === 1) return 'mark';
+      return 'luke';
+    }
+
+    function evangelistDisplayName(evangelistYear) {
+      const t = UI_TEXT[currentLang];
+      switch (evangelistYear) {
+        case 'matthew': return t.evangelistMatthew;
+        case 'mark': return t.evangelistMark;
+        case 'luke': return t.evangelistLuke;
+        case 'john': return t.evangelistJohn;
+        default: return '';
+      }
+    }
+
+    // Determines which movable Gitsawe season (if any) the given Ethiopian
+    // date falls in: 'himamat' (Holy Week, Hosanna through Holy Saturday),
+    // 'abiy-tsom' (the rest of Great Lent), or 'tinsae' (the Paschal season,
+    // Easter through Pentecost). Returns null for an ordinary fixed day.
+    function determineGitsaweSeason(year, month, day) {
+      const movableFeasts = getMovableFeastsForYear(year);
+      const jdn = ethiopianToJDN(year, month, day);
+
+      const hosanna = findMovableFeastDate(movableFeasts, 'hosanna');
+      const tinsae = findMovableFeastDate(movableFeasts, 'tinsae');
+      if (hosanna && tinsae) {
+        const hosannaJDN = ethiopianToJDN(year, hosanna.month, hosanna.day);
+        const holySaturdayJDN = ethiopianToJDN(year, tinsae.month, tinsae.day) - 1;
+        if (jdn >= hosannaJDN && jdn <= holySaturdayJDN) return 'himamat';
+      }
+
+      const abiyTsomFast = MAJOR_FASTS.find(f => f.key === 'abiy-tsom');
+      const abiyTsomResult = abiyTsomFast ? abiyTsomFast.resolve(year, movableFeasts) : null;
+      if (abiyTsomResult) {
+        const startJDN = ethiopianToJDN(abiyTsomResult.startEth.year, abiyTsomResult.startEth.month, abiyTsomResult.startEth.day);
+        const endJDN = ethiopianToJDN(abiyTsomResult.endEth.year, abiyTsomResult.endEth.month, abiyTsomResult.endEth.day);
+        if (jdn >= startJDN && jdn <= endJDN) return 'abiy-tsom'; // Himamat already handled above
+      }
+
+      const peraklitos = findMovableFeastDate(movableFeasts, 'peraklitos');
+      if (tinsae && peraklitos) {
+        const startJDN = ethiopianToJDN(year, tinsae.month, tinsae.day);
+        const endJDN = ethiopianToJDN(year, peraklitos.month, peraklitos.day);
+        if (jdn >= startJDN && jdn <= endJDN) return 'tinsae';
+      }
+
+      return null;
+    }
+
+    // Looks up the dataset entry for the active date, in priority order:
+    //   1. The day's own movable-feast slug (Genna, Timkat, Tinsae itself,
+    //      etc.) if the site's existing feast logic flagged one for this day.
+    //   2. The broader movable Gitsawe season (Himamat / Abiy Tsom / Tinsae).
+    //   3. The fixed Ethiopian month-day key ("month-day").
+    function lookupGitsaweEntry(data, year, monthId, day, feastSlug) {
+      if (!data) return null;
+      if (feastSlug && data.movable && data.movable[feastSlug]) {
+        return data.movable[feastSlug];
+      }
+      const season = determineGitsaweSeason(year, monthId, day);
+      if (season && data.movable && data.movable[season]) {
+        return data.movable[season];
+      }
+      if (data.fixed) {
+        const key = `${monthId}-${day}`;
+        if (data.fixed[key]) return data.fixed[key];
+      }
+      return null;
+    }
+
+    // Switches the day-resource modal from the 4-button picker into the
+    // Gitsawe readings view, fetches (or reuses the cached) dataset, looks
+    // up the entry for this exact date, and renders it.
+    async function openGitsaweView(monthObj, day, feastSlug) {
+      const pickGrid = document.getElementById('resourcePickGrid');
+      const readingsView = document.getElementById('gitsaweReadingsView');
+      pickGrid.style.display = 'none';
+      readingsView.style.display = 'block';
+      readingsView.innerHTML = `<div class="gitsawe-loading">${UI_TEXT[currentLang].gitsaweLoading}</div>`;
+
+      const data = await loadGitsaweData();
+      const entry = lookupGitsaweEntry(data, currentActiveYear, monthObj.id, day, feastSlug);
+      const evangelistYear = getEvangelistYear(currentActiveYear);
+      renderGitsaweReadings(entry, evangelistYear);
+    }
+
+    function renderGitsaweReadings(entry, evangelistYear) {
+      const readingsView = document.getElementById('gitsaweReadingsView');
+      const t = UI_TEXT[currentLang];
+
+      if (!entry) {
+        readingsView.innerHTML = `
+          <div class="gitsawe-not-found">${t.gitsaweNotFound}</div>
+          <button class="modal-submit-btn gitsawe-back-btn" onclick="closeGitsaweView()">${t.gitsaweBackBtn}</button>
+        `;
+        return;
+      }
+
+      const gospelText = (entry.gospelByEvangelist && entry.gospelByEvangelist[evangelistYear])
+        ? entry.gospelByEvangelist[evangelistYear]
+        : (entry.gospel || null);
+
+      const rows = [
+        { label: t.gitsaweLabelPauline, text: entry.pauline },
+        { label: t.gitsaweLabelCatholic, text: entry.catholic },
+        { label: t.gitsaweLabelActs, text: entry.acts },
+        { label: t.gitsaweLabelPsalm, text: entry.psalm },
+        { label: t.gitsaweLabelGospel, text: gospelText }
+      ];
+
+      const evangelistName = evangelistDisplayName(evangelistYear);
+      let html = evangelistName ? `<div class="gitsawe-evangelist-note">${t.gitsaweEvangelistNote(evangelistName)}</div>` : '';
+
+      html += '<div class="gitsawe-reading-list">';
+      rows.forEach(row => {
+        const safeText = row.text ? String(row.text) : '--';
+        html += `
+          <div class="gitsawe-reading-item">
+            <div class="gitsawe-reading-label">${row.label}</div>
+            <div class="gitsawe-reading-text">${safeText}</div>
+          </div>
+        `;
+      });
+      html += '</div>';
+      html += `<button class="modal-submit-btn gitsawe-back-btn" onclick="closeGitsaweView()">${t.gitsaweBackBtn}</button>`;
+
+      readingsView.innerHTML = html;
+    }
+
+    // Returns the day-resource modal to the original 4-button picker view.
+    function closeGitsaweView() {
+      const readingsView = document.getElementById('gitsaweReadingsView');
+      readingsView.style.display = 'none';
+      readingsView.innerHTML = '';
+      document.getElementById('resourcePickGrid').style.display = 'grid';
+    }
+
+    // =========================================================================
     // 07. DAY RESOURCE PICKER MODAL (Mahlet / Gitsawe / Mezmur / Qedassie)
     // =========================================================================
     function openDayResourceModal(monthObj, day, feast) {
@@ -1706,6 +1962,10 @@
       document.getElementById('dayResourceTitle').innerText = titleText;
       document.getElementById('errorMsg').style.display = 'none';
 
+      // Always reopen on the 4-button picker, even if a previous visit to
+      // this modal was left mid-way through the Gitsawe readings view.
+      closeGitsaweView();
+
       const pickGrid = document.getElementById('resourcePickGrid');
       pickGrid.innerHTML = '';
       RESOURCE_TYPES.forEach(r => {
@@ -1717,7 +1977,14 @@
         btn.innerText = (currentLang === 'en') ? r.nameEn : r.nameAm;
         btn.disabled = !avail;
         if (avail) {
-          btn.onclick = () => openPdf(monthObj, day, r, currentSelectedFeastSlug);
+          // Targeted change: only ግጻዌ (Gitsawe) gets the new readings-lookup
+          // behavior. Mahlet, Mezmur, and Qedassie are completely untouched
+          // and still go through openPdf() exactly as before.
+          if (r.key === 'gitsawe') {
+            btn.onclick = () => openGitsaweView(monthObj, day, currentSelectedFeastSlug);
+          } else {
+            btn.onclick = () => openPdf(monthObj, day, r, currentSelectedFeastSlug);
+          }
         }
         pickGrid.appendChild(btn);
       });
@@ -1898,6 +2165,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       applyLanguageUI();
       renderCalendar();
+      loadGitsaweData(); // warm the cache in the background; failures are handled silently until the button is actually clicked
     });
   </script>
 </body>
