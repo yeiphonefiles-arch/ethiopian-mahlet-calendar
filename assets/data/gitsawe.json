@@ -1,6 +1,5 @@
 {
   "_readme": "SAMPLE DATA — placeholder text only, not authentic Gitsawe readings. Replace every 'pauline'/'catholic'/'acts'/'psalm'/'gospel' value below with the real scripture citations (and, where your tradition varies the Gospel reading by year, fill in 'gospelByEvangelist' with matthew/mark/luke/john keys) from your church's Gitsawe reference book. Keys under 'fixed' are '<EthiopianMonthId>-<Day>', e.g. '12-2' = Nahase 2. Keys under 'movable' are the same season/feast slugs already used elsewhere in the site's code (see MAJOR_FASTS and calculateBahireHasabMovableFeasts): 'himamat', 'abiy-tsom', 'tinsae', plus any specific movable-feast slug such as 'genna', 'timkat', 'hosanna', 'siklet', 'irget', 'peraklitos', etc. if a given feast has its own distinct Gitsawe reading rather than falling back to the season.",
-
   "movable": {
     "abiy-tsom": {
       "pauline": "SAMPLE — replace with the Great Lent Pauline Epistle citation.",
@@ -29,14 +28,18 @@
       }
     }
   },
-
   "fixed": {
     "1-1": {
-      "pauline": "SAMPLE — Meskerem 1 (New Year) Pauline Epistle citation.",
-      "catholic": "SAMPLE — Meskerem 1 Catholic Epistle citation.",
-      "acts": "SAMPLE — Meskerem 1 Acts of the Apostles citation.",
-      "psalm": "SAMPLE — Meskerem 1 Psalm/Mesbak.",
-      "gospel": "SAMPLE — Meskerem 1 Gospel citation."
+      "pauline": "Hebrews 1:1-14",
+      "catholic": "1 John 1:1-10",
+      "acts": "Acts 1:1-8",
+      "psalm": "Psalms 65:11-12",
+      "gospel": "John 1:1-17",
+      "commemoration": "እንቁጣጣሽ / ርእሰ ዐውደ ዓመት (New Year / St. John the Baptist)",
+      "anaphora": "Anaphora of the Apostles",
+      "morning_psalm": "Psalms 65:11",
+      "morning_gospel": "Matthew 1:1-17",
+      "gregorian_date": "2026-09-11"
     },
     "12-2": {
       "pauline": "SAMPLE — Nahase 2 Pauline Epistle citation.",
@@ -44,6 +47,354 @@
       "acts": "SAMPLE — Nahase 2 Acts of the Apostles citation.",
       "psalm": "SAMPLE — Nahase 2 Psalm/Mesbak.",
       "gospel": "SAMPLE — Nahase 2 Gospel citation."
+    },
+    "1-2": {
+      "pauline": "2 Corinthians 6:1-13",
+      "catholic": "James 1:12-27",
+      "acts": "Acts 13:16-26",
+      "psalm": "Psalms 92:12-13",
+      "gospel": "Matthew 3:1-17",
+      "commemoration": "ኣባ ዮሐንስ መጥምቅ / ዘካርያስ ወኤልሳቤጥ",
+      "anaphora": "Anaphora of the Lord",
+      "morning_psalm": "Psalms 112:6",
+      "morning_gospel": "Luke 1:5-25",
+      "gregorian_date": "2026-09-12"
+    },
+    "1-3": {
+      "pauline": "Romans 8:14-25",
+      "catholic": "1 Peter 4:12-19",
+      "acts": "Acts 7:54-60",
+      "psalm": "Psalms 116:15",
+      "gospel": "John 15:17-27",
+      "commemoration": "አባ ሶፎንያስ / አባ ዲዮስቆሮስ",
+      "anaphora": "Anaphora of Our Lady Mary",
+      "morning_psalm": "Psalms 34:15",
+      "morning_gospel": "Luke 6:20-26",
+      "gregorian_date": "2026-09-13"
+    },
+    "1-4": {
+      "pauline": "1 Timothy 3:1-13",
+      "catholic": "1 Peter 5:1-11",
+      "acts": "Acts 20:28-35",
+      "psalm": "Psalms 132:13-14",
+      "gospel": "Matthew 24:42-51",
+      "commemoration": "አባ መካርዮስ / ዮሐንስ አፈወርቅ",
+      "anaphora": "Anaphora of John Chrysostom",
+      "morning_psalm": "Psalms 132:9",
+      "morning_gospel": "John 10:1-16",
+      "gregorian_date": "2026-09-14"
+    },
+    "1-5": {
+      "pauline": "2 Timothy 2:1-13",
+      "catholic": "2 Peter 1:1-11",
+      "acts": "Acts 12:1-11",
+      "psalm": "Psalms 34:19-20",
+      "gospel": "Luke 12:4-12",
+      "commemoration": "አባ ጢሞቴዎስ / ሶፊያ ወአዋልዳ",
+      "anaphora": "Anaphora of the 318 Orthodox Fathers",
+      "morning_psalm": "Psalms 37:39",
+      "morning_gospel": "Matthew 10:28-33",
+      "gregorian_date": "2026-09-15"
+    },
+    "1-6": {
+      "pauline": "Hebrews 11:32-40",
+      "catholic": "Jude 1:1-8",
+      "acts": "Acts 7:44-50",
+      "psalm": "Psalms 106:4-5",
+      "gospel": "Matthew 19:27-30",
+      "commemoration": "ኢያሱ ወልደ ነዌ / አባ ባስልዮስ",
+      "anaphora": "Anaphora of Basil",
+      "morning_psalm": "Psalms 105:42",
+      "morning_gospel": "Luke 10:1-12",
+      "gregorian_date": "2026-09-16"
+    },
+    "1-7": {
+      "pauline": "Galatians 6:11-18",
+      "catholic": "1 John 2:15-25",
+      "acts": "Acts 20:17-27",
+      "psalm": "Psalms 89:20-22",
+      "gospel": "John 10:11-18",
+      "commemoration": "አቡነ ዲዮስቆሮስ ዓቢይ",
+      "anaphora": "Anaphora of Epiphanius",
+      "morning_psalm": "Psalms 97:10",
+      "morning_gospel": "John 15:1-11",
+      "gregorian_date": "2026-09-17"
+    },
+    "1-8": {
+      "pauline": "1 Corinthians 9:19-27",
+      "catholic": "3 John 1:1-8",
+      "acts": "Acts 8:26-40",
+      "psalm": "Psalms 112:1-3",
+      "gospel": "Luke 18:9-14",
+      "commemoration": "አባ ሙሴ ጸሊም / ዘካርያስ ካህን",
+      "anaphora": "Anaphora of the Apostles",
+      "morning_psalm": "Psalms 68:31",
+      "morning_gospel": "Matthew 18:1-11",
+      "gregorian_date": "2026-09-18"
+    },
+    "1-9": {
+      "pauline": "Acts 6:8-15",
+      "catholic": "1 Peter 3:13-22",
+      "acts": "Acts 7:51-60",
+      "psalm": "Psalms 31:5",
+      "gospel": "Matthew 23:34-39",
+      "commemoration": "አባ እስጢፋኖስ ሊቀ ዲያቆናት",
+      "anaphora": "Anaphora of Athanasius",
+      "morning_psalm": "Psalms 119:161",
+      "morning_gospel": "Matthew 10:16-23",
+      "gregorian_date": "2026-09-19"
+    },
+    "1-10": {
+      "pauline": "Galatians 4:21-31",
+      "catholic": "1 John 4:7-21",
+      "acts": "Acts 1:12-14",
+      "psalm": "Psalms 45:10-11",
+      "gospel": "Luke 1:39-56",
+      "commemoration": "ፅንሰታ ለሐና (Conception of St. Anne)",
+      "anaphora": "Anaphora of Our Lady Mary",
+      "morning_psalm": "Psalms 87:1-2",
+      "morning_gospel": "Luke 1:26-38",
+      "gregorian_date": "2026-09-20"
+    },
+    "1-11": {
+      "pauline": "Ephesians 5:14-21",
+      "catholic": "James 5:13-20",
+      "acts": "Acts 16:22-34",
+      "psalm": "Psalms 98:4-6",
+      "gospel": "John 6:35-46",
+      "commemoration": "ቅዱስ ያሬድ / ማርያም ሐና",
+      "anaphora": "Anaphora of Gregory",
+      "morning_psalm": "Psalms 33:1-3",
+      "morning_gospel": "Matthew 11:25-30",
+      "gregorian_date": "2026-09-21"
+    },
+    "1-12": {
+      "pauline": "Hebrews 1:1-14",
+      "catholic": "1 Peter 1:10-12",
+      "acts": "Acts 10:1-8",
+      "psalm": "Psalms 34:7",
+      "gospel": "John 1:43-51",
+      "commemoration": "ቅዱስ ሚካኤል ሊቀ መላእክት",
+      "anaphora": "Anaphora of the Angels",
+      "morning_psalm": "Psalms 103:20",
+      "morning_gospel": "Matthew 18:10-20",
+      "gregorian_date": "2026-09-22"
+    },
+    "1-13": {
+      "pauline": "1 Titus 1:5-11",
+      "catholic": "1 John 2:1-11",
+      "acts": "Acts 15:1-11",
+      "psalm": "Psalms 132:17-18",
+      "gospel": "Luke 12:35-48",
+      "commemoration": "አባ ባስልዮስ ዘቂሳርያ",
+      "anaphora": "Anaphora of Basil",
+      "morning_psalm": "Psalms 110:4",
+      "morning_gospel": "John 10:11-16",
+      "gregorian_date": "2026-09-23"
+    },
+    "1-14": {
+      "pauline": "Philippians 3:12-21",
+      "catholic": "1 Peter 2:1-10",
+      "acts": "Acts 11:19-26",
+      "psalm": "Psalms 112:6-7",
+      "gospel": "John 15:1-10",
+      "commemoration": "አባ አጋቶን",
+      "anaphora": "Anaphora of the Apostles",
+      "morning_psalm": "Psalms 37:30-31",
+      "morning_gospel": "Matthew 5:13-19",
+      "gregorian_date": "2026-09-24"
+    },
+    "1-15": {
+      "pauline": "2 Corinthians 4:7-18",
+      "catholic": "James 1:1-11",
+      "acts": "Acts 7:54-60",
+      "psalm": "Psalms 116:15",
+      "gospel": "Matthew 10:24-33",
+      "commemoration": "እስጢፋኖስ / ኪራኮስ ወኢየሉጣ",
+      "anaphora": "Anaphora of Athanasius",
+      "morning_psalm": "Psalms 34:17",
+      "morning_gospel": "Luke 12:2-12",
+      "gregorian_date": "2026-09-25"
+    },
+    "1-16": {
+      "pauline": "Galatians 6:11-18",
+      "catholic": "1 Peter 2:11-17",
+      "acts": "Acts 10:34-43",
+      "psalm": "Psalms 98:1-3",
+      "gospel": "Luke 9:18-27",
+      "commemoration": "ደመራ (Demera / Eve of Meskel)",
+      "anaphora": "Anaphora of the Cross",
+      "morning_psalm": "Psalms 60:4",
+      "morning_gospel": "John 12:20-33",
+      "gregorian_date": "2026-09-26"
+    },
+    "1-17": {
+      "pauline": "1 Corinthians 1:18-31",
+      "catholic": "1 Peter 2:11-25",
+      "acts": "Acts 10:34-43",
+      "psalm": "Psalms 98:1-3",
+      "gospel": "John 19:16-37",
+      "commemoration": "መስቀል (Finding of the True Cross)",
+      "anaphora": "Anaphora of the Cross",
+      "morning_psalm": "Psalms 60:4",
+      "morning_gospel": "John 12:20-36",
+      "gregorian_date": "2026-09-27"
+    },
+    "1-18": {
+      "pauline": "2 Timothy 2:1-10",
+      "catholic": "1 Peter 4:12-19",
+      "acts": "Acts 21:8-14",
+      "psalm": "Psalms 97:10-11",
+      "gospel": "Matthew 10:34-42",
+      "commemoration": "ቅዱስ ጊዮርጊስ ዘኤስያ",
+      "anaphora": "Anaphora of the Apostles",
+      "morning_psalm": "Psalms 89:20",
+      "morning_gospel": "Luke 21:10-19",
+      "gregorian_date": "2026-09-28"
+    },
+    "1-19": {
+      "pauline": "Colossians 1:9-20",
+      "catholic": "1 Peter 1:13-21",
+      "acts": "Acts 12:6-11",
+      "psalm": "Psalms 148:1-2",
+      "gospel": "Luke 1:39-45",
+      "commemoration": "ቅዱስ ገብርኤል / ቅዱስ ዮሐንስ አፈወርቅ",
+      "anaphora": "Anaphora of John Chrysostom",
+      "morning_psalm": "Psalms 103:20",
+      "morning_gospel": "Luke 1:26-38",
+      "gregorian_date": "2026-09-29"
+    },
+    "1-20": {
+      "pauline": "1 Corinthians 3:9-17",
+      "catholic": "1 John 4:1-6",
+      "acts": "Acts 4:8-12",
+      "psalm": "Psalms 87:1-3",
+      "gospel": "John 2:13-22",
+      "commemoration": "ሕንጸተ ስብሐት / አባ አትናቴዎስ",
+      "anaphora": "Anaphora of Athanasius",
+      "morning_psalm": "Psalms 68:35",
+      "morning_gospel": "Matthew 16:13-19",
+      "gregorian_date": "2026-09-30"
+    },
+    "1-21": {
+      "pauline": "Hebrews 9:1-12",
+      "catholic": "1 John 2:12-17",
+      "acts": "Acts 1:12-14",
+      "psalm": "Psalms 45:13-15",
+      "gospel": "Luke 2:41-52",
+      "commemoration": "እግዝእትነ ማርያም (Monthly St. Mary)",
+      "anaphora": "Anaphora of Our Lady Mary",
+      "morning_psalm": "Psalms 45:10",
+      "morning_gospel": "Luke 1:39-56",
+      "gregorian_date": "2026-10-01"
+    },
+    "1-22": {
+      "pauline": "Hebrews 12:18-24",
+      "catholic": "1 Peter 1:3-9",
+      "acts": "Acts 5:12-16",
+      "psalm": "Psalms 91:11-12",
+      "gospel": "Luke 10:17-20",
+      "commemoration": "ቅዱስ ኡራኤል / አባ ይስሐቅ",
+      "anaphora": "Anaphora of the Angels",
+      "morning_psalm": "Psalms 104:4",
+      "morning_gospel": "Matthew 13:44-52",
+      "gregorian_date": "2026-10-02"
+    },
+    "1-23": {
+      "pauline": "2 Corinthians 1:3-11",
+      "catholic": "James 1:2-12",
+      "acts": "Acts 20:17-24",
+      "psalm": "Psalms 116:12-14",
+      "gospel": "Matthew 10:16-22",
+      "commemoration": "አባ ጊዮርጊስ ዘጋስጫ / ቅዱስ ጊዮርጊስ",
+      "anaphora": "Anaphora of Gregory",
+      "morning_psalm": "Psalms 92:12",
+      "morning_gospel": "John 15:17-27",
+      "gregorian_date": "2026-10-03"
+    },
+    "1-24": {
+      "pauline": "Revelation 4:1-11",
+      "catholic": "1 Peter 2:1-10",
+      "acts": "Acts 2:42-47",
+      "psalm": "Psalms 132:9-10",
+      "gospel": "John 12:20-26",
+      "commemoration": "አበው 24 ካህናተ ሰማይ (24 Heavenly Priests)",
+      "anaphora": "Anaphora of the 318 Orthodox Fathers",
+      "morning_psalm": "Psalms 149:1-2",
+      "morning_gospel": "Matthew 19:27-30",
+      "gregorian_date": "2026-10-04"
+    },
+    "1-25": {
+      "pauline": "1 Corinthians 15:50-58",
+      "catholic": "1 Peter 3:18-22",
+      "acts": "Acts 28:11-20",
+      "psalm": "Psalms 130:1-4",
+      "gospel": "Luke 11:29-32",
+      "commemoration": "ቅዱስ ዮናስ ነቢይ",
+      "anaphora": "Anaphora of the Lord",
+      "morning_psalm": "Psalms 107:23-30",
+      "morning_gospel": "Matthew 12:38-42",
+      "gregorian_date": "2026-10-05"
+    },
+    "1-26": {
+      "pauline": "2 Corinthians 12:1-10",
+      "catholic": "1 John 1:1-4",
+      "acts": "Acts 1:12-26",
+      "psalm": "Psalms 19:4",
+      "gospel": "John 14:1-14",
+      "commemoration": "አባ ቶማስ ዘመርዓስ",
+      "anaphora": "Anaphora of the Apostles",
+      "morning_psalm": "Psalms 37:23-24",
+      "morning_gospel": "John 20:24-29",
+      "gregorian_date": "2026-10-06"
+    },
+    "1-27": {
+      "pauline": "Romans 8:31-39",
+      "catholic": "1 John 3:1-8",
+      "acts": "Acts 7:54-60",
+      "psalm": "Psalms 8:2",
+      "gospel": "Matthew 11:25-30",
+      "commemoration": "አቡነ መቃርስ / ቅዱስ ቂርቆስ",
+      "anaphora": "Anaphora of Athanasius",
+      "morning_psalm": "Psalms 97:10-11",
+      "morning_gospel": "Matthew 18:1-6",
+      "gregorian_date": "2026-10-07"
+    },
+    "1-28": {
+      "pauline": "Hebrews 11:8-19",
+      "catholic": "James 2:14-26",
+      "acts": "Acts 3:12-26",
+      "psalm": "Psalms 47:9",
+      "gospel": "Matthew 8:5-13",
+      "commemoration": "አባ አብርሃም ወይስሐቅ ወያዕቆብ",
+      "anaphora": "Anaphora of the 318 Orthodox Fathers",
+      "morning_psalm": "Psalms 105:8-10",
+      "morning_gospel": "Luke 13:22-30",
+      "gregorian_date": "2026-10-08"
+    },
+    "1-29": {
+      "pauline": "Ephesians 1:3-14",
+      "catholic": "1 John 5:1-12",
+      "acts": "Acts 13:26-39",
+      "psalm": "Psalms 72:1-4",
+      "gospel": "John 10:22-38",
+      "commemoration": "በዓለ ወልድ / አባ ባላሞን",
+      "anaphora": "Anaphora of Epiphanius",
+      "morning_psalm": "Psalms 2:7-8",
+      "morning_gospel": "John 8:12-20",
+      "gregorian_date": "2026-10-09"
+    },
+    "1-30": {
+      "pauline": "Acts 13:16-25",
+      "catholic": "1 John 3:11-18",
+      "acts": "Acts 19:1-7",
+      "psalm": "Psalms 112:6-7",
+      "gospel": "Matthew 11:7-15",
+      "commemoration": "ቅዱስ ዮሐንስ መጥምቅ / አባ ጎርጎርዮስ",
+      "anaphora": "Anaphora of Gregory",
+      "morning_psalm": "Psalms 92:12-14",
+      "morning_gospel": "Luke 7:18-28",
+      "gregorian_date": "2026-10-10"
     }
   }
 }
