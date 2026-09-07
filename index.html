@@ -662,6 +662,27 @@
       color: var(--maroon-dark);
       text-decoration-style: solid;
     }
+    .gitsawe-row-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .gitsawe-misbak-btn {
+      border: 1px solid var(--gold-dark);
+      background: var(--cream);
+      color: var(--maroon-dark);
+      border-radius: 5px;
+      padding: 0.28rem 0.65rem;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .gitsawe-misbak-btn:hover {
+      background: var(--gold-light);
+    }
 
     /* ===== Verse Text modal (Amharic Bible popup) ===== */
     .verse-text-subtitle {
@@ -1144,7 +1165,7 @@
         evangelistLuke: "ሉቃስ",
         evangelistJohn: "ዮሐንስ",
         verseTextLoading: "ጥቅሱ እየተጫነ ነው...",
-        verseTextNotFound: "ለዚህ ጥቅስ የአማርኛ ትርጉም ገና አልተጫነም። እባክዎ ቆይተው እንደገና ይሞክሩ።",
+        verseTextNotFound: "ለዚህ ጥቅስ በአማርኛ የሚገኝ ጽሑፍ አልተገኘም።",
         verseTextParseError: "ይህን ጥቅስ ማንበብ አልተቻለም።",
         misbakDetailLoading: "ምስባኩ እየተጫነ ነው...",
         misbakDetailNotFound: "ለዚህ ቀን የምስባክ መረጃ አልተገኘም።",
@@ -1190,7 +1211,7 @@
         evangelistLuke: "Luke",
         evangelistJohn: "John",
         verseTextLoading: "Loading verse text...",
-        verseTextNotFound: "No Amharic text is available for this passage yet. Please check back later.",
+        verseTextNotFound: "No complete Amharic text is available for this passage in the local New Testament dataset.",
         verseTextParseError: "This citation couldn't be read.",
       }
     };
@@ -1913,167 +1934,42 @@
 
     // =========================================================================
     // 06b2. AMHARIC VERSE TEXT POPUP
-    // Lets the person click any citation shown in the Gitsawe readings view
-    // (Pauline/Catholic/Acts/Psalm/Gospel) and see the actual Amharic Bible
-    // text for that passage in a small popup. Reuses the same fetch-once-
-    // cache pattern as loadGitsaweData(), against a separate local dataset,
-    // since a Bible text corpus is a different shape/size than the daily
-    // readings list and may be swapped out independently.
+    // Uses the local New Testament dataset generated from the uploaded
+    // Haile Selassie Amharic Bible source. The JSON is loaded once at page
+    // load and then reused for every Gitsawe scripture click.
+    // Psalms are intentionally handled by misbak.json instead of this Bible
+    // dataset, because the daily Misbak record already contains the Psalm
+    // reading in Ge'ez, Amharic, and English.
     // =========================================================================
 
-    // NOTE: like GITSAWE_DATA_PATH, this is a relative path so it keeps
-    // working if the site is hosted in a subdirectory.
-    // The Amharic Bible used here is the Haile Selassie Amharic Bible (1962),
-    // presented by Bible.org. Bible.org explains that this edition was first
-    // published in 1962 and that its electronic preparation was supported by
-    // the Ethiopian Bible Society. Rather than bundling a large Bible corpus
-    // into the site, we use the GetBible read-only API for the same HSAB
-    // translation and cache each requested passage in memory.
-    // Bible.org's requested Haile Selassie Amharic Bible (1962) is also
-    // catalogued as HSAB in the older GetBible/Unbound data. The current
-    // GetBible V2 translation list no longer exposes HSAB, so the previous
-    // V2 URL could not return the requested passage. We therefore use the
-    // still-available V1 static chapter files and select only the requested
-    // verses locally.
-    const AMHARIC_BIBLE_API_BASE = 'https://api.getbible.net/v1/hsab/';
+    const AMHARIC_BIBLE_DATA_PATH = 'assets/data/amharic-bible.json';
+    let _amharicBibleDataPromise = null;
 
-    let _amharicBibleCache = new Map();
-
-    // Standard KJV/GetBible book numbers. HSAB uses the same canonical
-    // numbering for the books used by the Gitsawe citations.
-    const BIBLE_BOOK_NUMBERS = {
-      'Genesis': 1, 'Exodus': 2, 'Leviticus': 3, 'Numbers': 4, 'Deuteronomy': 5,
-      'Joshua': 6, 'Judges': 7, 'Ruth': 8, '1 Samuel': 9, '2 Samuel': 10,
-      '1 Kings': 11, '2 Kings': 12, '1 Chronicles': 13, '2 Chronicles': 14,
-      'Ezra': 15, 'Nehemiah': 16, 'Esther': 17, 'Job': 18, 'Psalm': 19,
-      'Psalms': 19, 'Proverbs': 20, 'Ecclesiastes': 21, 'Song of Solomon': 22,
-      'Isaiah': 23, 'Jeremiah': 24, 'Lamentations': 25, 'Ezekiel': 26,
-      'Daniel': 27, 'Hosea': 28, 'Joel': 29, 'Amos': 30, 'Obadiah': 31,
-      'Jonah': 32, 'Micah': 33, 'Nahum': 34, 'Habakkuk': 35, 'Zephaniah': 36,
-      'Haggai': 37, 'Zechariah': 38, 'Malachi': 39, 'Matthew': 40, 'Mark': 41,
-      'Luke': 42, 'John': 43, 'Acts': 44, 'Romans': 45, '1 Corinthians': 46,
-      '2 Corinthians': 47, 'Galatians': 48, 'Ephesians': 49, 'Philippians': 50,
-      'Colossians': 51, '1 Thessalonians': 52, '2 Thessalonians': 53,
-      '1 Timothy': 54, '2 Timothy': 55, 'Titus': 56, 'Philemon': 57,
-      'Hebrews': 58, 'James': 59, '1 Peter': 60, '2 Peter': 61,
-      '1 John': 62, '2 John': 63, '3 John': 64, 'Jude': 65, 'Revelation': 66
-    };
-
-    function normalizeBibleApiVerses(payload) {
-      if (!payload) return null;
-      const results = [];
-      const seen = new Set();
-
-      function addVerse(verseNo, text) {
-        if (verseNo == null || text == null) return;
-        const n = parseInt(verseNo, 10);
-        if (!Number.isFinite(n)) return;
-        const value = String(text).trim();
-        if (!value) return;
-        const key = `${n}\u0000${value}`;
-        if (seen.has(key)) return;
-        seen.add(key);
-        results.push({ verse: n, text: value });
-      }
-
-      // GetBible V1 chapter responses use this shape:
-      // { book: [{ chapter: { "1": { verse_nr: "1", verse: "..." } } }] }
-      // Handle that format explicitly before the generic fallback below.
-      if (Array.isArray(payload.book)) {
-        payload.book.forEach(book => {
-          if (!book || !book.chapter || typeof book.chapter !== 'object') return;
-          Object.keys(book.chapter).forEach(key => {
-            const verseObj = book.chapter[key];
-            if (!verseObj || typeof verseObj !== 'object') return;
-            addVerse(
-              verseObj.verse_nr ?? key,
-              verseObj.verse ?? verseObj.text ?? verseObj.content ?? verseObj.verse_text
-            );
-          });
-        });
-      }
-
-      // Also accept chapter-keyed/object/array responses used by newer or
-      // mirrored GetBible endpoints.
-      function visit(node) {
-        if (!node) return;
-        if (Array.isArray(node)) {
-          node.forEach(visit);
-          return;
-        }
-        if (typeof node !== 'object') return;
-
-        if (Object.prototype.hasOwnProperty.call(node, 'verse_nr')) {
-          addVerse(node.verse_nr, node.verse ?? node.text ?? node.content ?? node.verse_text);
-        } else if (Object.prototype.hasOwnProperty.call(node, 'verse_number')) {
-          addVerse(node.verse_number, node.text ?? node.content ?? node.verse_text ?? node.verse);
-        } else if (Object.prototype.hasOwnProperty.call(node, 'number') &&
-                   (Object.prototype.hasOwnProperty.call(node, 'text') ||
-                    Object.prototype.hasOwnProperty.call(node, 'content') ||
-                    Object.prototype.hasOwnProperty.call(node, 'verse_text'))) {
-          addVerse(node.number, node.text ?? node.content ?? node.verse_text);
-        }
-
-        if (Array.isArray(node.verses)) {
-          node.verses.forEach(visit);
-        } else if (node.verses && typeof node.verses === 'object') {
-          visit(node.verses);
-        }
-
-        Object.keys(node).forEach(key => {
-          if (key !== 'verses' && key !== 'book' && key !== 'chapter') visit(node[key]);
-        });
-      }
-
-      visit(payload);
-      return results.length ? results.sort((a, b) => a.verse - b.verse) : null;
-    }
-
-    async function fetchAmharicBibleChapter(book, chapter) {
-      const bookNumber = BIBLE_BOOK_NUMBERS[book];
-      if (!bookNumber) return null;
-
-      const chapterKey = `${bookNumber}/${chapter}`;
-      if (_amharicBibleCache.has(chapterKey)) {
-        return _amharicBibleCache.get(chapterKey);
-      }
-
-      const requestPromise = fetch(`${AMHARIC_BIBLE_API_BASE}${bookNumber}/${chapter}.json`)
+    function loadAmharicBibleData() {
+      if (_amharicBibleDataPromise) return _amharicBibleDataPromise;
+      _amharicBibleDataPromise = fetch(AMHARIC_BIBLE_DATA_PATH)
         .then(res => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
-        .then(payload => normalizeBibleApiVerses(payload))
         .catch(err => {
-          console.error('Failed to load HSAB chapter:', book, chapter, err);
+          console.error('Failed to load Amharic Bible dataset from', AMHARIC_BIBLE_DATA_PATH, err);
           return null;
         });
-
-      _amharicBibleCache.set(chapterKey, requestPromise);
-      return requestPromise;
+      return _amharicBibleDataPromise;
     }
 
-    // A few book names appear inconsistently across the Gitsawe data (e.g.
-    // "Psalms" vs "Psalm"). This tries the exact name first, then a couple
-    // of common alternate spellings, before giving up.
     const BOOK_NAME_ALIASES = {
       'Psalms': ['Psalm'],
       'Psalm': ['Psalms']
     };
 
-    // Parses a citation like "Hebrews 1:1-14", "Psalm 19:4", or the
-    // cross-chapter form "John 15:26 - 16:4" into its parts. Returns null if
-    // the string doesn't match a recognizable "Book chapter:verse[-verse]"
-    // pattern — the dataset itself is never re-interpreted or corrected, so
-    // a typo in the source data (e.g. a mislabeled book) simply won't match
-    // anything in the Bible dataset, rather than being silently "fixed".
     function parseCitation(citation) {
       if (!citation) return null;
       const match = String(citation).trim().match(
         /^((?:[1-3]\s)?[A-Za-z]+(?:\s[A-Za-z]+)*)\s+(\d+):(\d+)\s*(?:-\s*(?:(\d+):)?(\d+))?\s*$/
       );
       if (!match) return null;
-
       const [, book, chapter, verseStart, endChapter, verseEnd] = match;
       return {
         book: book.trim(),
@@ -2084,8 +1980,6 @@
       };
     }
 
-    // Returns [{verse, text}, ...] for the verses of one chapter that fall
-    // within [minVerse, maxVerse] (either bound optional), sorted in order.
     function getChapterVerses(bookData, chapterNum, minVerse, maxVerse) {
       const chapterData = bookData[String(chapterNum)];
       if (!chapterData) return [];
@@ -2093,14 +1987,12 @@
         .map(v => parseInt(v, 10))
         .filter(v => (minVerse == null || v >= minVerse) && (maxVerse == null || v <= maxVerse))
         .sort((a, b) => a - b)
-        .map(v => ({ verse: v, text: chapterData[String(v)] }));
+        .map(v => ({ verse: v, text: chapterData[String(v)] }))
+        .filter(v => String(v.text || '').trim());
     }
 
-    // Looks up the Amharic text for a parsed citation, handling both a
-    // same-chapter range (or single verse) and a cross-chapter range.
     function lookupAmharicVerses(data, parsed) {
       if (!data || !parsed) return null;
-
       const candidateNames = [parsed.book, ...(BOOK_NAME_ALIASES[parsed.book] || [])];
       let bookData = null;
       for (const name of candidateNames) {
@@ -2123,9 +2015,6 @@
       return verses.length ? verses : null;
     }
 
-    // Opens the popup, fetches (or reuses the cached) requested passage,
-    // and renders the Amharic text. The API returns the requested verses in
-    // reference order, including cross-chapter ranges.
     async function openVerseTextModal(citation) {
       document.getElementById('verseTextTitle').innerText = citation;
       const contentEl = document.getElementById('verseTextContent');
@@ -2138,47 +2027,32 @@
         return;
       }
 
-      const chapters = [];
-      const firstChapter = await fetchAmharicBibleChapter(parsed.book, parsed.chapter);
-      if (firstChapter) chapters.push({ chapter: parsed.chapter, verses: firstChapter });
-
-      if (parsed.endChapter && parsed.endChapter !== parsed.chapter) {
-        for (let c = parsed.chapter + 1; c <= parsed.endChapter; c++) {
-          const chapterVerses = await fetchAmharicBibleChapter(parsed.book, c);
-          if (chapterVerses) chapters.push({ chapter: c, verses: chapterVerses });
-        }
+      if (parsed.book === 'Psalm' || parsed.book === 'Psalms') {
+        closeVerseTextModal();
+        openMisbakDetailModal();
+        return;
       }
 
-      if (!chapters.length) {
+      const data = await loadAmharicBibleData();
+      const verses = lookupAmharicVerses(data, parsed);
+      if (!verses) {
         contentEl.innerHTML = `<div class="verse-text-not-found">${UI_TEXT[currentLang].verseTextNotFound}</div>`;
         return;
       }
 
-      const selectedVerses = [];
-      chapters.forEach(({ chapter, verses }) => {
-        verses.forEach(v => {
-          const inRange = chapter === parsed.chapter
-            ? v.verse >= parsed.verseStart &&
-              (!parsed.endChapter || parsed.endChapter === parsed.chapter
-                ? v.verse <= (parsed.verseEnd || parsed.verseStart)
-                : true)
-            : (!parsed.verseEnd || chapter < parsed.endChapter
-                ? (chapter < parsed.endChapter || v.verse <= parsed.verseEnd)
-                : v.verse <= parsed.verseEnd);
-          if (inRange) selectedVerses.push({ chapter, verse: v.verse, text: v.text });
-        });
-      });
-
-      if (!selectedVerses.length) {
+      const expectedCount = parsed.endChapter && parsed.endChapter !== parsed.chapter
+        ? null
+        : (parsed.verseEnd || parsed.verseStart) - parsed.verseStart + 1;
+      if (expectedCount !== null && verses.length !== expectedCount) {
         contentEl.innerHTML = `<div class="verse-text-not-found">${UI_TEXT[currentLang].verseTextNotFound}</div>`;
         return;
       }
 
       let html = '';
-      selectedVerses.forEach(v => {
+      verses.forEach(v => {
         html += `
           <div class="verse-text-item">
-            <div class="verse-text-num">${escapeHtml(v.chapter + ':' + v.verse)}</div>
+            <div class="verse-text-num">${escapeHtml(v.verse)}</div>
             <div class="verse-text-body">${escapeHtml(v.text)}</div>
           </div>
         `;
@@ -2190,9 +2064,6 @@
       document.getElementById('verseTextModal').classList.remove('active');
     }
 
-    // Small HTML-escaping helper for text inserted via innerHTML/attributes
-    // built from dataset content (defensive, even though the data is our
-    // own trusted JSON files).
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, '&amp;')
@@ -2202,17 +2073,19 @@
         .replace(/'/g, '&#39;');
     }
 
-    // Event delegation: a single listener on the Gitsawe readings container
-    // handles clicks on any citation, however many times the view gets
-    // re-rendered — no need to re-attach listeners on every render.
     function handleGitsaweReadingClick(event) {
+      const misbakBtn = event.target.closest('.gitsawe-misbak-btn');
+      if (misbakBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+        openMisbakDetailModal();
+        return;
+      }
+
       const el = event.target.closest('.clickable-verse');
       if (!el) return;
       const citation = el.dataset.citation;
       if (!citation) return;
-
-      // Gitsawe rows are Bible citations. Open the Bible passage popup here;
-      // Misbak has its own separate action and must not intercept Bible clicks.
       openVerseTextModal(citation);
     }
 
@@ -2458,6 +2331,7 @@
           <div class="gitsawe-reading-item">
             <div class="gitsawe-reading-label">${row.label}</div>
             <div class="gitsawe-reading-text${clickable}"${citationAttr}>${escapeHtml(safeText)}</div>
+            ${row.text ? `<div class="gitsawe-row-actions"><button type="button" class="gitsawe-misbak-btn" data-misbak-action="true">ምስባክ</button></div>` : ''}
           </div>
         `;
       });
@@ -2700,6 +2574,7 @@
       applyLanguageUI();
       renderCalendar();
       loadGitsaweData(); // warm the cache in the background; failures are handled silently until the button is actually clicked
+      loadAmharicBibleData(); // warm the New Testament dataset once at page load
       loadMisbakData();  // warm the misbak cache once at page load
       document.getElementById('gitsaweReadingsView').addEventListener('click', handleGitsaweReadingClick);
     });
