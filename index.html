@@ -1923,21 +1923,73 @@
 
     // NOTE: like GITSAWE_DATA_PATH, this is a relative path so it keeps
     // working if the site is hosted in a subdirectory.
-    const AMHARIC_BIBLE_DATA_PATH = 'assets/data/amharic-bible.json';
+    // The Amharic Bible used here is the Haile Selassie Amharic Bible (1962),
+    // presented by Bible.org. Bible.org explains that this edition was first
+    // published in 1962 and that its electronic preparation was supported by
+    // the Ethiopian Bible Society. Rather than bundling a large Bible corpus
+    // into the site, we use the GetBible read-only API for the same HSAB
+    // translation and cache each requested passage in memory.
+    const AMHARIC_BIBLE_API_BASE = 'https://query.getbible.net/v2/hsab/';
 
-    let _amharicBibleDataPromise = null;
-    function loadAmharicBibleData() {
-      if (_amharicBibleDataPromise) return _amharicBibleDataPromise; // cached after first call
-      _amharicBibleDataPromise = fetch(AMHARIC_BIBLE_DATA_PATH)
+    let _amharicBibleCache = new Map();
+
+    function normalizeBibleApiVerses(payload) {
+      if (!payload) return null;
+
+      const results = [];
+      const seen = new Set();
+
+      function visit(node) {
+        if (!node) return;
+
+        if (Array.isArray(node)) {
+          node.forEach(visit);
+          return;
+        }
+
+        if (typeof node !== 'object') return;
+
+        if (Array.isArray(node.verses)) {
+          node.verses.forEach(item => {
+            if (!item || typeof item !== 'object') return;
+            const verseNo = item.verse ?? item.verse_number ?? item.number;
+            const text = item.text ?? item.content ?? item.verse_text;
+            if (verseNo == null || text == null) return;
+            const key = `${verseNo}\u0000${text}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+            results.push({ verse: parseInt(verseNo, 10), text: String(text) });
+          });
+        }
+
+        Object.keys(node).forEach(key => {
+          if (key !== 'verses') visit(node[key]);
+        });
+      }
+
+      visit(payload);
+
+      return results.length ? results : null;
+    }
+
+    async function loadAmharicBibleData(citation) {
+      const cacheKey = String(citation || '').trim();
+      if (!cacheKey) return null;
+      if (_amharicBibleCache.has(cacheKey)) return _amharicBibleCache.get(cacheKey);
+
+      const requestPromise = fetch(AMHARIC_BIBLE_API_BASE + encodeURIComponent(cacheKey))
         .then(res => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
+        .then(payload => normalizeBibleApiVerses(payload))
         .catch(err => {
-          console.error('Failed to load Amharic Bible dataset from', AMHARIC_BIBLE_DATA_PATH, err);
+          console.error('Failed to load Amharic Bible passage from GetBible:', cacheKey, err);
           return null;
         });
-      return _amharicBibleDataPromise;
+
+      _amharicBibleCache.set(cacheKey, requestPromise);
+      return requestPromise;
     }
 
     // A few book names appear inconsistently across the Gitsawe data (e.g.
@@ -2010,9 +2062,9 @@
       return verses.length ? verses : null;
     }
 
-    // Opens the popup, fetches (or reuses the cached) Amharic Bible dataset,
-    // and renders the passage — or a clear "not available" message if the
-    // citation can't be parsed or isn't in the dataset yet.
+    // Opens the popup, fetches (or reuses the cached) requested passage,
+    // and renders the Amharic text. The API returns the requested verses in
+    // reference order, including cross-chapter ranges.
     async function openVerseTextModal(citation) {
       document.getElementById('verseTextTitle').innerText = citation;
       const contentEl = document.getElementById('verseTextContent');
@@ -2025,8 +2077,7 @@
         return;
       }
 
-      const data = await loadAmharicBibleData();
-      const verses = lookupAmharicVerses(data, parsed);
+      const verses = await loadAmharicBibleData(citation);
 
       if (!verses) {
         contentEl.innerHTML = `<div class="verse-text-not-found">${UI_TEXT[currentLang].verseTextNotFound}</div>`;
@@ -2037,7 +2088,7 @@
       verses.forEach(v => {
         html += `
           <div class="verse-text-item">
-            <div class="verse-text-num">${v.verse}</div>
+            <div class="verse-text-num">${escapeHtml(v.verse)}</div>
             <div class="verse-text-body">${escapeHtml(v.text)}</div>
           </div>
         `;
