@@ -1968,13 +1968,33 @@
         if (verseNo == null || text == null) return;
         const n = parseInt(verseNo, 10);
         if (!Number.isFinite(n)) return;
-        const value = String(text);
+        const value = String(text).trim();
+        if (!value) return;
         const key = `${n}\u0000${value}`;
         if (seen.has(key)) return;
         seen.add(key);
         results.push({ verse: n, text: value });
       }
 
+      // GetBible V1 chapter responses use this shape:
+      // { book: [{ chapter: { "1": { verse_nr: "1", verse: "..." } } }] }
+      // Handle that format explicitly before the generic fallback below.
+      if (Array.isArray(payload.book)) {
+        payload.book.forEach(book => {
+          if (!book || !book.chapter || typeof book.chapter !== 'object') return;
+          Object.keys(book.chapter).forEach(key => {
+            const verseObj = book.chapter[key];
+            if (!verseObj || typeof verseObj !== 'object') return;
+            addVerse(
+              verseObj.verse_nr ?? key,
+              verseObj.verse ?? verseObj.text ?? verseObj.content ?? verseObj.verse_text
+            );
+          });
+        });
+      }
+
+      // Also accept chapter-keyed/object/array responses used by newer or
+      // mirrored GetBible endpoints.
       function visit(node) {
         if (!node) return;
         if (Array.isArray(node)) {
@@ -1983,13 +2003,15 @@
         }
         if (typeof node !== 'object') return;
 
-        if (Object.prototype.hasOwnProperty.call(node, 'verse') ||
-            Object.prototype.hasOwnProperty.call(node, 'verse_number') ||
-            Object.prototype.hasOwnProperty.call(node, 'number')) {
-          addVerse(
-            node.verse ?? node.verse_number ?? node.number,
-            node.text ?? node.content ?? node.verse_text
-          );
+        if (Object.prototype.hasOwnProperty.call(node, 'verse_nr')) {
+          addVerse(node.verse_nr, node.verse ?? node.text ?? node.content ?? node.verse_text);
+        } else if (Object.prototype.hasOwnProperty.call(node, 'verse_number')) {
+          addVerse(node.verse_number, node.text ?? node.content ?? node.verse_text ?? node.verse);
+        } else if (Object.prototype.hasOwnProperty.call(node, 'number') &&
+                   (Object.prototype.hasOwnProperty.call(node, 'text') ||
+                    Object.prototype.hasOwnProperty.call(node, 'content') ||
+                    Object.prototype.hasOwnProperty.call(node, 'verse_text'))) {
+          addVerse(node.number, node.text ?? node.content ?? node.verse_text);
         }
 
         if (Array.isArray(node.verses)) {
@@ -1999,7 +2021,7 @@
         }
 
         Object.keys(node).forEach(key => {
-          if (key !== 'verses') visit(node[key]);
+          if (key !== 'verses' && key !== 'book' && key !== 'chapter') visit(node[key]);
         });
       }
 
