@@ -704,6 +704,63 @@
       line-height: 1.5;
     }
 
+    /* ===== Misbak reading-detail modal ===== */
+    #misbakDetailModal .modal-box {
+      max-width: 520px;
+    }
+
+    .misbak-detail-header {
+      background: var(--maroon-dark);
+      color: var(--gold-light);
+      border: 1px solid var(--gold);
+      border-radius: 7px;
+      padding: 0.7rem 2.2rem 0.7rem 0.8rem;
+      margin-bottom: 0.85rem;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .misbak-section {
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem 0;
+    }
+
+    .misbak-section:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .misbak-section-label {
+      color: var(--maroon-dark);
+      font-size: 0.76rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      line-height: 1.35;
+    }
+
+    .misbak-verse {
+      color: var(--text-dark);
+      font-size: 0.94rem;
+      line-height: 1.75;
+      white-space: pre-line;
+    }
+
+    .misbak-english {
+      font-family: Georgia, 'Times New Roman', serif;
+      line-height: 1.65;
+    }
+
+    .misbak-detail-loading,
+    .misbak-detail-not-found {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      padding: 1.25rem 0;
+      line-height: 1.5;
+    }
+
     .spinner {
       display: none;
       width: 26px;
@@ -971,6 +1028,15 @@
     </div>
   </div>
 
+  <!-- ===================== MISBAK READING DETAIL MODAL ===================== -->
+  <div id="misbakDetailModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeMisbakDetailModal()" aria-label="Close">&times;</button>
+      <div class="modal-title" id="misbakDetailTitle">-- -- --</div>
+      <div id="misbakDetailContent"></div>
+    </div>
+  </div>
+
   <script>
     // =========================================================================
     // 00. STATIC CONFIG
@@ -1080,6 +1146,11 @@
         verseTextLoading: "ጥቅሱ እየተጫነ ነው...",
         verseTextNotFound: "ለዚህ ጥቅስ የአማርኛ ትርጉም ገና አልተጫነም። እባክዎ ቆይተው እንደገና ይሞክሩ።",
         verseTextParseError: "ይህን ጥቅስ ማንበብ አልተቻለም።",
+        misbakDetailLoading: "ምስባኩ እየተጫነ ነው...",
+        misbakDetailNotFound: "ለዚህ ቀን የምስባክ መረጃ አልተገኘም።",
+        misbakLabelGeez: "ግእዝ",
+        misbakLabelAmharic: "አማርኛ",
+        misbakLabelEnglish: "English",
       },
       en: {
         pageTitle: "Ethiopian Orthodox Tewahedo Church Daily Service Resources",
@@ -1125,6 +1196,9 @@
     };
 
     let currentLang = sessionStorage.getItem('eotc_lang') || 'am';
+
+    // Exact Ethiopian calendar key used by misbak.json, e.g. "27/02".
+    let selectedReadingDate = null;
 
     // =========================================================================
     // 02. ETHIOPIAN CALENDAR MATH (Gregorian <-> Ethiopian via Julian Day Number)
@@ -1993,8 +2067,84 @@
     function handleGitsaweReadingClick(event) {
       const el = event.target.closest('.clickable-verse');
       if (!el) return;
-      const citation = el.dataset.citation;
-      if (citation) openVerseTextModal(citation);
+      openMisbakDetailModal();
+    }
+
+    // =========================================================================
+    // 06c. MISBAK DAILY READING DETAIL
+    // Loads misbak.json once and uses the exact DD/MM key captured when the
+    // calendar day was opened. No citation parsing is involved.
+    // =========================================================================
+    const MISBAK_DATA_PATH = 'assets/data/misbak.json';
+
+    let _misbakDataPromise = null;
+
+    function loadMisbakData() {
+      if (_misbakDataPromise) return _misbakDataPromise;
+      _misbakDataPromise = fetch(MISBAK_DATA_PATH)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .catch(err => {
+          console.error('Failed to load Misbak dataset from', MISBAK_DATA_PATH, err);
+          return null;
+        });
+      return _misbakDataPromise;
+    }
+
+    function getMisbakEntry(data, dateKey) {
+      if (!data || !dateKey) return null;
+      return data[dateKey] || null;
+    }
+
+    async function openMisbakDetailModal() {
+      const titleEl = document.getElementById('misbakDetailTitle');
+      const contentEl = document.getElementById('misbakDetailContent');
+      const t = UI_TEXT[currentLang];
+
+      titleEl.innerText = selectedReadingDate || '-- --';
+      contentEl.innerHTML = `<div class="misbak-detail-loading">${escapeHtml(t.misbakDetailLoading)}</div>`;
+
+      const modal = document.getElementById('misbakDetailModal');
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+
+      const data = await loadMisbakData();
+      const entry = getMisbakEntry(data, selectedReadingDate);
+
+      if (!entry) {
+        contentEl.innerHTML = `<div class="misbak-detail-not-found">${escapeHtml(t.misbakDetailNotFound)}</div>`;
+        return;
+      }
+
+      const geezVerseNo = entry.geez_verse_no ? String(entry.geez_verse_no) : '--';
+      const geezMisbak = entry.geez_misbak ? String(entry.geez_misbak) : '--';
+      const amharicVerse = entry.amharic_verse ? String(entry.amharic_verse) : '--';
+      const englishVerseNo = entry.english_verse_no ? String(entry.english_verse_no) : '--';
+      const englishVerse = entry.english_verse ? String(entry.english_verse) : '--';
+
+      contentEl.innerHTML = `
+        <div class="misbak-detail-header">${escapeHtml(geezVerseNo)}</div>
+        <div class="misbak-section">
+          <div class="misbak-section-label">${escapeHtml(t.misbakLabelGeez)}</div>
+          <div class="misbak-verse">${escapeHtml(geezMisbak)}</div>
+        </div>
+        <div class="misbak-section">
+          <div class="misbak-section-label">${escapeHtml(t.misbakLabelAmharic)}</div>
+          <div class="misbak-verse">${escapeHtml(amharicVerse)}</div>
+        </div>
+        <div class="misbak-section">
+          <div class="misbak-section-label">${escapeHtml(englishVerseNo)}</div>
+          <div class="misbak-verse misbak-english">${escapeHtml(englishVerse)}</div>
+        </div>
+      `;
+    }
+
+    function closeMisbakDetailModal() {
+      const modal = document.getElementById('misbakDetailModal');
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
     }
 
     // =========================================================================
@@ -2186,6 +2336,7 @@
       currentSelectedMonth = monthObj;
       currentSelectedDay = day;
       currentSelectedFeastSlug = (feast && feast.slug) ? feast.slug : null;
+      selectedReadingDate = `${String(day).padStart(2, '0')}/${String(monthObj.id).padStart(2, '0')}`;
 
       const monthName = (currentLang === 'en') ? monthObj.nameEn : monthObj.nameAm;
       let titleText = UI_TEXT[currentLang].pickResourceTitle(monthName, day);
@@ -2335,6 +2486,7 @@
       if (e.target === document.getElementById('gotoDateModal')) closeGotoDateModal();
       if (e.target === document.getElementById('viewerModal')) closeViewerModal();
       if (e.target === document.getElementById('verseTextModal')) closeVerseTextModal();
+      if (e.target === document.getElementById('misbakDetailModal')) closeMisbakDetailModal();
     };
 
     window.onkeydown = function (e) {
@@ -2343,6 +2495,7 @@
         closeGotoDateModal();
         closeViewerModal();
         closeVerseTextModal();
+        closeMisbakDetailModal();
       }
     };
 
@@ -2401,6 +2554,7 @@
       applyLanguageUI();
       renderCalendar();
       loadGitsaweData(); // warm the cache in the background; failures are handled silently until the button is actually clicked
+      loadMisbakData();  // warm the misbak cache once at page load
       document.getElementById('gitsaweReadingsView').addEventListener('click', handleGitsaweReadingClick);
     });
   </script>
