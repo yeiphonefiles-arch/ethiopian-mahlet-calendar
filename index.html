@@ -2118,7 +2118,12 @@
     function handleGitsaweReadingClick(event) {
       const el = event.target.closest('.clickable-verse');
       if (!el) return;
-      openMisbakDetailModal();
+      const citation = el.dataset.citation;
+      if (!citation) return;
+
+      // Gitsawe rows are Bible citations. Open the Bible passage popup here;
+      // Misbak has its own separate action and must not intercept Bible clicks.
+      openVerseTextModal(citation);
     }
 
     // =========================================================================
